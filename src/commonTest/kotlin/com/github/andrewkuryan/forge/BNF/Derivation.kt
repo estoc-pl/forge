@@ -25,12 +25,12 @@ class DerivationTest {
             }
 
             assertEquals(
-                grouped, mapOf<Nonterminal, Map<ProductionKind, Set<Production>>>(
+                mapOf<Nonterminal, Map<ProductionKind, Set<Production>>>(
                     C to mapOf(Regular to setOf(listOf(Terminal('d')))),
                     B to mapOf(Regular to ('c' / 'd')),
                     A to mapOf(Regular to ('b' / 'c' / 'd')),
                     S to mapOf(Regular to ('a' / 'b' / 'c' / 'd'))
-                )
+                ), grouped
             )
         }
     }
@@ -48,13 +48,13 @@ class DerivationTest {
             }
 
             assertEquals(
-                grouped, mapOf(
+                mapOf(
                     T to mapOf(Regular to (S..'b' / 'c')),
                     S to mapOf(
                         Recursion(setOf(CENTRAL)) to ('a'..S..'b'),
                         Regular to setOf(listOf(Terminal('a'), Terminal('c')))
                     )
-                )
+                ), grouped
             )
         }
     }
@@ -76,7 +76,7 @@ class DerivationTest {
             }
 
             assertEquals(
-                grouped, mapOf(
+                mapOf(
                     C to mapOf(Regular to (A..'d' / 'w')),
                     B to mapOf(Regular to (A..'d'..'c' / 'w'..'c' / 'z')),
                     A to mapOf(
@@ -84,7 +84,7 @@ class DerivationTest {
                         Regular to ('w'..'c'..'b' / 'z'..'b' / 'y'),
                     ),
                     S to mapOf(Regular to (A..'d'..'c'..'b'..'a' / 'w'..'c'..'b'..'a' / 'z'..'b'..'a' / 'y'..'a' / 'x'))
-                )
+                ), grouped
             )
         }
     }
@@ -104,7 +104,7 @@ class DerivationTest {
             }
 
             assertEquals(
-                grouped, mapOf(
+                mapOf(
                     A to mapOf(Regular to (S..'a' / 'x')),
                     B to mapOf(Regular to ('b'..S / 'y')),
                     S to mapOf(
@@ -113,7 +113,7 @@ class DerivationTest {
                         Recursion(setOf(CENTRAL, RIGHT)) to ('x'..S..'b'..S),
                         Recursion(setOf(CENTRAL)) to ('x'..S..'y')
                     )
-                )
+                ), grouped
             )
         }
     }
