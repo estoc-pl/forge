@@ -23,6 +23,8 @@ fun analyze(grammar: Grammar): List<Conclusion> = grammar.getGroupedDerivations(
     .let { derivations ->
         listOfNotNull(
             hasUnresolvedRecursions(derivations),
-            hasLeftRecursions(derivations)
+            hasLeftRecursions(derivations),
+            hasLeftRightRecursions(derivations),
+            isRegular(derivations)
         )
     }
