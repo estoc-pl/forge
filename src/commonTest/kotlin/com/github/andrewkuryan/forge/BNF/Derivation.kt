@@ -27,9 +27,9 @@ class DerivationTest {
             assertEquals(
                 mapOf<Nonterminal, Map<ProductionKind, Set<Production>>>(
                     C to mapOf(Regular to setOf(listOf(Terminal('d')))),
-                    B to mapOf(Regular to ('c' / 'd')),
-                    A to mapOf(Regular to ('b' / 'c' / 'd')),
-                    S to mapOf(Regular to ('a' / 'b' / 'c' / 'd'))
+                    B to mapOf(Regular to ('c' / 'd').toSet()),
+                    A to mapOf(Regular to ('b' / 'c' / 'd').toSet()),
+                    S to mapOf(Regular to ('a' / 'b' / 'c' / 'd').toSet())
                 ), grouped
             )
         }
@@ -49,9 +49,9 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    T to mapOf(Regular to (S..'b' / 'c')),
+                    T to mapOf(Regular to (S..'b' / 'c').toSet()),
                     S to mapOf(
-                        Recursion(setOf(CENTRAL)) to ('a'..S..'b'),
+                        Recursion(setOf(CENTRAL)) to ('a'..S..'b').toSet(),
                         Regular to setOf(listOf(Terminal('a'), Terminal('c')))
                     )
                 ), grouped
@@ -77,13 +77,15 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    C to mapOf(Regular to (A..'d' / 'w')),
-                    B to mapOf(Regular to (A..'d'..'c' / 'w'..'c' / 'z')),
+                    C to mapOf(Regular to (A..'d' / 'w').toSet()),
+                    B to mapOf(Regular to (A..'d'..'c' / 'w'..'c' / 'z').toSet()),
                     A to mapOf(
-                        Recursion(setOf(LEFT)) to (A..'d'..'c'..'b'),
-                        Regular to ('w'..'c'..'b' / 'z'..'b' / 'y'),
+                        Recursion(setOf(LEFT)) to (A..'d'..'c'..'b').toSet(),
+                        Regular to ('w'..'c'..'b' / 'z'..'b' / 'y').toSet(),
                     ),
-                    S to mapOf(Regular to (A..'d'..'c'..'b'..'a' / 'w'..'c'..'b'..'a' / 'z'..'b'..'a' / 'y'..'a' / 'x'))
+                    S to mapOf(
+                        Regular to (A..'d'..'c'..'b'..'a' / 'w'..'c'..'b'..'a' / 'z'..'b'..'a' / 'y'..'a' / 'x').toSet()
+                    )
                 ), grouped
             )
         }
@@ -105,13 +107,13 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    A to mapOf(Regular to (S..'a' / 'x')),
-                    B to mapOf(Regular to ('b'..S / 'y')),
+                    A to mapOf(Regular to (S..'a' / 'x').toSet()),
+                    B to mapOf(Regular to ('b'..S / 'y').toSet()),
                     S to mapOf(
-                        Recursion(setOf(LEFT, CENTRAL, RIGHT)) to (S..'a'..S..'b'..S),
-                        Recursion(setOf(LEFT, CENTRAL)) to (S..'a'..S..'y'),
-                        Recursion(setOf(CENTRAL, RIGHT)) to ('x'..S..'b'..S),
-                        Recursion(setOf(CENTRAL)) to ('x'..S..'y')
+                        Recursion(setOf(LEFT, CENTRAL, RIGHT)) to (S..'a'..S..'b'..S).toSet(),
+                        Recursion(setOf(LEFT, CENTRAL)) to (S..'a'..S..'y').toSet(),
+                        Recursion(setOf(CENTRAL, RIGHT)) to ('x'..S..'b'..S).toSet(),
+                        Recursion(setOf(CENTRAL)) to ('x'..S..'y').toSet()
                     )
                 ), grouped
             )

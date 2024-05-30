@@ -4,8 +4,10 @@ import kotlin.reflect.KProperty
 
 sealed class GrammarSymbol
 
-data class Nonterminal(val name: String, val synthetic: Boolean = false) : GrammarSymbol() {
-    override fun toString() = name
+data class Nonterminal(val name: String, val origin: Nonterminal? = null) : GrammarSymbol() {
+    override fun toString() = if (isSynthetic) "$name'" else name
+
+    val isSynthetic = origin != null
 }
 
 data class Terminal(val value: Char) : GrammarSymbol() {
@@ -51,45 +53,45 @@ class Grammar(
     private fun CharRange.prod() = listOf(Terminal(first), Terminal(last))
     private fun Nonterminal.prod() = listOf(this)
 
-    private fun Set<Production>.addToFirst(production: Production) = setOf(production + first()) + drop(1)
-    private fun Set<Production>.addToLast(production: Production) = take(size - 1).toSet() + setOf(last() + production)
+    private fun List<Production>.addToFirst(production: Production) = listOf(production + first()) + drop(1)
+    private fun List<Production>.addToLast(production: Production) = take(size - 1) + listOf(last() + production)
 
 
-    operator fun Nonterminal.divAssign(nontermProductions: Set<Production>) {
+    operator fun Nonterminal.divAssign(nontermProductions: List<Production>) {
         internalProductions.getOrPut(this) { mutableSetOf() }.addAll(nontermProductions)
     }
 
     operator fun Nonterminal.divAssign(char: Char) = divAssign(char.prod())
     operator fun Nonterminal.divAssign(range: CharRange) = divAssign(range.prod())
     operator fun Nonterminal.divAssign(nonterm: Nonterminal) = divAssign(nonterm.prod())
-    operator fun Nonterminal.divAssign(production: Production) = divAssign(setOf(production))
+    operator fun Nonterminal.divAssign(production: Production) = divAssign(listOf(production))
 
 
-    operator fun Char.rangeTo(nonterm: Nonterminal) = setOf(prod() + nonterm)
-    operator fun Char.rangeTo(productions: Set<Production>) = productions.addToFirst(prod())
+    operator fun Char.rangeTo(nonterm: Nonterminal) = listOf(prod() + nonterm)
+    operator fun Char.rangeTo(productions: List<Production>) = productions.addToFirst(prod())
 
-    operator fun CharRange.rangeTo(char: Char) = setOf(prod() + Terminal(char))
-    operator fun CharRange.rangeTo(nonterm: Nonterminal) = setOf(prod() + nonterm)
-    operator fun CharRange.rangeTo(productions: Set<Production>) = productions.addToFirst(prod())
+    operator fun CharRange.rangeTo(char: Char) = listOf(prod() + Terminal(char))
+    operator fun CharRange.rangeTo(nonterm: Nonterminal) = listOf(prod() + nonterm)
+    operator fun CharRange.rangeTo(productions: List<Production>) = productions.addToFirst(prod())
 
-    operator fun Nonterminal.rangeTo(char: Char) = setOf(prod() + Terminal(char))
-    operator fun Nonterminal.rangeTo(nonterm: Nonterminal) = setOf(prod() + nonterm)
-    operator fun Nonterminal.rangeTo(productions: Set<Production>) = productions.addToFirst(prod())
+    operator fun Nonterminal.rangeTo(char: Char) = listOf(prod() + Terminal(char))
+    operator fun Nonterminal.rangeTo(nonterm: Nonterminal) = listOf(prod() + nonterm)
+    operator fun Nonterminal.rangeTo(productions: List<Production>) = productions.addToFirst(prod())
 
-    operator fun Set<Production>.rangeTo(char: Char) = addToLast(char.prod())
-    operator fun Set<Production>.rangeTo(nonterm: Nonterminal) = addToLast(nonterm.prod())
-    operator fun Set<Production>.rangeTo(productions: Set<Production>) =
+    operator fun List<Production>.rangeTo(char: Char) = addToLast(char.prod())
+    operator fun List<Production>.rangeTo(nonterm: Nonterminal) = addToLast(nonterm.prod())
+    operator fun List<Production>.rangeTo(productions: List<Production>) =
         addToLast(productions.first()) + productions.drop(1)
 
 
-    operator fun Char.div(char: Char) = setOf(prod(), char.prod())
-    operator fun Char.div(nonterm: Nonterminal) = setOf(prod(), nonterm.prod())
-    operator fun CharRange.div(char: Char) = setOf(prod(), char.prod())
-    operator fun CharRange.div(nonterm: Nonterminal) = setOf(prod(), nonterm.prod())
-    operator fun Nonterminal.div(char: Char) = setOf(prod(), char.prod())
-    operator fun Nonterminal.div(nonterm: Nonterminal) = setOf(prod(), nonterm.prod())
-    operator fun Set<Production>.div(char: Char) = this + setOf(char.prod())
-    operator fun Set<Production>.div(nonterm: Nonterminal) = this + setOf(nonterm.prod())
+    operator fun Char.div(char: Char) = listOf(prod(), char.prod())
+    operator fun Char.div(nonterm: Nonterminal) = listOf(prod(), nonterm.prod())
+    operator fun CharRange.div(char: Char) = listOf(prod(), char.prod())
+    operator fun CharRange.div(nonterm: Nonterminal) = listOf(prod(), nonterm.prod())
+    operator fun Nonterminal.div(char: Char) = listOf(prod(), char.prod())
+    operator fun Nonterminal.div(nonterm: Nonterminal) = listOf(prod(), nonterm.prod())
+    operator fun List<Production>.div(char: Char) = this + listOf(char.prod())
+    operator fun List<Production>.div(nonterm: Nonterminal) = this + listOf(nonterm.prod())
 
     private fun Set<Production>.format(head: Nonterminal) =
         head.toString() + " ::= " + joinToString(" | ") { it.joinToString(" ") }

@@ -19,7 +19,7 @@ class UnresolvedRecursionTest {
             B /= 'c'..C
             C /= 'd'..S
 
-            val result = hasUnresolvedRecursion(getGroupedDerivations())
+            val result = hasUnresolvedRecursions(getGroupedDerivations())
 
             assertEquals(UnresolvedRecursion(setOf(S, A, B, C)), result)
         }
@@ -35,7 +35,7 @@ class UnresolvedRecursionTest {
             A /= 'b'..B
             B /= 'i'..A..'j'
 
-            val result = hasUnresolvedRecursion(getGroupedDerivations())
+            val result = hasUnresolvedRecursions(getGroupedDerivations())
 
             assertEquals(UnresolvedRecursion(setOf(A, B)), result)
         }
@@ -51,7 +51,7 @@ class UnresolvedRecursionTest {
             A /= 'b'..B / 'x'
             B /= 'i'..A..'j'
 
-            val result = hasUnresolvedRecursion(getGroupedDerivations())
+            val result = hasUnresolvedRecursions(getGroupedDerivations())
 
             assertEquals(null, result)
         }
@@ -67,7 +67,7 @@ class UnresolvedRecursionTest {
             A /= 'a'..B
             B /= 'b'..A
 
-            val result = hasUnresolvedRecursion(getGroupedDerivations())
+            val result = hasUnresolvedRecursions(getGroupedDerivations())
 
             assertEquals(UnresolvedRecursion(setOf(A, B)), result)
         }

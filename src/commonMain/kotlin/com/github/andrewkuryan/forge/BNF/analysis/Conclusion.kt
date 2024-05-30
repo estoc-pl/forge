@@ -22,6 +22,7 @@ sealed class Conclusion(
 fun analyze(grammar: Grammar): List<Conclusion> = grammar.getGroupedDerivations()
     .let { derivations ->
         listOfNotNull(
-            hasUnresolvedRecursion(derivations)
+            hasUnresolvedRecursions(derivations),
+            hasLeftRecursions(derivations)
         )
     }
