@@ -72,4 +72,20 @@ class UnresolvedRecursionTest {
             assertEquals(UnresolvedRecursion(setOf(A, B)), result)
         }
     }
+
+    @Test
+    fun `should find unresolved recursions in S → Aa；A → Sb ⏐ Ac`() {
+        grammar {
+            val A by nonterm()
+
+            S /= A..'a'
+            A /= S..'b' / A..'c'
+
+            println(getGroupedDerivations())
+
+            val result = hasUnresolvedRecursions(getGroupedDerivations())
+
+            assertEquals(UnresolvedRecursion(setOf(A, S)), result)
+        }
+    }
 }

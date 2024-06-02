@@ -54,7 +54,7 @@ class LeftRecursionTest {
     }
 
     @Test
-    fun `should eliminate left rec in S →AB；A → BS ⏐ b；B → SS ⏐ a`() {
+    fun `should eliminate left rec in S → Aa ⏐ Bb；A → Si；B → Cj ⏐ x；C → Sk ⏐ y`() {
         grammar {
             val A by nonterm()
             val B by nonterm()

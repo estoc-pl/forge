@@ -49,7 +49,10 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    T to mapOf(Regular to (S..'b' / 'c').toSet()),
+                    T to mapOf(
+                        Recursion(setOf(CENTRAL)) to ('a'..T..'b').toSet(),
+                        Regular to setOf(listOf(Terminal('c')))
+                    ),
                     S to mapOf(
                         Recursion(setOf(CENTRAL)) to ('a'..S..'b').toSet(),
                         Regular to setOf(listOf(Terminal('a'), Terminal('c')))
@@ -77,8 +80,14 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    C to mapOf(Regular to (A..'d' / 'w').toSet()),
-                    B to mapOf(Regular to (A..'d'..'c' / 'w'..'c' / 'z').toSet()),
+                    C to mapOf(
+                        Recursion(setOf(LEFT)) to (C..'c'..'b'..'d').toSet(),
+                        Regular to ('z'..'b'..'d' / 'y'..'d' / 'w').toSet()
+                    ),
+                    B to mapOf(
+                        Recursion(setOf(LEFT)) to (B..'b'..'d'..'c').toSet(),
+                        Regular to ('y'..'d'..'c' / 'w'..'c' / 'z').toSet()
+                    ),
                     A to mapOf(
                         Recursion(setOf(LEFT)) to (A..'d'..'c'..'b').toSet(),
                         Regular to ('w'..'c'..'b' / 'z'..'b' / 'y').toSet(),
@@ -107,8 +116,14 @@ class DerivationTest {
 
             assertEquals(
                 mapOf(
-                    A to mapOf(Regular to (S..'a' / 'x').toSet()),
-                    B to mapOf(Regular to ('b'..S / 'y').toSet()),
+                    A to mapOf(
+                        Recursion(setOf(LEFT)) to (A..S..'b'..S..'a' / A..S..'y'..'a').toSet(),
+                        Regular to setOf(listOf(Terminal('x')))
+                    ),
+                    B to mapOf(
+                        Recursion(setOf(RIGHT)) to ('b'..S..'a'..S..B / 'b'..'x'..S..B).toSet(),
+                        Regular to setOf(listOf(Terminal('y')))
+                    ),
                     S to mapOf(
                         Recursion(setOf(LEFT, CENTRAL, RIGHT)) to (S..'a'..S..'b'..S).toSet(),
                         Recursion(setOf(LEFT, CENTRAL)) to (S..'a'..S..'y').toSet(),
