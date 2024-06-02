@@ -5,7 +5,7 @@ import com.github.andrewkuryan.forge.BNF.getGroupedDerivations
 
 enum class ConclusionSeverity { INFO, WARNING, ERROR }
 
-enum class FormatPattern { SHORT, DETAILED }
+enum class ConclusionFormatPattern { SHORT, DETAILED }
 
 sealed class Conclusion(
     val severity: ConclusionSeverity,
@@ -13,9 +13,9 @@ sealed class Conclusion(
     val details: String,
     val description: String,
 ) {
-    fun format(pattern: FormatPattern = FormatPattern.SHORT) = when (pattern) {
-        FormatPattern.SHORT -> "$severity: $title"
-        FormatPattern.DETAILED -> "$severity: $details. $description"
+    fun format(pattern: ConclusionFormatPattern = ConclusionFormatPattern.SHORT) = when (pattern) {
+        ConclusionFormatPattern.SHORT -> "$severity: $title"
+        ConclusionFormatPattern.DETAILED -> "$severity: $details. $description"
     }
 }
 
@@ -25,6 +25,7 @@ fun analyze(grammar: Grammar): List<Conclusion> = grammar.getGroupedDerivations(
             hasUnresolvedRecursions(derivations),
             hasLeftRecursions(derivations),
             hasLeftRightRecursions(derivations),
+            hasAmbiguousDerivations(derivations),
             isRegular(derivations)
         )
     }
