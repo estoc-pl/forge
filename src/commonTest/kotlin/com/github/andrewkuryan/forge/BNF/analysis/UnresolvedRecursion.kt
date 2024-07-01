@@ -81,8 +81,6 @@ class UnresolvedRecursionTest {
             S /= A..'a'
             A /= S..'b' / A..'c'
 
-            println(getGroupedDerivations())
-
             val result = hasUnresolvedRecursions(getGroupedDerivations())
 
             assertEquals(UnresolvedRecursion(setOf(A, S)), result)

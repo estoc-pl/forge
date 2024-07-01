@@ -2,13 +2,13 @@ package com.github.andrewkuryan.forge.automata
 
 enum class NSAFormatPattern { DEFAULT, VIZ }
 
-fun NSA.format(pattern: NSAFormatPattern) =
+fun NSA<*>.format(pattern: NSAFormatPattern) =
     when (pattern) {
         NSAFormatPattern.DEFAULT -> defaultFormat()
         NSAFormatPattern.VIZ -> vizFormat()
     }
 
-fun NSA.defaultFormat() = """NSA(
+fun NSA<*>.defaultFormat() = """NSA(
         |   Q = ${(transitionTable.keys + finalStates).joinToString(", ", "{", "}")}
         |   ẟ = ${
     transitionTable.entries.flatMap { entry -> entry.value }
@@ -18,7 +18,7 @@ fun NSA.defaultFormat() = """NSA(
         |   F = ${finalStates.joinToString(", ", "{", "}")}
         |)""".trimMargin()
 
-fun NSA.vizFormat() = """digraph {
+fun NSA<*>.vizFormat() = """digraph {
         |   rankdir=LR;
         |   ${finalStates.joinToString(";\n") { "node [shape = doublecircle] \"${it}\";" }}
         |   node [shape = circle];
@@ -30,5 +30,5 @@ fun NSA.vizFormat() = """digraph {
 }
         |}""".trimMargin()
 
-fun Transition.defaultFormat() = "$source -> $input, $stackPreview / $action -> $target"
-fun Transition.vizFormat() = """"$source" -> "$target" [label=<$input / $stackPreview<br/>$action>]"""
+fun Transition<*>.defaultFormat() = "$source -> $input, $stackPreview / $action -> $target"
+fun Transition<*>.vizFormat() = """"$source" -> "$target" [label=<$input / $stackPreview<br/>$action>]"""

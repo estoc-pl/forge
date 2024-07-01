@@ -4,6 +4,7 @@ import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.forge.BNF.ProductionKind.Recursion
 import com.github.andrewkuryan.forge.BNF.ProductionKind.Regular
 import com.github.andrewkuryan.forge.BNF.RecursionKind.*
+import com.github.andrewkuryan.forge.translation.SyntaxNode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -25,8 +26,8 @@ class DerivationTest {
             }
 
             assertEquals(
-                mapOf<Nonterminal, Map<ProductionKind, Set<Production>>>(
-                    C to mapOf(Regular to setOf(listOf(Terminal('d')))),
+                mapOf<Nonterminal, Map<ProductionKind, Set<Production<SyntaxNode>>>>(
+                    C to mapOf(Regular to setOf(Production(listOf(Terminal('d'))))),
                     B to mapOf(Regular to ('c' / 'd').toSet()),
                     A to mapOf(Regular to ('b' / 'c' / 'd').toSet()),
                     S to mapOf(Regular to ('a' / 'b' / 'c' / 'd').toSet())
@@ -51,11 +52,11 @@ class DerivationTest {
                 mapOf(
                     T to mapOf(
                         Recursion(setOf(CENTRAL)) to ('a'..T..'b').toSet(),
-                        Regular to setOf(listOf(Terminal('c')))
+                        Regular to setOf(Production(listOf(Terminal('c'))))
                     ),
                     S to mapOf(
                         Recursion(setOf(CENTRAL)) to ('a'..S..'b').toSet(),
-                        Regular to setOf(listOf(Terminal('a'), Terminal('c')))
+                        Regular to setOf(Production(listOf(Terminal('a'), Terminal('c'))))
                     )
                 ), grouped
             )
@@ -118,11 +119,11 @@ class DerivationTest {
                 mapOf(
                     A to mapOf(
                         Recursion(setOf(LEFT)) to (A..S..'b'..S..'a' / A..S..'y'..'a').toSet(),
-                        Regular to setOf(listOf(Terminal('x')))
+                        Regular to setOf(Production(listOf(Terminal('x'))))
                     ),
                     B to mapOf(
                         Recursion(setOf(RIGHT)) to ('b'..S..'a'..S..B / 'b'..'x'..S..B).toSet(),
-                        Regular to setOf(listOf(Terminal('y')))
+                        Regular to setOf(Production(listOf(Terminal('y'))))
                     ),
                     S to mapOf(
                         Recursion(setOf(LEFT, CENTRAL, RIGHT)) to (S..'a'..S..'b'..S).toSet(),

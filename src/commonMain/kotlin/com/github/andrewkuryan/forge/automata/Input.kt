@@ -10,10 +10,10 @@ sealed class Signal {
     object EOI : Signal(), InputSignal {
         override fun toString() = "┴"
     }
-}
 
-data class Letter(val value: Char) : Signal(), InputSignal {
-    override fun toString() = value.toString()
+    data class Letter(val value: Char) : Signal(), InputSignal {
+        override fun toString() = value.toString()
+    }
 }
 
 data class Input(val signal: Signal, val preview: List<InputSignal> = listOf()) {
@@ -22,6 +22,8 @@ data class Input(val signal: Signal, val preview: List<InputSignal> = listOf()) 
     }
 
     val isEmpty: Boolean get() = this == EMPTY
+
+    val size: Int = preview.size + if (signal is Signal.Empty) 0 else 1
 
     override fun toString() = signal.toString() +
             if (preview.isNotEmpty()) preview.joinToString(", ", " (", ")") else ""

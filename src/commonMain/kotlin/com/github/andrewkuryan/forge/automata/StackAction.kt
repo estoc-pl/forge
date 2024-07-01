@@ -1,15 +1,18 @@
 package com.github.andrewkuryan.forge.automata
 
-sealed class StackAction {
-    object None : StackAction() {
-        override fun toString() = "-"
-    }
-}
+import com.github.andrewkuryan.forge.translation.SemanticAction
+import com.github.andrewkuryan.forge.translation.SyntaxNode
 
-data class Push(val letter: StackLetter) : StackAction() {
+sealed class StackAction<N : SyntaxNode>
+
+data class Push<N : SyntaxNode>(val letter: StackSignal.Letter) : StackAction<N>() {
     override fun toString() = letter.toString()
 }
 
-data class Rollup(val target: StackLetter, val top: List<StackFrame>) : StackAction() {
+data class Rollup<N : SyntaxNode>(
+    val target: StackSignal.Letter,
+    val top: List<StackSignal>,
+    val semanticAction: SemanticAction<N>?,
+) : StackAction<N>() {
     override fun toString() = "${top.joinToString("")} → $target"
 }
