@@ -91,8 +91,49 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
         else throw ReachableStateRemoveAttemptException(state)
     }
 
+    @Throws(MultipleInitStatesException::class)
+    fun mergeStates(states: Set<State>): State =
+        if (states.size > 1) {
+            val newState = nextState()
+            if (initState in states) {
+                throw MultipleInitStatesException()
+            }
+            if (states.intersect(finalStates).isNotEmpty()) {
+                internalFinalStates.add(newState)
+            }
+            internalTransitionTable[newState] = transitionTable.entries.filter { (key, _) -> key in states }
+                .fold(mutableSetOf()) { acc, (_, value) -> acc.apply { addAll(value.map { it.copy(source = newState) }) } }
+            internalTransitionTable.putAll(transitionTable
+                .mapValues { (_, value) -> value.filter { it.target in states } }
+                .filter { it.value.isNotEmpty() }
+                .mapValues { (_, value) -> value.map { it.copy(target = newState) }.toMutableSet() })
+            newState
+        } else states.first()
+
     private fun hasInTransitions(state: State) =
         transitionTable.values.flatten().any { it.target == state }
 
     private fun isUnreachable(state: State) = !hasInTransitions(state) && state != initState
+
+    fun clearUnreachableStates() {
+        val reachable = mutableSetOf(initState)
+        val queue = mutableListOf(initState)
+        while (queue.isNotEmpty()) {
+            transitionTable[queue.removeAt(0)]
+                ?.map { it.target }
+                ?.filter { it !in reachable }
+                ?.let {
+                    queue.addAll(it)
+                    reachable.addAll(it)
+                }
+        }
+        for (state in transitionTable.keys.toSet()) {
+            if (state !in reachable) {
+                removeState(state)
+                if (state in finalStates) {
+                    internalFinalStates.remove(state)
+                }
+            }
+        }
+    }
 }

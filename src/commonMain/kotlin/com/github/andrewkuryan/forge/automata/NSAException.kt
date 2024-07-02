@@ -7,3 +7,5 @@ class UnreachableFinalStateException(state: State) :
 
 class ReachableStateRemoveAttemptException(state: State) :
     NSAFormatException("The $state is reachable and cannot be safely removed")
+
+class MultipleInitStatesException : NSAFormatException("Cannot have more than one initial state")
