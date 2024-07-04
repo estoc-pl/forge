@@ -9,7 +9,7 @@ import com.github.andrewkuryan.forge.extensions.commonSuffix
 import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 private fun Transition<*>.canHCombine(other: Transition<*>) =
-    action == other.action && input.signal == other.input.signal &&
+    !isLoop && !other.isLoop && action == other.action && input.signal == other.input.signal &&
             (stackPreview.isAny || other.stackPreview.isAny ||
                     commonSuffix(stackPreview.signals, other.stackPreview.signals).isNotEmpty())
 

@@ -1,5 +1,7 @@
 package com.github.andrewkuryan.forge.automata
 
+import com.github.andrewkuryan.forge.extensions.startsWith
+
 sealed interface InputSignal
 
 sealed class Signal {
@@ -25,6 +27,14 @@ data class Input(val signal: Signal, val preview: List<InputSignal> = listOf()) 
 
     val size: Int = preview.size + if (signal is Signal.Empty) 0 else 1
 
+    val signals: List<InputSignal> =
+        when (signal) {
+            is Signal.Empty -> preview
+            is InputSignal -> listOf(signal) + preview
+        }
+
+    fun startsWith(other: Input) = signals.startsWith(other.signals)
+
     override fun toString() = signal.toString() +
-            if (preview.isNotEmpty()) preview.joinToString(", ", " (", ")") else ""
+            if (preview.isNotEmpty()) preview.joinToString(", ", "(", ")") else ""
 }

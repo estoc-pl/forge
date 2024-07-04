@@ -13,7 +13,10 @@ data class Transition<N : SyntaxNode>(
     val input: Input = Input.EMPTY,
     val stackPreview: StackPreview = StackPreview.ANY,
     val action: StackAction<N>? = null,
-)
+) {
+
+    val isLoop = source == target
+}
 
 class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
     inner class Port(val enter: State, val innerExit: State) {
@@ -68,15 +71,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
         return transition
     }
 
-    @Throws(ReachableStateRemoveAttemptException::class)
     fun setInitState(state: State) {
-        if (!hasInTransitions(initState)) {
-            val oldInitState = initState
-            internalInitState = state
-            removeState(oldInitState)
-        } else {
-            throw ReachableStateRemoveAttemptException(initState)
-        }
+        internalInitState = state
     }
 
     @Throws(UnreachableFinalStateException::class)
@@ -85,10 +81,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
         else internalFinalStates.add(state)
     }
 
-    @Throws(ReachableStateRemoveAttemptException::class)
-    fun removeState(state: State) {
-        if (isUnreachable(state)) internalTransitionTable.remove(state)
-        else throw ReachableStateRemoveAttemptException(state)
+    private fun removeState(state: State) {
+        internalTransitionTable.remove(state)
     }
 
     @Throws(MultipleInitStatesException::class)
@@ -103,10 +97,13 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
             }
             internalTransitionTable[newState] = transitionTable.entries.filter { (key, _) -> key in states }
                 .fold(mutableSetOf()) { acc, (_, value) -> acc.apply { addAll(value.map { it.copy(source = newState) }) } }
-            internalTransitionTable.putAll(transitionTable
+            transitionTable
                 .mapValues { (_, value) -> value.filter { it.target in states } }
                 .filter { it.value.isNotEmpty() }
-                .mapValues { (_, value) -> value.map { it.copy(target = newState) }.toMutableSet() })
+                .mapValues { (_, value) -> value.map { it.copy(target = newState) }.toMutableSet() }
+                .forEach { (state, transitions) ->
+                    internalTransitionTable.getOrPut(state) { mutableSetOf() }.addAll(transitions)
+                }
             newState
         } else states.first()
 
