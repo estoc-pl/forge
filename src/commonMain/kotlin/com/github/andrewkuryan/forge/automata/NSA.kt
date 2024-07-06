@@ -18,23 +18,9 @@ data class Transition<N : SyntaxNode>(
     val isLoop = source == target
 }
 
+data class Port(val enter: State, val exit: State)
+
 class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
-    inner class Port(val enter: State, val innerExit: State) {
-        val exit: State = nextState()
-        private val barriers = mutableMapOf<StackPreview, Transition<N>>()
-
-        fun addBarrier(barrier: StackPreview) {
-            if (barriers.none { barrier.endsWith(it.key) }) {
-                val transition = addTransition(Transition(innerExit, exit, Input.EMPTY, barrier))
-                barriers.filter { it.key.endsWith(barrier) }.forEach {
-                    removeTransition(it.value)
-                    barriers.remove(it.key)
-                }
-                barriers[barrier] = transition
-            }
-        }
-    }
-
     private var internalInitState = State(0)
     val initState: State get() = internalInitState
 

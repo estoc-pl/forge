@@ -17,66 +17,77 @@ fun <N : SyntaxNode> GrammarSymbol.asPush() = Push<N>(asStackLetter())
 fun <N : SyntaxNode> StackPreview.asRollup(target: Nonterminal, semanticAction: SemanticAction<N>?) =
     Rollup(target.asStackLetter(), signals, semanticAction)
 
-fun <N : SyntaxNode> NSA<N>.processNonterm(
-    nonterm: Nonterminal,
-    productions: Map<Nonterminal, Set<Production<N>>>,
-    ports: Map<Nonterminal, NontermPort<*>>,
+fun <N : SyntaxNode> NSA<N>.addTransitions(
+    source: State,
+    target: State,
+    input: Input,
+    stackPreviews: List<StackPreview>,
+    action: StackAction<N>? = null,
 ) {
-    val port = ports.getValue(nonterm).nsaPort
-    productions.getValue(nonterm).forEach { production ->
-        val (lastState, stackPreview) = production.symbols.fold(port.enter to StackPreview.ANY) { (prevState, prevStack), symbol ->
-            when (symbol) {
-                is Terminal -> {
-                    val nextState = nextState()
-                    addTransition(Transition(prevState, nextState, symbol.asInput(), prevStack, symbol.asPush()))
-                    nextState to (prevStack + symbol.asStackLetter())
-                }
-
-                is Nonterminal -> {
-                    val nestedPort = ports.getValue(symbol)
-                    nestedPort.addBarrier(prevStack)
-                    addTransition(Transition(prevState, nestedPort.nsaPort.enter, Input.EMPTY, prevStack))
-                    nestedPort.nsaPort.exit to (prevStack + symbol.asStackLetter())
-                }
-            }
-        }
-        addTransition(
-            Transition(
-                lastState, port.innerExit,
-                Input.EMPTY,
-                stackPreview,
-                stackPreview.asRollup(nonterm, production.action),
-            )
-        )
+    for (stackPreview in stackPreviews) {
+        addTransition(Transition(source, target, input, stackPreview, action))
     }
 }
 
-data class NontermPort<N : SyntaxNode>(val nonterm: Nonterminal, val nsaPort: NSA<N>.Port) {
+fun <N : SyntaxNode> NSA<N>.processNonterm(
+    nonterm: Nonterminal,
+    productions: Map<Nonterminal, Set<Production<N>>>,
+    ports: Map<Nonterminal, Port>,
+    prefixes: Map<Nonterminal, List<Prefix>>,
+) {
+    val port = ports.getValue(nonterm)
+    productions.getValue(nonterm).forEach { production ->
+        val stackSymbols = production.symbols.map { it.asStackLetter() }
+        val (lastState, lastStackPreview) = production.symbols
+            .foldIndexed(port.enter to listOf<StackPreview>()) { index, (prevState, prevStack), symbol ->
+                val stackPreviews = prevStack.ifEmpty { listOf(StackPreview(stackSymbols.take(index))) }
 
-    fun addBarrier(barrier: StackPreview) {
-        nsaPort.addBarrier(barrier + nonterm.asStackLetter())
+                when (symbol) {
+                    is Terminal -> {
+                        val nextState = nextState()
+                        addTransitions(prevState, nextState, symbol.asInput(), stackPreviews, symbol.asPush())
+                        nextState to listOf()
+                    }
+
+                    is Nonterminal -> {
+                        val nestedPort = ports.getValue(symbol)
+                        addTransitions(prevState, nestedPort.enter, Input.EMPTY, stackPreviews)
+
+                        nestedPort.exit to resolvePrefix(Prefix(nonterm, stackSymbols.take(index)), prefixes)
+                            .map { StackPreview(it + stackSymbols[index]) }
+                    }
+                }
+            }
+        val stackPreviews = lastStackPreview.ifEmpty { listOf(StackPreview(stackSymbols)) }
+        addTransitions(
+            lastState, port.exit,
+            Input.EMPTY,
+            stackPreviews,
+            StackPreview(stackSymbols).asRollup(nonterm, production.action)
+        )
     }
 }
 
 fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA(nodeBuilder).apply {
-    val ports = productions.mapValues { NontermPort(it.key, Port(nextState(), nextState())) }
+    val prefixes = collectPrefixes()
+
+    val ports = productions.mapValues { Port(nextState(), nextState()) }
 
     for (nonterm in ports.keys) {
-        processNonterm(nonterm, productions, ports)
+        processNonterm(nonterm, productions, ports, prefixes)
     }
 
     val rootPort = ports.getValue(startSymbol)
 
-    rootPort.addBarrier(StackPreview(listOf(StackSignal.Bottom)))
-    setInitState(rootPort.nsaPort.enter)
+    setInitState(rootPort.enter)
 
-    val accept = nextState()
+    val acceptState = nextState()
     addTransition(
         Transition(
-            rootPort.nsaPort.exit, accept,
+            rootPort.exit, acceptState,
             Input(Signal.EOI),
-            StackPreview(listOf(StackSignal.Bottom, startSymbol.asStackLetter()))
+            StackPreview.BOTTOM + startSymbol.asStackLetter()
         )
     )
-    addFinalState(accept)
+    addFinalState(acceptState)
 }

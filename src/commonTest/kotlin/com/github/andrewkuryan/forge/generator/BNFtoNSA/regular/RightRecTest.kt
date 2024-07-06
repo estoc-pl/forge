@@ -20,18 +20,17 @@ class RightRecTest {
                 """
                     digraph {
                        rankdir=LR;
-                       node [shape = doublecircle] "S6";
+                       node [shape = doublecircle] "S5";
                        node [shape = circle];
                        secret_node [style=invis, shape=point];
                        secret_node -> "S1" [style=bold];
-                       	"S1" -> "S4" [label=<a / *<br/>a>]
-                    	"S1" -> "S5" [label=<b / *<br/>b>]
-                    	"S2" -> "S3" [label=<ε / aS<br/>->]
-                    	"S2" -> "S3" [label=<ε / ${"$"}S<br/>->]
-                    	"S4" -> "S1" [label=<ε / a<br/>->]
-                    	"S3" -> "S2" [label=<ε / aS<br/>aS → S>]
-                    	"S3" -> "S6" [label=<┴ / ${"$"}S<br/>->]
-                    	"S5" -> "S2" [label=<ε / b<br/>b → S>]
+                       	"S1" -> "S3" [label=<a / *<br/>a>]
+                    	"S1" -> "S4" [label=<b / *<br/>b>]
+                    	"S3" -> "S1" [label=<ε / a<br/>->]
+                    	"S2" -> "S2" [label=<ε / ${"$"}aS<br/>aS → S>]
+                    	"S2" -> "S2" [label=<ε / aS<br/>aS → S>]
+                    	"S2" -> "S5" [label=<┴ / ${"$"}S<br/>->]
+                    	"S4" -> "S2" [label=<ε / b<br/>b → S>]
                     }
                 """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
             )
@@ -54,26 +53,25 @@ class RightRecTest {
                 """
                     digraph {
                        rankdir=LR;
-                       node [shape = doublecircle] "S14";
+                       node [shape = doublecircle] "S11";
                        node [shape = circle];
                        secret_node [style=invis, shape=point];
                        secret_node -> "S1" [style=bold];
-                       	"S1" -> "S10" [label=<a / *<br/>a>]
-                    	"S5" -> "S6" [label=<ε / aA<br/>->]
-                    	"S10" -> "S4" [label=<ε / a<br/>->]
-                    	"S6" -> "S2" [label=<ε / aA<br/>aA → S>]
-                    	"S4" -> "S11" [label=<b / *<br/>b>]
-                    	"S8" -> "S9" [label=<ε / bB<br/>->]
-                    	"S11" -> "S7" [label=<ε / b<br/>->]
-                    	"S9" -> "S5" [label=<ε / bB<br/>bB → A>]
-                    	"S7" -> "S12" [label=<c / *<br/>c>]
-                    	"S7" -> "S13" [label=<d / *<br/>d>]
-                    	"S2" -> "S3" [label=<ε / cS<br/>->]
-                    	"S2" -> "S3" [label=<ε / ${"$"}S<br/>->]
-                    	"S12" -> "S1" [label=<ε / c<br/>->]
-                    	"S3" -> "S8" [label=<ε / cS<br/>cS → B>]
-                    	"S3" -> "S14" [label=<┴ / ${"$"}S<br/>->]
-                    	"S13" -> "S8" [label=<ε / d<br/>d → B>]
+                       	"S1" -> "S7" [label=<a / *<br/>a>]
+                    	"S7" -> "S3" [label=<ε / a<br/>->]
+                    	"S4" -> "S2" [label=<ε / ${"$"}aA<br/>aA → S>]
+                    	"S4" -> "S2" [label=<ε / bcaA<br/>aA → S>]
+                    	"S3" -> "S8" [label=<b / *<br/>b>]
+                    	"S8" -> "S5" [label=<ε / b<br/>->]
+                    	"S6" -> "S4" [label=<ε / ${"$"}abB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / cabB<br/>bB → A>]
+                    	"S5" -> "S9" [label=<c / *<br/>c>]
+                    	"S5" -> "S10" [label=<d / *<br/>d>]
+                    	"S9" -> "S1" [label=<ε / c<br/>->]
+                    	"S2" -> "S6" [label=<ε / ${"$"}abcS<br/>cS → B>]
+                    	"S2" -> "S6" [label=<ε / abcS<br/>cS → B>]
+                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
+                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
                     }
                 """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
             )
@@ -96,29 +94,36 @@ class RightRecTest {
                 """
                     digraph {
                        rankdir=LR;
-                       node [shape = doublecircle] "S14";
+                       node [shape = doublecircle] "S11";
                        node [shape = circle];
                        secret_node [style=invis, shape=point];
                        secret_node -> "S1" [style=bold];
-                       	"S1" -> "S10" [label=<a / *<br/>a>]
-                    	"S1" -> "S4" [label=<ε / *<br/>->]
-                    	"S2" -> "S3" [label=<ε / aS<br/>->]
-                    	"S2" -> "S3" [label=<ε / cS<br/>->]
-                    	"S2" -> "S3" [label=<ε / ${"$"}S<br/>->]
-                    	"S10" -> "S1" [label=<ε / a<br/>->]
-                    	"S3" -> "S2" [label=<ε / aS<br/>aS → S>]
-                    	"S3" -> "S8" [label=<ε / cS<br/>cS → B>]
-                    	"S3" -> "S14" [label=<┴ / ${"$"}S<br/>->]
-                    	"S5" -> "S6" [label=<ε / A<br/>->]
-                    	"S6" -> "S2" [label=<ε / A<br/>A → S>]
-                    	"S4" -> "S11" [label=<b / *<br/>b>]
-                    	"S8" -> "S9" [label=<ε / bB<br/>->]
-                    	"S11" -> "S7" [label=<ε / b<br/>->]
-                    	"S9" -> "S5" [label=<ε / bB<br/>bB → A>]
-                    	"S7" -> "S12" [label=<c / *<br/>c>]
-                    	"S7" -> "S13" [label=<d / *<br/>d>]
-                    	"S12" -> "S1" [label=<ε / c<br/>->]
-                    	"S13" -> "S8" [label=<ε / d<br/>d → B>]
+                       	"S1" -> "S7" [label=<a / *<br/>a>]
+                    	"S1" -> "S3" [label=<ε / *<br/>->]
+                    	"S7" -> "S1" [label=<ε / a<br/>->]
+                    	"S2" -> "S2" [label=<ε / ${"$"}aS<br/>aS → S>]
+                    	"S2" -> "S2" [label=<ε / aS<br/>aS → S>]
+                    	"S2" -> "S2" [label=<ε / ${"$"}bcaS<br/>aS → S>]
+                    	"S2" -> "S2" [label=<ε / bcaS<br/>aS → S>]
+                    	"S2" -> "S6" [label=<ε / ${"$"}bcS<br/>cS → B>]
+                    	"S2" -> "S6" [label=<ε / ${"$"}abcS<br/>cS → B>]
+                    	"S2" -> "S6" [label=<ε / abcS<br/>cS → B>]
+                    	"S2" -> "S6" [label=<ε / bcS<br/>cS → B>]
+                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
+                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
+                    	"S4" -> "S2" [label=<ε / ${"$"}aA<br/>A → S>]
+                    	"S4" -> "S2" [label=<ε / aA<br/>A → S>]
+                    	"S3" -> "S8" [label=<b / *<br/>b>]
+                    	"S8" -> "S5" [label=<ε / b<br/>->]
+                    	"S6" -> "S4" [label=<ε / ${"$"}bB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / ${"$"}abB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / abB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / cabB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / cbB<br/>bB → A>]
+                    	"S5" -> "S9" [label=<c / *<br/>c>]
+                    	"S5" -> "S10" [label=<d / *<br/>d>]
+                    	"S9" -> "S1" [label=<ε / c<br/>->]
+                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
                     }
                 """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
             )
@@ -139,24 +144,23 @@ class RightRecTest {
                 """
                     digraph {
                        rankdir=LR;
-                       node [shape = doublecircle] "S11";
+                       node [shape = doublecircle] "S9";
                        node [shape = circle];
                        secret_node [style=invis, shape=point];
                        secret_node -> "S1" [style=bold];
-                       	"S1" -> "S7" [label=<x / *<br/>x>]
-                    	"S1" -> "S8" [label=<y / *<br/>y>]
-                    	"S5" -> "S6" [label=<ε / xA<br/>->]
-                    	"S7" -> "S4" [label=<ε / x<br/>->]
-                    	"S6" -> "S2" [label=<ε / xA<br/>xA → S>]
-                    	"S8" -> "S2" [label=<ε / y<br/>y → S>]
-                    	"S4" -> "S9" [label=<a / *<br/>a>]
-                    	"S4" -> "S10" [label=<b / *<br/>b>]
-                    	"S2" -> "S3" [label=<ε / aS<br/>->]
-                    	"S2" -> "S3" [label=<ε / ${"$"}S<br/>->]
-                    	"S9" -> "S1" [label=<ε / a<br/>->]
-                    	"S3" -> "S5" [label=<ε / aS<br/>aS → A>]
-                    	"S3" -> "S11" [label=<┴ / ${"$"}S<br/>->]
-                    	"S10" -> "S5" [label=<ε / b<br/>b → A>]
+                       	"S1" -> "S5" [label=<x / *<br/>x>]
+                    	"S1" -> "S6" [label=<y / *<br/>y>]
+                    	"S5" -> "S3" [label=<ε / x<br/>->]
+                    	"S4" -> "S2" [label=<ε / ${"$"}xA<br/>xA → S>]
+                    	"S4" -> "S2" [label=<ε / axA<br/>xA → S>]
+                    	"S6" -> "S2" [label=<ε / y<br/>y → S>]
+                    	"S3" -> "S7" [label=<a / *<br/>a>]
+                    	"S3" -> "S8" [label=<b / *<br/>b>]
+                    	"S7" -> "S1" [label=<ε / a<br/>->]
+                    	"S2" -> "S4" [label=<ε / ${"$"}xaS<br/>aS → A>]
+                    	"S2" -> "S4" [label=<ε / xaS<br/>aS → A>]
+                    	"S2" -> "S9" [label=<┴ / ${"$"}S<br/>->]
+                    	"S8" -> "S4" [label=<ε / b<br/>b → A>]
                     }
                 """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
             )
@@ -179,32 +183,38 @@ class RightRecTest {
                 """
                     digraph {
                        rankdir=LR;
-                       node [shape = doublecircle] "S16";
+                       node [shape = doublecircle] "S13";
                        node [shape = circle];
                        secret_node [style=invis, shape=point];
                        secret_node -> "S1" [style=bold];
-                       	"S1" -> "S10" [label=<i / *<br/>i>]
-                    	"S1" -> "S11" [label=<s / *<br/>s>]
-                    	"S5" -> "S6" [label=<ε / iA<br/>->]
-                    	"S5" -> "S6" [label=<ε / cA<br/>->]
-                    	"S10" -> "S4" [label=<ε / i<br/>->]
-                    	"S6" -> "S2" [label=<ε / iA<br/>iA → S>]
-                    	"S6" -> "S8" [label=<ε / cA<br/>cA → B>]
-                    	"S11" -> "S2" [label=<ε / s<br/>s → S>]
-                    	"S4" -> "S12" [label=<a / *<br/>a>]
-                    	"S4" -> "S13" [label=<b / *<br/>b>]
-                    	"S2" -> "S3" [label=<ε / aS<br/>->]
-                    	"S2" -> "S3" [label=<ε / ${"$"}S<br/>->]
-                    	"S12" -> "S1" [label=<ε / a<br/>->]
-                    	"S3" -> "S5" [label=<ε / aS<br/>aS → A>]
-                    	"S3" -> "S16" [label=<┴ / ${"$"}S<br/>->]
-                    	"S8" -> "S9" [label=<ε / bB<br/>->]
-                    	"S13" -> "S7" [label=<ε / b<br/>->]
-                    	"S9" -> "S5" [label=<ε / bB<br/>bB → A>]
-                    	"S7" -> "S14" [label=<c / *<br/>c>]
-                    	"S7" -> "S15" [label=<d / *<br/>d>]
-                    	"S14" -> "S4" [label=<ε / c<br/>->]
-                    	"S15" -> "S8" [label=<ε / d<br/>d → B>]
+                       	"S1" -> "S7" [label=<i / *<br/>i>]
+                    	"S1" -> "S8" [label=<s / *<br/>s>]
+                    	"S7" -> "S3" [label=<ε / i<br/>->]
+                    	"S4" -> "S2" [label=<ε / ${"$"}iA<br/>iA → S>]
+                    	"S4" -> "S2" [label=<ε / aiA<br/>iA → S>]
+                    	"S4" -> "S2" [label=<ε / bcaiA<br/>iA → S>]
+                    	"S4" -> "S6" [label=<ε / ${"$"}ibcA<br/>cA → B>]
+                    	"S4" -> "S6" [label=<ε / aibcA<br/>cA → B>]
+                    	"S4" -> "S6" [label=<ε / bcA<br/>cA → B>]
+                    	"S8" -> "S2" [label=<ε / s<br/>s → S>]
+                    	"S3" -> "S9" [label=<a / *<br/>a>]
+                    	"S3" -> "S10" [label=<b / *<br/>b>]
+                    	"S9" -> "S1" [label=<ε / a<br/>->]
+                    	"S2" -> "S4" [label=<ε / ${"$"}iaS<br/>aS → A>]
+                    	"S2" -> "S4" [label=<ε / iaS<br/>aS → A>]
+                    	"S2" -> "S4" [label=<ε / ${"$"}ibcaS<br/>aS → A>]
+                    	"S2" -> "S4" [label=<ε / ibcaS<br/>aS → A>]
+                    	"S2" -> "S4" [label=<ε / bcaS<br/>aS → A>]
+                    	"S2" -> "S13" [label=<┴ / ${"$"}S<br/>->]
+                    	"S10" -> "S5" [label=<ε / b<br/>->]
+                    	"S6" -> "S4" [label=<ε / ${"$"}ibB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / aibB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / caibB<br/>bB → A>]
+                    	"S6" -> "S4" [label=<ε / cbB<br/>bB → A>]
+                    	"S5" -> "S11" [label=<c / *<br/>c>]
+                    	"S5" -> "S12" [label=<d / *<br/>d>]
+                    	"S11" -> "S3" [label=<ε / c<br/>->]
+                    	"S12" -> "S6" [label=<ε / d<br/>d → B>]
                     }
                 """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
             )
