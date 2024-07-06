@@ -15,6 +15,7 @@ sealed class StackSignal {
 data class StackPreview(val signals: List<StackSignal>) {
     companion object {
         val ANY = StackPreview(listOf())
+        val BOTTOM = StackPreview(listOf(StackSignal.Bottom))
     }
 
     val isAny: Boolean get() = this == ANY
