@@ -18,8 +18,6 @@ data class Transition<N : SyntaxNode>(
     val isLoop = source == target
 }
 
-data class Port(val enter: State, val exit: State)
-
 class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
     private var internalInitState = State(0)
     val initState: State get() = internalInitState
@@ -29,6 +27,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
 
     private val internalTransitionTable = mutableMapOf<State, MutableSet<Transition<N>>>()
     val transitionTable: Map<State, Set<Transition<N>>> get() = internalTransitionTable
+
+    val states: Set<State> get() = transitionTable.keys + finalStates
 
     private var stateCount = 1
     private val inputSizes = mutableMapOf<Int, Int>()
@@ -67,8 +67,25 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
         else internalFinalStates.add(state)
     }
 
-    private fun removeState(state: State) {
-        internalTransitionTable.remove(state)
+    private fun getInTransitions(states: Set<State>) =
+        internalTransitionTable
+            .mapValues { (_, value) -> value.filter { it.target in states } }
+            .filter { it.value.isNotEmpty() }
+            .values.flatten()
+
+    private fun getOutTransitions(states: Set<State>) =
+        transitionTable.filter { (key, _) -> key in states }.values.flatten()
+
+    fun removeStates(states: Set<State>) {
+        for (state in states) {
+            internalTransitionTable.remove(state)
+        }
+        for (transition in getInTransitions(states)) {
+            removeTransition(transition)
+            if (internalTransitionTable.getValue(transition.source).isEmpty()) {
+                internalTransitionTable.remove(transition.source)
+            }
+        }
     }
 
     @Throws(MultipleInitStatesException::class)
@@ -81,15 +98,14 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
             if (states.intersect(finalStates).isNotEmpty()) {
                 internalFinalStates.add(newState)
             }
-            internalTransitionTable[newState] = transitionTable.entries.filter { (key, _) -> key in states }
-                .fold(mutableSetOf()) { acc, (_, value) -> acc.apply { addAll(value.map { it.copy(source = newState) }) } }
-            transitionTable
-                .mapValues { (_, value) -> value.filter { it.target in states } }
-                .filter { it.value.isNotEmpty() }
-                .mapValues { (_, value) -> value.map { it.copy(target = newState) }.toMutableSet() }
-                .forEach { (state, transitions) ->
-                    internalTransitionTable.getOrPut(state) { mutableSetOf() }.addAll(transitions)
-                }
+            val newOutTransitions = getOutTransitions(states)
+                .map { it.copy(source = newState, target = if (it.target in states) newState else it.target) }
+            val newInTransitions = getInTransitions(states)
+                .map { it.copy(source = if (it.source in states) newState else it.source, target = newState) }
+
+            for (transition in newOutTransitions + newInTransitions) {
+                addTransition(transition)
+            }
             newState
         } else states.first()
 
@@ -110,13 +126,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
                     reachable.addAll(it)
                 }
         }
-        for (state in transitionTable.keys.toSet()) {
-            if (state !in reachable) {
-                removeState(state)
-                if (state in finalStates) {
-                    internalFinalStates.remove(state)
-                }
-            }
-        }
+        val unreachable = transitionTable.keys - reachable
+        removeStates(unreachable)
+        internalFinalStates.removeAll(unreachable)
     }
 }

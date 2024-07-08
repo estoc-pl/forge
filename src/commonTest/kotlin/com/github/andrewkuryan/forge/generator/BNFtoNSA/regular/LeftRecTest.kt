@@ -2,9 +2,8 @@ package com.github.andrewkuryan.forge.generator.BNFtoNSA.regular
 
 import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.forge.BNF.grammar
-import com.github.andrewkuryan.forge.automata.NSAFormatPattern
-import com.github.andrewkuryan.forge.automata.format
 import com.github.andrewkuryan.forge.generator.buildNSAParser
+import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,23 +15,24 @@ class LeftRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S5";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S1" [label=<ε / *<br/>->]
-                    	"S1" -> "S4" [label=<b / *<br/>b>]
-                    	"S2" -> "S3" [label=<a / ${"$"}S<br/>a>]
-                    	"S2" -> "S5" [label=<┴ / ${"$"}S<br/>->]
-                    	"S3" -> "S2" [label=<ε / Sa<br/>Sa → S>]
-                    	"S4" -> "S2" [label=<ε / b<br/>b → S>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(5, states.size)
+                val s = Array(5) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[4],
+                    mapOf(
+                        s[0] to listOf(read('b', "") to s[1]),
+                        s[1] to listOf(rollup("b", "b", "S") to s[2]),
+                        s[2] to listOf(
+                            read('a', "\$S") to s[3],
+                            exit("\$S") to s[4]
+                        ),
+                        s[3] to listOf(rollup("Sa", "Sa", "S") to s[2]),
+                        s[4] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -48,29 +48,28 @@ class LeftRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S11";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S4" -> "S7" [label=<a / ${"$"}A<br/>a>]
-                    	"S7" -> "S2" [label=<ε / Aa<br/>Aa → S>]
-                    	"S3" -> "S5" [label=<ε / *<br/>->]
-                    	"S6" -> "S8" [label=<b / ${"$"}B<br/>b>]
-                    	"S8" -> "S4" [label=<ε / Bb<br/>Bb → A>]
-                    	"S5" -> "S1" [label=<ε / *<br/>->]
-                    	"S5" -> "S10" [label=<d / *<br/>d>]
-                    	"S2" -> "S9" [label=<c / ${"$"}S<br/>c>]
-                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
-                    	"S9" -> "S6" [label=<ε / Sc<br/>Sc → B>]
-                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(9, states.size)
+                val s = Array(9) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[8],
+                    mapOf(
+                        s[0] to listOf(read('d', "") to s[1]),
+                        s[1] to listOf(rollup("d", "d", "B") to s[2]),
+                        s[2] to listOf(read('b', "\$B") to s[3]),
+                        s[3] to listOf(rollup("Bb", "Bb", "A") to s[4]),
+                        s[4] to listOf(read('a', "\$A") to s[5]),
+                        s[5] to listOf(rollup("Aa", "Aa", "S") to s[6]),
+                        s[6] to listOf(
+                            read('c', "\$S") to s[7],
+                            exit("\$S") to s[8]
+                        ),
+                        s[7] to listOf(rollup("Sc", "Sc", "B") to s[2]),
+                        s[8] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -86,31 +85,29 @@ class LeftRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S11";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S1" [label=<ε / *<br/>->]
-                    	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S2" -> "S7" [label=<a / ${"$"}S<br/>a>]
-                    	"S2" -> "S9" [label=<c / ${"$"}S<br/>c>]
-                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
-                    	"S7" -> "S2" [label=<ε / Sa<br/>Sa → S>]
-                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
-                    	"S3" -> "S5" [label=<ε / *<br/>->]
-                    	"S6" -> "S8" [label=<b / ${"$"}B<br/>b>]
-                    	"S8" -> "S4" [label=<ε / Bb<br/>Bb → A>]
-                    	"S5" -> "S1" [label=<ε / *<br/>->]
-                    	"S5" -> "S10" [label=<d / *<br/>d>]
-                    	"S9" -> "S6" [label=<ε / Sc<br/>Sc → B>]
-                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(9, states.size)
+                val s = Array(9) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[8],
+                    mapOf(
+                        s[0] to listOf(read('d', "") to s[1]),
+                        s[1] to listOf(rollup("d", "d", "B") to s[2]),
+                        s[2] to listOf(read('b', "\$B") to s[3]),
+                        s[3] to listOf(rollup("Bb", "Bb", "A") to s[4]),
+                        s[4] to listOf(rollup("\$A", "A", "S") to s[5]),
+                        s[5] to listOf(
+                            read('a', "\$S") to s[6],
+                            read('c', "\$S") to s[7],
+                            exit("\$S") to s[8]
+                        ),
+                        s[6] to listOf(rollup("Sa", "Sa", "S") to s[5]),
+                        s[7] to listOf(rollup("Sc", "Sc", "B") to s[2]),
+                        s[8] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -124,28 +121,30 @@ class LeftRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S9";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S1" -> "S6" [label=<y / *<br/>y>]
-                    	"S4" -> "S5" [label=<x / ${"$"}A<br/>x>]
-                    	"S5" -> "S2" [label=<ε / Ax<br/>Ax → S>]
-                    	"S6" -> "S2" [label=<ε / y<br/>y → S>]
-                    	"S3" -> "S1" [label=<ε / *<br/>->]
-                    	"S3" -> "S8" [label=<b / *<br/>b>]
-                    	"S2" -> "S7" [label=<a / ${"$"}S<br/>a>]
-                    	"S2" -> "S9" [label=<┴ / ${"$"}S<br/>->]
-                    	"S7" -> "S4" [label=<ε / Sa<br/>Sa → A>]
-                    	"S8" -> "S4" [label=<ε / b<br/>b → A>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(8, states.size)
+                val s = Array(8) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[7],
+                    mapOf(
+                        s[0] to listOf(
+                            read('y', "") to s[1],
+                            read('b', "") to s[2]
+                        ),
+                        s[1] to listOf(rollup("y", "y", "S") to s[3]),
+                        s[3] to listOf(
+                            read('a', "\$S") to s[4],
+                            exit("\$S") to s[7]
+                        ),
+                        s[4] to listOf(rollup("Sa", "Sa", "A") to s[5]),
+                        s[5] to listOf(read('x', "\$A") to s[6]),
+                        s[6] to listOf(rollup("Ax", "Ax", "S") to s[3]),
+                        s[2] to listOf(rollup("b", "b", "A") to s[5]),
+                        s[7] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -161,34 +160,36 @@ class LeftRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S13";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S1" -> "S8" [label=<s / *<br/>s>]
-                    	"S4" -> "S7" [label=<i / ${"$"}A<br/>i>]
-                    	"S4" -> "S11" [label=<c / ${"$"}A<br/>c>]
-                    	"S7" -> "S2" [label=<ε / Ai<br/>Ai → S>]
-                    	"S8" -> "S2" [label=<ε / s<br/>s → S>]
-                    	"S3" -> "S1" [label=<ε / *<br/>->]
-                    	"S3" -> "S5" [label=<ε / *<br/>->]
-                    	"S2" -> "S9" [label=<a / ${"$"}S<br/>a>]
-                    	"S2" -> "S13" [label=<┴ / ${"$"}S<br/>->]
-                    	"S9" -> "S4" [label=<ε / Sa<br/>Sa → A>]
-                    	"S6" -> "S10" [label=<b / ${"$"}B<br/>b>]
-                    	"S10" -> "S4" [label=<ε / Bb<br/>Bb → A>]
-                    	"S5" -> "S3" [label=<ε / *<br/>->]
-                    	"S5" -> "S12" [label=<d / *<br/>d>]
-                    	"S11" -> "S6" [label=<ε / Ac<br/>Ac → B>]
-                    	"S12" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(11, states.size)
+                val s = Array(11) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[10],
+                    mapOf(
+                        s[0] to listOf(
+                            read('s', "") to s[1],
+                            read('d', "") to s[2]
+                        ),
+                        s[1] to listOf(rollup("s", "s", "S") to s[3]),
+                        s[3] to listOf(
+                            read('a', "\$S") to s[4],
+                            exit("\$S") to s[10]
+                        ),
+                        s[4] to listOf(rollup("Sa", "Sa", "A") to s[5]),
+                        s[5] to listOf(
+                            read('i', "\$A") to s[6],
+                            read('c', "\$A") to s[7]
+                        ),
+                        s[6] to listOf(rollup("Ai", "Ai", "S") to s[3]),
+                        s[7] to listOf(rollup("Ac", "Ac", "B") to s[8]),
+                        s[8] to listOf(read('b', "\$B") to s[9]),
+                        s[9] to listOf(rollup("Bb", "Bb", "A") to s[5]),
+                        s[2] to listOf(rollup("d", "d", "B") to s[8]),
+                        s[10] to listOf()
+                    )
+                )
+            }
         }
     }
 }

@@ -161,12 +161,4 @@ class PrefixTest {
             assertContains(aPrefixes, listOf(Letter("b")))
         }
     }
-
-    @Test
-    fun test() {
-        val map = mapOf("a" to 1, "b" to 2)
-        val map1 = map + ("b" to 3)
-
-        println(map1)
-    }
 }

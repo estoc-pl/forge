@@ -2,9 +2,8 @@ package com.github.andrewkuryan.forge.generator.BNFtoNSA.regular
 
 import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.forge.BNF.grammar
-import com.github.andrewkuryan.forge.automata.NSAFormatPattern
-import com.github.andrewkuryan.forge.automata.format
 import com.github.andrewkuryan.forge.generator.buildNSAParser
+import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,20 +16,20 @@ class LinearGrammarTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S4";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<a / *<br/>a>]
-                    	"S3" -> "S2" [label=<ε / a<br/>a → S>]
-                    	"S2" -> "S4" [label=<┴ / ${"$"}S<br/>->]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(4, states.size)
+                val s = Array(4) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[3],
+                    mapOf(
+                        s[0] to listOf(read('a', "") to s[1]),
+                        s[1] to listOf(rollup("a", "a", "S") to s[2]),
+                        s[2] to listOf(exit("\$S") to s[3]),
+                        s[3] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -48,30 +47,27 @@ class LinearGrammarTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S14";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S4" -> "S9" [label=<s / ${"$"}A<br/>s>]
-                    	"S9" -> "S2" [label=<ε / As<br/>As → S>]
-                    	"S3" -> "S10" [label=<a / *<br/>a>]
-                    	"S10" -> "S5" [label=<ε / a<br/>->]
-                    	"S6" -> "S4" [label=<ε / ${"$"}aB<br/>aB → A>]
-                    	"S5" -> "S11" [label=<b / *<br/>b>]
-                    	"S11" -> "S7" [label=<ε / b<br/>->]
-                    	"S8" -> "S6" [label=<ε / ${"$"}abC<br/>bC → B>]
-                    	"S7" -> "S12" [label=<c / *<br/>c>]
-                    	"S12" -> "S13" [label=<d / c<br/>d>]
-                    	"S13" -> "S8" [label=<ε / cd<br/>cd → C>]
-                    	"S2" -> "S14" [label=<┴ / ${"$"}S<br/>->]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(11, states.size)
+                val s = Array(11) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[10],
+                    mapOf(
+                        s[0] to listOf(read('a', "") to s[1]),
+                        s[1] to listOf(read('b', "") to s[2]),
+                        s[2] to listOf(read('c', "") to s[3]),
+                        s[3] to listOf(read('d', "c") to s[4]),
+                        s[4] to listOf(rollup("cd", "cd", "C") to s[5]),
+                        s[5] to listOf(rollup("\$abC", "bC", "B") to s[6]),
+                        s[6] to listOf(rollup("\$aB", "aB", "A") to s[7]),
+                        s[7] to listOf(read('s', "\$A") to s[8]),
+                        s[8] to listOf(rollup("As", "As", "S") to s[9]),
+                        s[9] to listOf(exit("\$S") to s[10]),
+                        s[10] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -87,29 +83,29 @@ class LinearGrammarTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S12";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S1" -> "S5" [label=<ε / *<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
-                    	"S6" -> "S2" [label=<ε / ${"$"}B<br/>B → S>]
-                    	"S3" -> "S7" [label=<a / *<br/>a>]
-                    	"S7" -> "S8" [label=<b / a<br/>b>]
-                    	"S8" -> "S9" [label=<c / ab<br/>c>]
-                    	"S9" -> "S4" [label=<ε / abc<br/>abc → A>]
-                    	"S5" -> "S10" [label=<d / *<br/>d>]
-                    	"S10" -> "S11" [label=<e / d<br/>e>]
-                    	"S11" -> "S6" [label=<ε / de<br/>de → B>]
-                    	"S2" -> "S12" [label=<┴ / ${"$"}S<br/>->]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(10, states.size)
+                val s = Array(10) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[9],
+                    mapOf(
+                        s[0] to listOf(
+                            read('a', "") to s[1],
+                            read('d', "") to s[6]
+                        ),
+                        s[1] to listOf(read('b', "a") to s[2]),
+                        s[2] to listOf(read('c', "ab") to s[3]),
+                        s[3] to listOf(rollup("abc", "abc", "A") to s[4]),
+                        s[4] to listOf(rollup("\$A", "A", "S") to s[5]),
+                        s[5] to listOf(exit("\$S") to s[9]),
+                        s[6] to listOf(read('e', "d") to s[7]),
+                        s[7] to listOf(rollup("de", "de", "B") to s[8]),
+                        s[8] to listOf(rollup("\$B", "B", "S") to s[5]),
+                        s[9] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -127,30 +123,73 @@ class LinearGrammarTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S12";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S1" -> "S5" [label=<ε / *<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
-                    	"S6" -> "S2" [label=<ε / ${"$"}B<br/>B → S>]
-                    	"S3" -> "S9" [label=<a / *<br/>a>]
-                    	"S9" -> "S7" [label=<ε / a<br/>->]
-                    	"S8" -> "S4" [label=<ε / ${"$"}aC<br/>aC → A>]
-                    	"S8" -> "S6" [label=<ε / ${"$"}bC<br/>bC → B>]
-                    	"S5" -> "S10" [label=<b / *<br/>b>]
-                    	"S10" -> "S7" [label=<ε / b<br/>->]
-                    	"S7" -> "S11" [label=<c / *<br/>c>]
-                    	"S11" -> "S8" [label=<ε / c<br/>c → C>]
-                    	"S2" -> "S12" [label=<┴ / ${"$"}S<br/>->]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(8, states.size)
+                val s = Array(8) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[7],
+                    mapOf(
+                        s[0] to listOf(
+                            read('a', "") to s[1],
+                            read('a', "") to s[1]
+                        ),
+                        s[1] to listOf(read('c', "") to s[2]),
+                        s[2] to listOf(rollup("c", "c", "C") to s[3]),
+                        s[3] to listOf(
+                            rollup("\$aC", "aC", "A") to s[4],
+                            rollup("\$bC", "bC", "B") to s[5]
+                        ),
+                        s[4] to listOf(rollup("\$A", "A", "S") to s[6]),
+                        s[5] to listOf(rollup("\$B", "B", "S") to s[6]),
+                        s[6] to listOf(exit("\$S") to s[7]),
+                        s[7] to listOf()
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `should build NSA for S → aA ⏐ bB；A → Сc；B → Cd；C → e`() {
+        grammar {
+            val A by nonterm()
+            val B by nonterm()
+            val C by nonterm()
+
+            S /= 'a'..A / 'b'..B
+            A /= C..'c'
+            B /= C..'d'
+            C /= 'e'
+
+            val nsa = buildNSAParser()
+
+            with(nsa) {
+                assertEquals(10, states.size)
+                val s = Array(10) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[9],
+                    mapOf(
+                        s[0] to listOf(
+                            read('a', "") to s[1],
+                            read('b', "") to s[1]
+                        ),
+                        s[1] to listOf(read('e', "") to s[2]),
+                        s[2] to listOf(rollup("e", "e", "C") to s[3]),
+                        s[3] to listOf(
+                            read('c', "\$aC") to s[4],
+                            read('d', "\$bC") to s[5],
+                        ),
+                        s[4] to listOf(rollup("Cc", "Cc", "A") to s[6]),
+                        s[5] to listOf(rollup("Cd", "Cd", "B") to s[7]),
+                        s[6] to listOf(rollup("\$aA", "aA", "S") to s[8]),
+                        s[7] to listOf(rollup("\$bB", "bB", "S") to s[8]),
+                        s[8] to listOf(exit("\$S") to s[9]),
+                        s[9] to listOf()
+                    )
+                )
+            }
         }
     }
 }

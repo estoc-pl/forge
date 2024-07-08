@@ -3,10 +3,9 @@ package com.github.andrewkuryan.forge.automata.optimization
 import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.forge.BNF.grammar
 import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.automata.NSAFormatPattern
-import com.github.andrewkuryan.forge.automata.format
 import com.github.andrewkuryan.forge.generator.buildNSAParser
 import com.github.andrewkuryan.forge.translation.SyntaxNode
+import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -25,27 +24,105 @@ class HCombineTest {
             val nsa = buildNSAParser()
             nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S13";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S14" [label=<ε / *<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
-                    	"S6" -> "S2" [label=<ε / ${"$"}B<br/>B → S>]
-                    	"S9" -> "S4" [label=<ε / abc<br/>abc → A>]
-                    	"S12" -> "S6" [label=<ε / abd<br/>abd → B>]
-                    	"S2" -> "S13" [label=<┴ / ${"$"}S<br/>->]
-                    	"S14" -> "S15" [label=<a / *<br/>a>]
-                    	"S15" -> "S16" [label=<b / a<br/>b>]
-                    	"S16" -> "S9" [label=<c / ab<br/>c>]
-                    	"S16" -> "S12" [label=<d / ab<br/>d>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(9, states.size)
+                val s = Array(9) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[8],
+                    mapOf(
+                        s[0] to listOf(read('a', "") to s[1]),
+                        s[1] to listOf(read('b', "a") to s[2]),
+                        s[2] to listOf(
+                            read('c', "ab") to s[3],
+                            read('d', "ab") to s[4]
+                        ),
+                        s[3] to listOf(rollup("abc", "abc", "A") to s[5]),
+                        s[4] to listOf(rollup("abd", "abd", "B") to s[6]),
+                        s[5] to listOf(rollup("\$A", "A", "S") to s[7]),
+                        s[6] to listOf(rollup("\$B", "B", "S") to s[7]),
+                        s[7] to listOf(exit("\$S") to s[8]),
+                        s[8] to listOf()
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `should build optimized NSA for S → A ⏐ B；A → abc；B → aC；C → b`() {
+        grammar {
+            val A by nonterm()
+            val B by nonterm()
+            val C by nonterm()
+
+            S /= A / B
+            A /= 'a'..'b'..'c'
+            B /= 'a'..C
+            C /= 'b'
+
+            val nsa = buildNSAParser()
+            nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
+
+            with(nsa) {
+                assertEquals(9, states.size)
+                val s = Array(9) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[8],
+                    mapOf(
+                        s[0] to listOf(read('a', "") to s[1]),
+                        s[1] to listOf(read('b', "") to s[2]),
+                        s[2] to listOf(
+                            read('c', "ab") to s[3],
+                            rollup("b", "b", "C") to s[4]
+                        ),
+                        s[3] to listOf(rollup("abc", "abc", "A") to s[5]),
+                        s[4] to listOf(rollup("\$aC", "aC", "B") to s[6]),
+                        s[5] to listOf(rollup("\$A", "A", "S") to s[7]),
+                        s[6] to listOf(rollup("\$B", "B", "S") to s[7]),
+                        s[7] to listOf(exit("\$S") to s[8]),
+                        s[8] to listOf()
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `should build optimized NSA for S → Sc ⏐ A ⏐ s；A → sa`() {
+        grammar {
+            val A by nonterm()
+
+            S /= S..'c' / A / 's'
+            A /= 's'..'a'
+
+            val nsa = buildNSAParser()
+            nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
+
+            with(nsa) {
+                assertEquals(7, states.size)
+                val s = Array(7) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[6],
+                    mapOf(
+                        s[0] to listOf(read('s', "") to s[1]),
+                        s[1] to listOf(
+                            rollup("s", "s", "S") to s[2],
+                            read('a', "s") to s[3]
+                        ),
+                        s[3] to listOf(rollup("sa", "sa", "A") to s[4]),
+                        s[4] to listOf(rollup("\$A", "A", "S") to s[2]),
+                        s[2] to listOf(
+                            exit("\$S") to s[6],
+                            read('c', "\$S") to s[5]
+                        ),
+                        s[5] to listOf(rollup("Sc", "Sc", "S") to s[2]),
+                        s[6] to listOf()
+                    )
+                )
+            }
         }
     }
 }

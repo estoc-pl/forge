@@ -2,9 +2,8 @@ package com.github.andrewkuryan.forge.generator.BNFtoNSA.regular
 
 import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.forge.BNF.grammar
-import com.github.andrewkuryan.forge.automata.NSAFormatPattern
-import com.github.andrewkuryan.forge.automata.format
 import com.github.andrewkuryan.forge.generator.buildNSAParser
+import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,24 +15,27 @@ class RightRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S5";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S3" [label=<a / *<br/>a>]
-                    	"S1" -> "S4" [label=<b / *<br/>b>]
-                    	"S3" -> "S1" [label=<ε / a<br/>->]
-                    	"S2" -> "S2" [label=<ε / ${"$"}aS<br/>aS → S>]
-                    	"S2" -> "S2" [label=<ε / aS<br/>aS → S>]
-                    	"S2" -> "S5" [label=<┴ / ${"$"}S<br/>->]
-                    	"S4" -> "S2" [label=<ε / b<br/>b → S>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(4, states.size)
+                val s = Array(4) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[3],
+                    mapOf(
+                        s[0] to listOf(
+                            read('a', "") to s[0],
+                            read('b', "") to s[1]
+                        ),
+                        s[1] to listOf(rollup("b", "b", "S") to s[2]),
+                        s[2] to listOf(
+                            rollup("\$aS", "aS", "S") to s[2],
+                            rollup("aS", "aS", "S") to s[2],
+                            exit("\$S") to s[3],
+                        ),
+                        s[3] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -49,32 +51,37 @@ class RightRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S11";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S7" [label=<a / *<br/>a>]
-                    	"S7" -> "S3" [label=<ε / a<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}aA<br/>aA → S>]
-                    	"S4" -> "S2" [label=<ε / bcaA<br/>aA → S>]
-                    	"S3" -> "S8" [label=<b / *<br/>b>]
-                    	"S8" -> "S5" [label=<ε / b<br/>->]
-                    	"S6" -> "S4" [label=<ε / ${"$"}abB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / cabB<br/>bB → A>]
-                    	"S5" -> "S9" [label=<c / *<br/>c>]
-                    	"S5" -> "S10" [label=<d / *<br/>d>]
-                    	"S9" -> "S1" [label=<ε / c<br/>->]
-                    	"S2" -> "S6" [label=<ε / ${"$"}abcS<br/>cS → B>]
-                    	"S2" -> "S6" [label=<ε / abcS<br/>cS → B>]
-                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
-                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(8, states.size)
+                val s = Array(8) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[7],
+                    mapOf(
+                        s[0] to listOf(read('a', "") to s[1]),
+                        s[1] to listOf(read('b', "") to s[2]),
+                        s[2] to listOf(
+                            read('c', "") to s[0],
+                            read('d', "") to s[3],
+                        ),
+                        s[3] to listOf(rollup("d", "d", "B") to s[4]),
+                        s[4] to listOf(
+                            rollup("\$abB", "bB", "A") to s[5],
+                            rollup("cabB", "bB", "A") to s[5]
+                        ),
+                        s[5] to listOf(
+                            rollup("\$aA", "aA", "S") to s[6],
+                            rollup("bcaA", "aA", "S") to s[6],
+                        ),
+                        s[6] to listOf(
+                            rollup("\$abcS", "cS", "B") to s[4],
+                            rollup("abcS", "cS", "B") to s[4],
+                            exit("\$S") to s[7]
+                        ),
+                        s[7] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -90,43 +97,49 @@ class RightRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S11";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S7" [label=<a / *<br/>a>]
-                    	"S1" -> "S3" [label=<ε / *<br/>->]
-                    	"S7" -> "S1" [label=<ε / a<br/>->]
-                    	"S2" -> "S2" [label=<ε / ${"$"}aS<br/>aS → S>]
-                    	"S2" -> "S2" [label=<ε / aS<br/>aS → S>]
-                    	"S2" -> "S2" [label=<ε / ${"$"}bcaS<br/>aS → S>]
-                    	"S2" -> "S2" [label=<ε / bcaS<br/>aS → S>]
-                    	"S2" -> "S6" [label=<ε / ${"$"}bcS<br/>cS → B>]
-                    	"S2" -> "S6" [label=<ε / ${"$"}abcS<br/>cS → B>]
-                    	"S2" -> "S6" [label=<ε / abcS<br/>cS → B>]
-                    	"S2" -> "S6" [label=<ε / bcS<br/>cS → B>]
-                    	"S2" -> "S11" [label=<┴ / ${"$"}S<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}A<br/>A → S>]
-                    	"S4" -> "S2" [label=<ε / ${"$"}aA<br/>A → S>]
-                    	"S4" -> "S2" [label=<ε / aA<br/>A → S>]
-                    	"S3" -> "S8" [label=<b / *<br/>b>]
-                    	"S8" -> "S5" [label=<ε / b<br/>->]
-                    	"S6" -> "S4" [label=<ε / ${"$"}bB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / ${"$"}abB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / abB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / cabB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / cbB<br/>bB → A>]
-                    	"S5" -> "S9" [label=<c / *<br/>c>]
-                    	"S5" -> "S10" [label=<d / *<br/>d>]
-                    	"S9" -> "S1" [label=<ε / c<br/>->]
-                    	"S10" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(7, states.size)
+                val s = Array(7) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[6],
+                    mapOf(
+                        s[0] to listOf(
+                            read('a', "") to s[0],
+                            read('b', "") to s[1],
+                        ),
+                        s[1] to listOf(
+                            read('c', "") to s[0],
+                            read('d', "") to s[2],
+                        ),
+                        s[2] to listOf(rollup("d", "d", "B") to s[3]),
+                        s[3] to listOf(
+                            rollup("\$bB", "bB", "A") to s[4],
+                            rollup("\$abB", "bB", "A") to s[4],
+                            rollup("abB", "bB", "A") to s[4],
+                            rollup("cabB", "bB", "A") to s[4],
+                            rollup("cbB", "bB", "A") to s[4],
+                        ),
+                        s[4] to listOf(
+                            rollup("\$A", "A", "S") to s[5],
+                            rollup("\$aA", "A", "S") to s[5],
+                            rollup("aA", "A", "S") to s[5],
+                        ),
+                        s[5] to listOf(
+                            rollup("\$aS", "aS", "S") to s[5],
+                            rollup("aS", "aS", "S") to s[5],
+                            rollup("\$bcaS", "aS", "S") to s[5],
+                            rollup("bcaS", "aS", "S") to s[5],
+                            rollup("\$bcS", "cS", "B") to s[3],
+                            rollup("\$abcS", "cS", "B") to s[3],
+                            rollup("abcS", "cS", "B") to s[3],
+                            rollup("bcS", "cS", "B") to s[3],
+                            exit("\$S") to s[6]
+                        ),
+                        s[6] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -140,30 +153,36 @@ class RightRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S9";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S5" [label=<x / *<br/>x>]
-                    	"S1" -> "S6" [label=<y / *<br/>y>]
-                    	"S5" -> "S3" [label=<ε / x<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}xA<br/>xA → S>]
-                    	"S4" -> "S2" [label=<ε / axA<br/>xA → S>]
-                    	"S6" -> "S2" [label=<ε / y<br/>y → S>]
-                    	"S3" -> "S7" [label=<a / *<br/>a>]
-                    	"S3" -> "S8" [label=<b / *<br/>b>]
-                    	"S7" -> "S1" [label=<ε / a<br/>->]
-                    	"S2" -> "S4" [label=<ε / ${"$"}xaS<br/>aS → A>]
-                    	"S2" -> "S4" [label=<ε / xaS<br/>aS → A>]
-                    	"S2" -> "S9" [label=<┴ / ${"$"}S<br/>->]
-                    	"S8" -> "S4" [label=<ε / b<br/>b → A>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(7, states.size)
+                val s = Array(7) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[6],
+                    mapOf(
+                        s[0] to listOf(
+                            read('x', "") to s[1],
+                            read('y', "") to s[2]
+                        ),
+                        s[1] to listOf(
+                            read('a', "") to s[0],
+                            read('b', "") to s[3]
+                        ),
+                        s[3] to listOf(rollup("b", "b", "A") to s[4]),
+                        s[4] to listOf(
+                            rollup("\$xA", "xA", "S") to s[5],
+                            rollup("axA", "xA", "S") to s[5],
+                        ),
+                        s[5] to listOf(
+                            rollup("\$xaS", "aS", "A") to s[4],
+                            rollup("xaS", "aS", "A") to s[4],
+                            exit("\$S") to s[6]
+                        ),
+                        s[2] to listOf(rollup("y", "y", "S") to s[5]),
+                        s[6] to listOf()
+                    )
+                )
+            }
         }
     }
 
@@ -179,45 +198,53 @@ class RightRecTest {
 
             val nsa = buildNSAParser()
 
-            assertEquals(
-                """
-                    digraph {
-                       rankdir=LR;
-                       node [shape = doublecircle] "S13";
-                       node [shape = circle];
-                       secret_node [style=invis, shape=point];
-                       secret_node -> "S1" [style=bold];
-                       	"S1" -> "S7" [label=<i / *<br/>i>]
-                    	"S1" -> "S8" [label=<s / *<br/>s>]
-                    	"S7" -> "S3" [label=<ε / i<br/>->]
-                    	"S4" -> "S2" [label=<ε / ${"$"}iA<br/>iA → S>]
-                    	"S4" -> "S2" [label=<ε / aiA<br/>iA → S>]
-                    	"S4" -> "S2" [label=<ε / bcaiA<br/>iA → S>]
-                    	"S4" -> "S6" [label=<ε / ${"$"}ibcA<br/>cA → B>]
-                    	"S4" -> "S6" [label=<ε / aibcA<br/>cA → B>]
-                    	"S4" -> "S6" [label=<ε / bcA<br/>cA → B>]
-                    	"S8" -> "S2" [label=<ε / s<br/>s → S>]
-                    	"S3" -> "S9" [label=<a / *<br/>a>]
-                    	"S3" -> "S10" [label=<b / *<br/>b>]
-                    	"S9" -> "S1" [label=<ε / a<br/>->]
-                    	"S2" -> "S4" [label=<ε / ${"$"}iaS<br/>aS → A>]
-                    	"S2" -> "S4" [label=<ε / iaS<br/>aS → A>]
-                    	"S2" -> "S4" [label=<ε / ${"$"}ibcaS<br/>aS → A>]
-                    	"S2" -> "S4" [label=<ε / ibcaS<br/>aS → A>]
-                    	"S2" -> "S4" [label=<ε / bcaS<br/>aS → A>]
-                    	"S2" -> "S13" [label=<┴ / ${"$"}S<br/>->]
-                    	"S10" -> "S5" [label=<ε / b<br/>->]
-                    	"S6" -> "S4" [label=<ε / ${"$"}ibB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / aibB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / caibB<br/>bB → A>]
-                    	"S6" -> "S4" [label=<ε / cbB<br/>bB → A>]
-                    	"S5" -> "S11" [label=<c / *<br/>c>]
-                    	"S5" -> "S12" [label=<d / *<br/>d>]
-                    	"S11" -> "S3" [label=<ε / c<br/>->]
-                    	"S12" -> "S6" [label=<ε / d<br/>d → B>]
-                    }
-                """.trimIndent(), nsa.format(NSAFormatPattern.VIZ)
-            )
+            with(nsa) {
+                assertEquals(9, states.size)
+                val s = Array(9) { StateRef() }
+
+                assertTransitions(
+                    s[0], s[8],
+                    mapOf(
+                        s[0] to listOf(
+                            read('i', "") to s[1],
+                            read('s', "") to s[2]
+                        ),
+                        s[1] to listOf(
+                            read('a', "") to s[0],
+                            read('b', "") to s[3]
+                        ),
+                        s[3] to listOf(
+                            read('c', "") to s[1],
+                            read('d', "") to s[4]
+                        ),
+                        s[4] to listOf(rollup("d", "d", "B") to s[5]),
+                        s[5] to listOf(
+                            rollup("\$ibB", "bB", "A") to s[6],
+                            rollup("aibB", "bB", "A") to s[6],
+                            rollup("caibB", "bB", "A") to s[6],
+                            rollup("cbB", "bB", "A") to s[6],
+                        ),
+                        s[6] to listOf(
+                            rollup("\$iA", "iA", "S") to s[7],
+                            rollup("aiA", "iA", "S") to s[7],
+                            rollup("bcaiA", "iA", "S") to s[7],
+                            rollup("\$ibcA", "cA", "B") to s[5],
+                            rollup("aibcA", "cA", "B") to s[5],
+                            rollup("bcA", "cA", "B") to s[5],
+                        ),
+                        s[7] to listOf(
+                            rollup("\$iaS", "aS", "A") to s[6],
+                            rollup("iaS", "aS", "A") to s[6],
+                            rollup("\$ibcaS", "aS", "A") to s[6],
+                            rollup("ibcaS", "aS", "A") to s[6],
+                            rollup("bcaS", "aS", "A") to s[6],
+                            exit("\$S") to s[8]
+                        ),
+                        s[2] to listOf(rollup("s", "s", "S") to s[7]),
+                        s[8] to listOf()
+                    )
+                )
+            }
         }
     }
 }
