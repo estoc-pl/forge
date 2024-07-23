@@ -57,9 +57,9 @@ class PrefixTest {
             val aPrefixes = resolvePrefixes(A, prefixes)
             val bPrefixes = resolvePrefixes(B, prefixes)
 
-            assertEquals(sPrefixes, setOf(listOf(Bottom)))
-            assertEquals(aPrefixes, setOf(listOf(Bottom)))
-            assertEquals(bPrefixes, setOf(listOf(Bottom)))
+            assertEquals(setOf(listOf(Bottom)), sPrefixes)
+            assertEquals(setOf(listOf(Bottom)), aPrefixes)
+            assertEquals(setOf(listOf(Bottom)), bPrefixes)
         }
     }
 
@@ -88,6 +88,37 @@ class PrefixTest {
     }
 
     @Test
+    fun `should resolve prefixes for S → aA；A → Bb；B → Sc`() {
+        grammar {
+            val A by nonterm()
+            val B by nonterm()
+
+            S /= 'a'..A
+            A /= B..'b'
+            B /= S..'c'
+
+            val prefixes = collectPrefixes()
+            val sPrefixes = resolvePrefixes(S, prefixes)
+            val aPrefixes = resolvePrefixes(A, prefixes)
+            val bPrefixes = resolvePrefixes(B, prefixes)
+
+            assertEquals(3, sPrefixes.size)
+            assertEquals(2, aPrefixes.size)
+            assertEquals(2, bPrefixes.size)
+
+            assertContains(sPrefixes, listOf(Bottom))
+            assertContains(sPrefixes, listOf(Bottom, Letter("a")))
+            assertContains(sPrefixes, listOf(Letter("a")))
+
+            assertContains(aPrefixes, listOf(Bottom, Letter("a")))
+            assertContains(aPrefixes, listOf(Letter("a")))
+
+            assertContains(bPrefixes, listOf(Bottom, Letter("a")))
+            assertContains(bPrefixes, listOf(Letter("a")))
+        }
+    }
+
+    @Test
     fun `should resolve prefixes for S → SaA ⏐ A；A → Ab ⏐ b`() {
         grammar {
             val A by nonterm()
@@ -100,7 +131,7 @@ class PrefixTest {
             val sPrefixes = resolvePrefixes(S, prefixes)
             val aPrefixes = resolvePrefixes(A, prefixes)
 
-            assertEquals(sPrefixes, setOf(listOf(Bottom)))
+            assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(2, aPrefixes.size)
             assertContains(aPrefixes, listOf(Bottom, Letter("S"), Letter("a")))
@@ -121,7 +152,7 @@ class PrefixTest {
             val sPrefixes = resolvePrefixes(S, prefixes)
             val aPrefixes = resolvePrefixes(A, prefixes)
 
-            assertEquals(sPrefixes, setOf(listOf(Bottom)))
+            assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(5, aPrefixes.size)
             assertContains(aPrefixes, listOf(Bottom, Letter("S"), Letter("a")))

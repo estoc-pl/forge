@@ -124,6 +124,8 @@ class RightRecTest {
                             rollup("\$A", "A", "S") to s[5],
                             rollup("\$aA", "A", "S") to s[5],
                             rollup("aA", "A", "S") to s[5],
+                            rollup("bcaA", "A", "S") to s[5],
+                            rollup("bcA", "A", "S") to s[5],
                         ),
                         s[5] to listOf(
                             rollup("\$aS", "aS", "S") to s[5],

@@ -5,7 +5,8 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.translation.SemanticAction
 import com.github.andrewkuryan.forge.translation.SyntaxNode
 
-fun Terminal.asInput() = Input(Signal.Letter(value))
+fun Terminal.asLetter() = Signal.Letter(value)
+fun Terminal.asInput() = Input(asLetter())
 
 fun GrammarSymbol.asStackLetter() =
     when (this) {
@@ -62,7 +63,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<Production<N>>>,
     ports: Ports<N>,
-    prefixes: Map<Nonterminal, List<Prefix>>,
+    prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
         val stackSymbols = production.symbols.map { it.asStackLetter() }
