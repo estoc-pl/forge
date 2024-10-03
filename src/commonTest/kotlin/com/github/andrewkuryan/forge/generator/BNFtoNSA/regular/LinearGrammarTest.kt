@@ -24,7 +24,7 @@ class LinearGrammarTest {
                     s[0], s[3],
                     mapOf(
                         s[0] to listOf(read('a', "") to s[1]),
-                        s[1] to listOf(rollup("a", "a", "S") to s[2]),
+                        s[1] to listOf(rollup("", "a", "S") to s[2]),
                         s[2] to listOf(exit("\$S") to s[3]),
                         s[3] to listOf()
                     )
@@ -58,11 +58,11 @@ class LinearGrammarTest {
                         s[1] to listOf(read('b', "") to s[2]),
                         s[2] to listOf(read('c', "") to s[3]),
                         s[3] to listOf(read('d', "c") to s[4]),
-                        s[4] to listOf(rollup("cd", "cd", "C") to s[5]),
-                        s[5] to listOf(rollup("\$abC", "bC", "B") to s[6]),
-                        s[6] to listOf(rollup("\$aB", "aB", "A") to s[7]),
+                        s[4] to listOf(rollup("", "cd", "C") to s[5]),
+                        s[5] to listOf(rollup("\$a", "bC", "B") to s[6]),
+                        s[6] to listOf(rollup("\$", "aB", "A") to s[7]),
                         s[7] to listOf(read('s', "\$A") to s[8]),
-                        s[8] to listOf(rollup("As", "As", "S") to s[9]),
+                        s[8] to listOf(rollup("", "As", "S") to s[9]),
                         s[9] to listOf(exit("\$S") to s[10]),
                         s[10] to listOf()
                     )
@@ -96,12 +96,12 @@ class LinearGrammarTest {
                         ),
                         s[1] to listOf(read('b', "a") to s[2]),
                         s[2] to listOf(read('c', "ab") to s[3]),
-                        s[3] to listOf(rollup("abc", "abc", "A") to s[4]),
-                        s[4] to listOf(rollup("\$A", "A", "S") to s[5]),
+                        s[3] to listOf(rollup("", "abc", "A") to s[4]),
+                        s[4] to listOf(rollup("\$", "A", "S") to s[5]),
                         s[5] to listOf(exit("\$S") to s[9]),
                         s[6] to listOf(read('e', "d") to s[7]),
-                        s[7] to listOf(rollup("de", "de", "B") to s[8]),
-                        s[8] to listOf(rollup("\$B", "B", "S") to s[5]),
+                        s[7] to listOf(rollup("", "de", "B") to s[8]),
+                        s[8] to listOf(rollup("\$", "B", "S") to s[5]),
                         s[9] to listOf()
                     )
                 )
@@ -135,13 +135,13 @@ class LinearGrammarTest {
                             read('a', "") to s[1]
                         ),
                         s[1] to listOf(read('c', "") to s[2]),
-                        s[2] to listOf(rollup("c", "c", "C") to s[3]),
+                        s[2] to listOf(rollup("", "c", "C") to s[3]),
                         s[3] to listOf(
-                            rollup("\$aC", "aC", "A") to s[4],
-                            rollup("\$bC", "bC", "B") to s[5]
+                            rollup("\$", "aC", "A") to s[4],
+                            rollup("\$", "bC", "B") to s[5]
                         ),
-                        s[4] to listOf(rollup("\$A", "A", "S") to s[6]),
-                        s[5] to listOf(rollup("\$B", "B", "S") to s[6]),
+                        s[4] to listOf(rollup("\$", "A", "S") to s[6]),
+                        s[5] to listOf(rollup("\$", "B", "S") to s[6]),
                         s[6] to listOf(exit("\$S") to s[7]),
                         s[7] to listOf()
                     )
@@ -176,15 +176,15 @@ class LinearGrammarTest {
                             read('b', "") to s[1]
                         ),
                         s[1] to listOf(read('e', "") to s[2]),
-                        s[2] to listOf(rollup("e", "e", "C") to s[3]),
+                        s[2] to listOf(rollup("", "e", "C") to s[3]),
                         s[3] to listOf(
                             read('c', "\$aC") to s[4],
                             read('d', "\$bC") to s[5],
                         ),
-                        s[4] to listOf(rollup("Cc", "Cc", "A") to s[6]),
-                        s[5] to listOf(rollup("Cd", "Cd", "B") to s[7]),
-                        s[6] to listOf(rollup("\$aA", "aA", "S") to s[8]),
-                        s[7] to listOf(rollup("\$bB", "bB", "S") to s[8]),
+                        s[4] to listOf(rollup("", "Cc", "A") to s[6]),
+                        s[5] to listOf(rollup("", "Cd", "B") to s[7]),
+                        s[6] to listOf(rollup("\$", "aA", "S") to s[8]),
+                        s[7] to listOf(rollup("\$", "bB", "S") to s[8]),
                         s[8] to listOf(exit("\$S") to s[9]),
                         s[9] to listOf()
                     )

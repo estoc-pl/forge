@@ -1,21 +1,57 @@
 package com.github.andrewkuryan.forge.automata
 
 import com.github.andrewkuryan.forge.translation.NodeBuilder
+import com.github.andrewkuryan.forge.translation.SemanticAction
 import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 data class State(val index: Int) {
     override fun toString() = "S${index}"
 }
 
-data class Transition<N : SyntaxNode>(
-    val source: State,
-    val target: State,
-    val input: Input = Input.EMPTY,
-    val stackPreview: StackPreview = StackPreview.ANY,
-    val action: StackAction<N>? = null,
-) {
+sealed class Transition<N : SyntaxNode> {
+    abstract val source: State
+    abstract val target: State
+    abstract val inputPreview: InputSlice
+    abstract val stackPreview: StackSlice
 
-    val isLoop = source == target
+    abstract val inputSize: Int
+    abstract val stackSize: Int
+
+    val isLoop: Boolean get() = source == target
+}
+
+data class InputTransition<N : SyntaxNode>(
+    val input: InputSlice,
+    val stackPush: StackSlice,
+    override val source: State,
+    override val target: State,
+    override val inputPreview: InputSlice,
+    override val stackPreview: StackSlice,
+) : Transition<N>() {
+
+    override val inputSize = input.size + inputPreview.size
+    override val stackSize = stackPreview.size
+}
+
+data class StackTransition<N : SyntaxNode>(
+    val stack: StackSlice,
+    val stackPush: StackSignal,
+    val semanticAction: SemanticAction<N>?,
+    override val source: State,
+    override val target: State,
+    override val inputPreview: InputSlice,
+    override val stackPreview: StackSlice,
+) : Transition<N>() {
+
+    override val inputSize = inputPreview.size
+    override val stackSize = stack.size + stackPreview.size
+}
+
+fun <N : SyntaxNode> Transition<N>.replaceVertexes(source: State, target: State): Transition<N> {
+    return when (this) {
+        is InputTransition<N> -> copy(source = source, target = target)
+        is StackTransition<N> -> copy(source = source, target = target)
+    }
 }
 
 class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
@@ -42,8 +78,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
     fun addTransition(transition: Transition<N>): Transition<N> {
         internalTransitionTable.getOrPut(transition.source) { mutableSetOf() }.add(transition)
 
-        inputSizes[transition.input.size] = (inputSizes[transition.input.size] ?: 0) + 1
-        stackPreviewSizes[transition.stackPreview.size] = (stackPreviewSizes[transition.stackPreview.size] ?: 0) + 1
+        inputSizes[transition.inputSize] = (inputSizes[transition.inputSize] ?: 0) + 1
+        stackPreviewSizes[transition.stackSize] = (stackPreviewSizes[transition.stackSize] ?: 0) + 1
 
         return transition
     }
@@ -51,8 +87,8 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
     fun removeTransition(transition: Transition<N>): Transition<N> {
         internalTransitionTable[transition.source]?.remove(transition)
 
-        inputSizes[transition.input.size] = inputSizes.getValue(transition.input.size) - 1
-        stackPreviewSizes[transition.stackPreview.size] = stackPreviewSizes.getValue(transition.stackPreview.size) - 1
+        inputSizes[transition.inputSize] = inputSizes.getValue(transition.inputSize) - 1
+        stackPreviewSizes[transition.stackSize] = stackPreviewSizes.getValue(transition.stackSize) - 1
 
         return transition
     }
@@ -99,9 +135,9 @@ class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
                 internalFinalStates.add(newState)
             }
             val newOutTransitions = getOutTransitions(states)
-                .map { it.copy(source = newState, target = if (it.target in states) newState else it.target) }
+                .map { it.replaceVertexes(newState, if (it.target in states) newState else it.target) }
             val newInTransitions = getInTransitions(states)
-                .map { it.copy(source = if (it.source in states) newState else it.source, target = newState) }
+                .map { it.replaceVertexes(if (it.source in states) newState else it.source, newState) }
 
             for (transition in newOutTransitions + newInTransitions) {
                 addTransition(transition)

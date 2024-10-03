@@ -3,7 +3,6 @@ package com.github.andrewkuryan.forge.generator
 import com.github.andrewkuryan.forge.BNF.Grammar
 import com.github.andrewkuryan.forge.BNF.Nonterminal
 import com.github.andrewkuryan.forge.BNF.Terminal
-import com.github.andrewkuryan.forge.automata.StackPreview
 import com.github.andrewkuryan.forge.automata.StackSignal
 import com.github.andrewkuryan.forge.translation.SyntaxNode
 
@@ -37,7 +36,7 @@ fun resolvePrefixes(nonterm: Nonterminal, prefixes: Map<Nonterminal, Set<Prefix>
 
 fun <N : SyntaxNode> Grammar<N>.collectPrefixes(): Map<Nonterminal, Set<Prefix>> =
     productions.keys
-        .fold(mapOf(startSymbol to setOf(Prefix(null, StackPreview.BOTTOM.signals)))) { result, nonterm ->
+        .fold(mapOf(startSymbol to setOf(Prefix(null, listOf(StackSignal.Bottom))))) { result, nonterm ->
             productions.getValue(nonterm).fold(result) { nontermResult, production ->
                 production.symbols.fold(nontermResult to listOf<StackSignal>()) { (prodResult, prefix), symbol ->
                     when (symbol) {

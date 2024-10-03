@@ -44,9 +44,7 @@ fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<TransitionBod
     }
 
     for ((transition, target) in transitions) {
-        val foundTransitions = transitionTable.getValue(source).filter {
-            it.input == transition.input && it.stackPreview == transition.stackPreview && it.action == transition.action
-        }
+        val foundTransitions = transitionTable.getValue(source).filter { transition.isSameAs(it) }
         assertEquals(1, foundTransitions.size, "Cannot find an unambiguous transition $transition in $source")
 
         if (target.value != null) {

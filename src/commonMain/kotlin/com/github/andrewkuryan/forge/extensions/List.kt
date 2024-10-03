@@ -27,3 +27,5 @@ fun <T> commonPrefix(list1: List<T>, list2: List<T>): List<T> =
         }
 
 fun <T> List<T>.removeCommonSuffix(other: List<T>): List<T> = dropLast(commonSuffix(this, other).size)
+
+fun <T> List<T>.removeSuffix(suffix: List<T>) = removeCommonSuffix(suffix)

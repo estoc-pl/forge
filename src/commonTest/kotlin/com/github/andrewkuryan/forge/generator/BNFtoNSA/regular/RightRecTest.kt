@@ -26,10 +26,10 @@ class RightRecTest {
                             read('a', "") to s[0],
                             read('b', "") to s[1]
                         ),
-                        s[1] to listOf(rollup("b", "b", "S") to s[2]),
+                        s[1] to listOf(rollup("", "b", "S") to s[2]),
                         s[2] to listOf(
-                            rollup("\$aS", "aS", "S") to s[2],
-                            rollup("aS", "aS", "S") to s[2],
+                            rollup("\$", "aS", "S") to s[2],
+                            rollup("", "aS", "S") to s[2],
                             exit("\$S") to s[3],
                         ),
                         s[3] to listOf()
@@ -64,18 +64,18 @@ class RightRecTest {
                             read('c', "") to s[0],
                             read('d', "") to s[3],
                         ),
-                        s[3] to listOf(rollup("d", "d", "B") to s[4]),
+                        s[3] to listOf(rollup("", "d", "B") to s[4]),
                         s[4] to listOf(
-                            rollup("\$abB", "bB", "A") to s[5],
-                            rollup("cabB", "bB", "A") to s[5]
+                            rollup("\$a", "bB", "A") to s[5],
+                            rollup("ca", "bB", "A") to s[5]
                         ),
                         s[5] to listOf(
-                            rollup("\$aA", "aA", "S") to s[6],
-                            rollup("bcaA", "aA", "S") to s[6],
+                            rollup("\$", "aA", "S") to s[6],
+                            rollup("bc", "aA", "S") to s[6],
                         ),
                         s[6] to listOf(
-                            rollup("\$abcS", "cS", "B") to s[4],
-                            rollup("abcS", "cS", "B") to s[4],
+                            rollup("\$ab", "cS", "B") to s[4],
+                            rollup("ab", "cS", "B") to s[4],
                             exit("\$S") to s[7]
                         ),
                         s[7] to listOf()
@@ -112,30 +112,30 @@ class RightRecTest {
                             read('c', "") to s[0],
                             read('d', "") to s[2],
                         ),
-                        s[2] to listOf(rollup("d", "d", "B") to s[3]),
+                        s[2] to listOf(rollup("", "d", "B") to s[3]),
                         s[3] to listOf(
-                            rollup("\$bB", "bB", "A") to s[4],
-                            rollup("\$abB", "bB", "A") to s[4],
-                            rollup("abB", "bB", "A") to s[4],
-                            rollup("cabB", "bB", "A") to s[4],
-                            rollup("cbB", "bB", "A") to s[4],
+                            rollup("\$", "bB", "A") to s[4],
+                            rollup("\$a", "bB", "A") to s[4],
+                            rollup("a", "bB", "A") to s[4],
+                            rollup("ca", "bB", "A") to s[4],
+                            rollup("c", "bB", "A") to s[4],
                         ),
                         s[4] to listOf(
-                            rollup("\$A", "A", "S") to s[5],
-                            rollup("\$aA", "A", "S") to s[5],
-                            rollup("aA", "A", "S") to s[5],
-                            rollup("bcaA", "A", "S") to s[5],
-                            rollup("bcA", "A", "S") to s[5],
+                            rollup("\$", "A", "S") to s[5],
+                            rollup("\$a", "A", "S") to s[5],
+                            rollup("a", "A", "S") to s[5],
+                            rollup("bca", "A", "S") to s[5],
+                            rollup("bc", "A", "S") to s[5],
                         ),
                         s[5] to listOf(
-                            rollup("\$aS", "aS", "S") to s[5],
-                            rollup("aS", "aS", "S") to s[5],
-                            rollup("\$bcaS", "aS", "S") to s[5],
-                            rollup("bcaS", "aS", "S") to s[5],
-                            rollup("\$bcS", "cS", "B") to s[3],
-                            rollup("\$abcS", "cS", "B") to s[3],
-                            rollup("abcS", "cS", "B") to s[3],
-                            rollup("bcS", "cS", "B") to s[3],
+                            rollup("\$", "aS", "S") to s[5],
+                            rollup("", "aS", "S") to s[5],
+                            rollup("\$bc", "aS", "S") to s[5],
+                            rollup("bc", "aS", "S") to s[5],
+                            rollup("\$b", "cS", "B") to s[3],
+                            rollup("\$ab", "cS", "B") to s[3],
+                            rollup("ab", "cS", "B") to s[3],
+                            rollup("b", "cS", "B") to s[3],
                             exit("\$S") to s[6]
                         ),
                         s[6] to listOf()
@@ -170,17 +170,17 @@ class RightRecTest {
                             read('a', "") to s[0],
                             read('b', "") to s[3]
                         ),
-                        s[3] to listOf(rollup("b", "b", "A") to s[4]),
+                        s[3] to listOf(rollup("", "b", "A") to s[4]),
                         s[4] to listOf(
-                            rollup("\$xA", "xA", "S") to s[5],
-                            rollup("axA", "xA", "S") to s[5],
+                            rollup("\$", "xA", "S") to s[5],
+                            rollup("a", "xA", "S") to s[5],
                         ),
                         s[5] to listOf(
-                            rollup("\$xaS", "aS", "A") to s[4],
-                            rollup("xaS", "aS", "A") to s[4],
+                            rollup("\$x", "aS", "A") to s[4],
+                            rollup("x", "aS", "A") to s[4],
                             exit("\$S") to s[6]
                         ),
-                        s[2] to listOf(rollup("y", "y", "S") to s[5]),
+                        s[2] to listOf(rollup("", "y", "S") to s[5]),
                         s[6] to listOf()
                     )
                 )
@@ -219,30 +219,30 @@ class RightRecTest {
                             read('c', "") to s[1],
                             read('d', "") to s[4]
                         ),
-                        s[4] to listOf(rollup("d", "d", "B") to s[5]),
+                        s[4] to listOf(rollup("", "d", "B") to s[5]),
                         s[5] to listOf(
-                            rollup("\$ibB", "bB", "A") to s[6],
-                            rollup("aibB", "bB", "A") to s[6],
-                            rollup("caibB", "bB", "A") to s[6],
-                            rollup("cbB", "bB", "A") to s[6],
+                            rollup("\$i", "bB", "A") to s[6],
+                            rollup("ai", "bB", "A") to s[6],
+                            rollup("cai", "bB", "A") to s[6],
+                            rollup("c", "bB", "A") to s[6],
                         ),
                         s[6] to listOf(
-                            rollup("\$iA", "iA", "S") to s[7],
-                            rollup("aiA", "iA", "S") to s[7],
-                            rollup("bcaiA", "iA", "S") to s[7],
-                            rollup("\$ibcA", "cA", "B") to s[5],
-                            rollup("aibcA", "cA", "B") to s[5],
-                            rollup("bcA", "cA", "B") to s[5],
+                            rollup("\$", "iA", "S") to s[7],
+                            rollup("a", "iA", "S") to s[7],
+                            rollup("bca", "iA", "S") to s[7],
+                            rollup("\$ib", "cA", "B") to s[5],
+                            rollup("aib", "cA", "B") to s[5],
+                            rollup("b", "cA", "B") to s[5],
                         ),
                         s[7] to listOf(
-                            rollup("\$iaS", "aS", "A") to s[6],
-                            rollup("iaS", "aS", "A") to s[6],
-                            rollup("\$ibcaS", "aS", "A") to s[6],
-                            rollup("ibcaS", "aS", "A") to s[6],
-                            rollup("bcaS", "aS", "A") to s[6],
+                            rollup("\$i", "aS", "A") to s[6],
+                            rollup("i", "aS", "A") to s[6],
+                            rollup("\$ibc", "aS", "A") to s[6],
+                            rollup("ibc", "aS", "A") to s[6],
+                            rollup("bc", "aS", "A") to s[6],
                             exit("\$S") to s[8]
                         ),
-                        s[2] to listOf(rollup("s", "s", "S") to s[7]),
+                        s[2] to listOf(rollup("", "s", "S") to s[7]),
                         s[8] to listOf()
                     )
                 )

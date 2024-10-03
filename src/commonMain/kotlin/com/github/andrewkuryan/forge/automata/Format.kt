@@ -30,5 +30,12 @@ fun NSA<*>.vizFormat() = """digraph {
 }
         |}""".trimMargin()
 
-fun Transition<*>.defaultFormat() = "$source -> $input, $stackPreview / ${action ?: '-'} -> $target"
-fun Transition<*>.vizFormat() = """"$source" -> "$target" [label=<$input / $stackPreview<br/>${action ?: '-'}>]"""
+fun Transition<*>.defaultFormat() = when (this) {
+    is InputTransition -> "$source -> $input($inputPreview), $stackPreview / $stackPush -> $target"
+    is StackTransition -> "$source -> $inputPreview, ($stackPreview)$stack / $stackPush -> $target"
+}
+
+fun Transition<*>.vizFormat() = when (this) {
+    is InputTransition -> """"$source" -> "$target" [label=<$input($inputPreview) / $stackPreview<br/>$stackPush>]"""
+    is StackTransition -> """"$source" -> "$target" [label=<$inputPreview / ($stackPreview)$stack<br/>$stackPush>]"""
+}
