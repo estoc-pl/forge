@@ -1,10 +1,10 @@
 package com.github.andrewkuryan.forge.generator.regular
 
-import com.github.andrewkuryan.forge.BNF.Grammar
-import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
-import com.github.andrewkuryan.forge.BNF.grammar
+import com.github.andrewkuryan.BNF.Grammar
+import com.github.andrewkuryan.BNF.Grammar.Companion.S
+import com.github.andrewkuryan.BNF.SyntaxNode
+import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 import com.github.andrewkuryan.forge.utils.GrammarTest
 
 abstract class LinearGrammarTest(buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNode>) : GrammarTest(buildNSA) {

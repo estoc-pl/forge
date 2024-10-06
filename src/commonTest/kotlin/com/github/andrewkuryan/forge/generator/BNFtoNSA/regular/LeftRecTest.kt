@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.generator.BNFtoNSA.regular
 
-import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
-import com.github.andrewkuryan.forge.BNF.grammar
+import com.github.andrewkuryan.BNF.Grammar.Companion.S
+import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.generator.buildNSAParser
 import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test

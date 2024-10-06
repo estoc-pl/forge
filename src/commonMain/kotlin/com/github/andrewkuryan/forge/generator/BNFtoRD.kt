@@ -1,11 +1,7 @@
 package com.github.andrewkuryan.forge.generator
 
-import com.github.andrewkuryan.forge.BNF.Grammar
-import com.github.andrewkuryan.forge.BNF.Nonterminal
-import com.github.andrewkuryan.forge.BNF.Production
-import com.github.andrewkuryan.forge.BNF.Terminal
+import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 fun <N : SyntaxNode> NSA<N>.processNonterm(
     nonterm: Nonterminal,
@@ -58,7 +54,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     }
 }
 
-fun <N : SyntaxNode> Grammar<N>.buildRDParser() = NSA(nodeBuilder).apply {
+fun <N : SyntaxNode> Grammar<N>.buildRDParser() = NSA<N>().apply {
     val ports = Ports(this, productions.keys)
 
     for (nonterm in productions.keys) {

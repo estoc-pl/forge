@@ -1,8 +1,8 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
+import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.Transition
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 typealias Optimizer<N> = NSA<N>.(List<Transition<N>>) -> List<Transition<N>>
 

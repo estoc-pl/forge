@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.generator.BNFtoNSA
 
-import com.github.andrewkuryan.forge.BNF.Grammar.Companion.S
-import com.github.andrewkuryan.forge.BNF.grammar
+import com.github.andrewkuryan.BNF.Grammar.Companion.S
+import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.StackSignal.Bottom
 import com.github.andrewkuryan.forge.automata.StackSignal.Letter
 import com.github.andrewkuryan.forge.generator.collectPrefixes

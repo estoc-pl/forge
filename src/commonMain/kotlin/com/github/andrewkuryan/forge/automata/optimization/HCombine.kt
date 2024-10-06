@@ -1,9 +1,9 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
+import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.commonPrefix
 import com.github.andrewkuryan.forge.extensions.commonSuffix
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 private fun InputTransition<*>.canHCombine(other: InputTransition<*>) =
     input == other.input && stackPush == other.stackPush

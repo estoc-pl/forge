@@ -1,8 +1,7 @@
 package com.github.andrewkuryan.forge.automata
 
-import com.github.andrewkuryan.forge.translation.NodeBuilder
-import com.github.andrewkuryan.forge.translation.SemanticAction
-import com.github.andrewkuryan.forge.translation.SyntaxNode
+import com.github.andrewkuryan.BNF.SemanticAction
+import com.github.andrewkuryan.BNF.SyntaxNode
 
 data class State(val index: Int) {
     override fun toString() = "S${index}"
@@ -54,7 +53,7 @@ fun <N : SyntaxNode> Transition<N>.replaceVertexes(source: State, target: State)
     }
 }
 
-class NSA<N : SyntaxNode>(val nodeBuilder: NodeBuilder<N>) {
+class NSA<N : SyntaxNode> {
     private var internalInitState = State(0)
     val initState: State get() = internalInitState
 

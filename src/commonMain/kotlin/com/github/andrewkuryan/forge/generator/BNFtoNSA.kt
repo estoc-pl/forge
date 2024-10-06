@@ -1,10 +1,8 @@
 package com.github.andrewkuryan.forge.generator
 
-import com.github.andrewkuryan.forge.BNF.*
+import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.removeSuffix
-import com.github.andrewkuryan.forge.translation.SemanticAction
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 fun <N : SyntaxNode> NSA<N>.addRollupTransitions(
     rollupTop: StackSlice,
@@ -86,7 +84,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     }
 }
 
-fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA(nodeBuilder).apply {
+fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
     val prefixes = collectPrefixes()
 
     val ports = Ports(this, productions.keys)

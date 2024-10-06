@@ -1,10 +1,10 @@
 package com.github.andrewkuryan.forge.generator
 
-import com.github.andrewkuryan.forge.BNF.Grammar
-import com.github.andrewkuryan.forge.BNF.Nonterminal
-import com.github.andrewkuryan.forge.BNF.Terminal
+import com.github.andrewkuryan.BNF.Grammar
+import com.github.andrewkuryan.BNF.Nonterminal
+import com.github.andrewkuryan.BNF.SyntaxNode
+import com.github.andrewkuryan.BNF.Terminal
 import com.github.andrewkuryan.forge.automata.StackSignal
-import com.github.andrewkuryan.forge.translation.SyntaxNode
 
 data class Prefix(val head: Nonterminal?, val body: List<StackSignal>)
 

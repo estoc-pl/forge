@@ -1,8 +1,8 @@
 package com.github.andrewkuryan.forge.generator
 
-import com.github.andrewkuryan.forge.BNF.GrammarSymbol
-import com.github.andrewkuryan.forge.BNF.Nonterminal
-import com.github.andrewkuryan.forge.BNF.Terminal
+import com.github.andrewkuryan.BNF.GrammarSymbol
+import com.github.andrewkuryan.BNF.Nonterminal
+import com.github.andrewkuryan.BNF.Terminal
 import com.github.andrewkuryan.forge.automata.InputSignal
 import com.github.andrewkuryan.forge.automata.StackSignal
 
