@@ -18,10 +18,10 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
                         InputTransition(
                             InputSlice(listOf(symbol.asInputLetter())),
                             StackSlice(listOf(symbol.asStackLetter())),
-                            prevState,
-                            nextState,
                             InputSlice.EMPTY,
                             StackSlice.EMPTY,
+                            prevState,
+                            nextState,
                         )
                     )
 
@@ -29,11 +29,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
                 }
 
                 is Nonterminal -> {
-                    if (index == 0) {
-                        ports.mergeEntries(nonterm, symbol)
-                    } else {
-                        ports.mergeStateToEntry(prevState, symbol)
-                    }
+                    addTransition(EmptyTransition(prevState, ports.getEntry(symbol)))
 
                     ports.getExit(symbol)
                 }
@@ -42,13 +38,13 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
 
         addTransition(
             StackTransition(
-                StackSlice(production.symbols.map { it.asStackLetter() }),
+                StackSlice(production.symbols.reversed().map { it.asStackLetter() }),
                 nonterm.asStackLetter(),
                 production.action,
-                lastState,
-                ports.getExit(nonterm),
                 InputSlice.EMPTY,
                 StackSlice.EMPTY,
+                lastState,
+                ports.getExit(nonterm),
             )
         )
     }
@@ -68,11 +64,13 @@ fun <N : SyntaxNode> Grammar<N>.buildRDParser() = NSA<N>().apply {
         InputTransition(
             InputSlice(listOf(InputSignal.EOI)),
             StackSlice.EMPTY,
+            InputSlice.EMPTY,
+            StackSlice(listOf(startSymbol.asStackLetter(), StackSignal.Bottom)),
             ports.getExit(startSymbol),
             acceptState,
-            InputSlice.EMPTY,
-            StackSlice(listOf(StackSignal.Bottom, startSymbol.asStackLetter())),
         )
     )
     addFinalState(acceptState)
+
+    removeEmptyTransitions()
 }

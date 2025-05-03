@@ -14,7 +14,7 @@ class Ports<N : SyntaxNode>(private val nsa: NSA<N>, nonterms: Set<Nonterminal>)
 
     private fun mergeStates(state1: State, state2: State) {
         if (state1 != state2) {
-            val commonState = nsa.mergeStates(setOf(state1, state2))
+            val commonState = nsa.createMergedState(setOf(state1, state2))
             nsa.removeStates(setOf(state1, state2))
             val relatedNonterms = entries.getOrElse(state1) { setOf() } + entries.getOrElse(state2) { setOf() }
             for (nonterm in relatedNonterms) {

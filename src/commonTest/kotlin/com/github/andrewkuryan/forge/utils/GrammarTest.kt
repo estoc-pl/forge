@@ -14,10 +14,10 @@ abstract class GrammarTest(val buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNod
         val provider = StateProvider()
         val (initRef, finalRef, transitions, verbose) = getAssertion(provider)
 
-        assertEquals(provider.numOfStates, nsa.states.size)
         if (verbose) {
             println(nsa.format(NSAFormatPattern.VIZ))
         }
+        assertEquals(provider.numOfStates, nsa.states.size, "Total number of states does not match the expected")
         nsa.assertTransitions(initRef, finalRef, transitions)
     }
 }

@@ -6,10 +6,14 @@ import com.github.andrewkuryan.forge.extensions.commonPrefix
 import com.github.andrewkuryan.forge.extensions.commonSuffix
 
 private fun InputTransition<*>.canHCombine(other: InputTransition<*>) =
-    input == other.input && stackPush == other.stackPush
+    input == other.input && stackPush == other.stackPush &&
+            inputPreview.canHCombine(other.inputPreview) &&
+            stackPreview.canHCombine(other.stackPreview)
 
 private fun StackTransition<*>.canHCombine(other: StackTransition<*>) =
-    stack == other.stack && stackPush == other.stackPush && semanticAction == other.semanticAction
+    stack == other.stack && stackPush == other.stackPush && semanticAction == other.semanticAction &&
+            inputPreview.canHCombine(other.inputPreview) &&
+            stackPreview.canHCombine(other.stackPreview)
 
 private fun InputSlice.canHCombine(other: InputSlice) =
     isEmpty || other.isEmpty || commonPrefix(value, other.value).isNotEmpty()
@@ -22,9 +26,7 @@ private fun Transition<*>.canHCombine(other: Transition<*>) =
         this is InputTransition && other is InputTransition -> canHCombine(other)
         this is StackTransition && other is StackTransition -> canHCombine(other)
         else -> false
-    } && !isLoop && !other.isLoop &&
-            inputPreview.canHCombine(other.inputPreview) &&
-            stackPreview.canHCombine(other.stackPreview)
+    } && !isLoop && !other.isLoop
 
 private fun InputSlice.hCombine(other: InputSlice) = InputSlice(commonPrefix(value, other.value))
 private fun StackSlice.hCombine(other: StackSlice) = StackSlice(commonSuffix(value, other.value))
@@ -33,10 +35,10 @@ private fun <N : SyntaxNode> InputTransition<N>.hCombine(other: InputTransition<
     InputTransition<N>(
         input,
         stackPush,
-        source,
-        commonTarget,
         inputPreview.hCombine(other.inputPreview),
         stackPreview.hCombine(other.stackPreview),
+        source,
+        commonTarget,
     )
 
 private fun <N : SyntaxNode> StackTransition<N>.hCombine(other: StackTransition<N>, commonTarget: State) =
@@ -44,16 +46,16 @@ private fun <N : SyntaxNode> StackTransition<N>.hCombine(other: StackTransition<
         stack,
         stackPush,
         semanticAction,
-        source,
-        commonTarget,
         inputPreview.hCombine(other.inputPreview),
         stackPreview.hCombine(other.stackPreview),
+        source,
+        commonTarget,
     )
 
 private fun <N : SyntaxNode> NSA<N>.hCombine(transition1: Transition<N>, transition2: Transition<N>): Transition<N> {
     removeTransition(transition1)
     removeTransition(transition2)
-    val newTarget = mergeStates(setOf(transition1.target, transition2.target))
+    val newTarget = createMergedState(setOf(transition1.target, transition2.target))
     val newTransition = when {
         transition1 is InputTransition && transition2 is InputTransition -> transition1.hCombine(transition2, newTarget)
         transition1 is StackTransition && transition2 is StackTransition -> transition1.hCombine(transition2, newTarget)

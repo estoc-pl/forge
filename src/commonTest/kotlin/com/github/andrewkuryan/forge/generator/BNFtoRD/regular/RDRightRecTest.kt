@@ -22,8 +22,8 @@ class RDRightRecTest : RightRecTest({ buildRDParser() }) {
                     ),
                     s[1] to listOf(rollup("", "b", "S") to s[2]),
                     s[2] to listOf(
-                        rollup("", "aS", "S") to s[2],
-                        exit("\$S") to s[3],
+                        rollup("", "Sa", "S") to s[2],
+                        exit("S$") to s[3],
                     ),
                     s[3] to listOf()
                 )
@@ -43,11 +43,11 @@ class RDRightRecTest : RightRecTest({ buildRDParser() }) {
                         read('d', "") to s[3],
                     ),
                     s[3] to listOf(rollup("", "d", "B") to s[4]),
-                    s[4] to listOf(rollup("", "bB", "A") to s[5]),
-                    s[5] to listOf(rollup("", "aA", "S") to s[6]),
+                    s[4] to listOf(rollup("", "Bb", "A") to s[5]),
+                    s[5] to listOf(rollup("", "Aa", "S") to s[6]),
                     s[6] to listOf(
-                        rollup("", "cS", "B") to s[4],
-                        exit("\$S") to s[7]
+                        rollup("", "Sc", "B") to s[4],
+                        exit("S$") to s[7]
                     ),
                     s[7] to listOf()
                 )
@@ -69,12 +69,12 @@ class RDRightRecTest : RightRecTest({ buildRDParser() }) {
                         read('d', "") to s[2],
                     ),
                     s[2] to listOf(rollup("", "d", "B") to s[3]),
-                    s[3] to listOf(rollup("", "bB", "A") to s[4]),
+                    s[3] to listOf(rollup("", "Bb", "A") to s[4]),
                     s[4] to listOf(rollup("", "A", "S") to s[5]),
                     s[5] to listOf(
-                        rollup("", "aS", "S") to s[5],
-                        rollup("", "cS", "B") to s[3],
-                        exit("\$S") to s[6]
+                        rollup("", "Sa", "S") to s[5],
+                        rollup("", "Sc", "B") to s[3],
+                        exit("S$") to s[6]
                     ),
                     s[6] to listOf()
                 )
@@ -96,10 +96,10 @@ class RDRightRecTest : RightRecTest({ buildRDParser() }) {
                         read('b', "") to s[3]
                     ),
                     s[3] to listOf(rollup("", "b", "A") to s[4]),
-                    s[4] to listOf(rollup("", "xA", "S") to s[5]),
+                    s[4] to listOf(rollup("", "Ax", "S") to s[5]),
                     s[5] to listOf(
-                        rollup("", "aS", "A") to s[4],
-                        exit("\$S") to s[6]
+                        rollup("", "Sa", "A") to s[4],
+                        exit("S$") to s[6]
                     ),
                     s[2] to listOf(rollup("", "y", "S") to s[5]),
                     s[6] to listOf()
@@ -126,14 +126,14 @@ class RDRightRecTest : RightRecTest({ buildRDParser() }) {
                         read('d', "") to s[4]
                     ),
                     s[4] to listOf(rollup("", "d", "B") to s[5]),
-                    s[5] to listOf(rollup("", "bB", "A") to s[6]),
+                    s[5] to listOf(rollup("", "Bb", "A") to s[6]),
                     s[6] to listOf(
-                        rollup("", "iA", "S") to s[7],
-                        rollup("", "cA", "B") to s[5],
+                        rollup("", "Ai", "S") to s[7],
+                        rollup("", "Ac", "B") to s[5],
                     ),
                     s[7] to listOf(
-                        rollup("", "aS", "A") to s[6],
-                        exit("\$S") to s[8]
+                        rollup("", "Sa", "A") to s[6],
+                        exit("S$") to s[8]
                     ),
                     s[2] to listOf(rollup("", "s", "S") to s[7]),
                     s[8] to listOf()

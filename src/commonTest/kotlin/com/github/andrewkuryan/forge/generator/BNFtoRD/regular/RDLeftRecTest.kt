@@ -20,9 +20,9 @@ class RDLeftRecTest : LeftRecTest({ buildRDParser() }) {
                     s[1] to listOf(rollup("", "b", "S") to s[2]),
                     s[2] to listOf(
                         read('a', "") to s[3],
-                        exit("\$S") to s[4]
+                        exit("S$") to s[4]
                     ),
-                    s[3] to listOf(rollup("", "Sa", "S") to s[2]),
+                    s[3] to listOf(rollup("", "aS", "S") to s[2]),
                     s[4] to listOf()
                 )
             )
@@ -37,14 +37,14 @@ class RDLeftRecTest : LeftRecTest({ buildRDParser() }) {
                     s[0] to listOf(read('d', "") to s[1]),
                     s[1] to listOf(rollup("", "d", "B") to s[2]),
                     s[2] to listOf(read('b', "") to s[3]),
-                    s[3] to listOf(rollup("", "Bb", "A") to s[4]),
+                    s[3] to listOf(rollup("", "bB", "A") to s[4]),
                     s[4] to listOf(read('a', "") to s[5]),
-                    s[5] to listOf(rollup("", "Aa", "S") to s[6]),
+                    s[5] to listOf(rollup("", "aA", "S") to s[6]),
                     s[6] to listOf(
                         read('c', "") to s[7],
-                        exit("\$S") to s[8]
+                        exit("S$") to s[8]
                     ),
-                    s[7] to listOf(rollup("", "Sc", "B") to s[2]),
+                    s[7] to listOf(rollup("", "cS", "B") to s[2]),
                     s[8] to listOf()
                 )
             )
@@ -59,15 +59,15 @@ class RDLeftRecTest : LeftRecTest({ buildRDParser() }) {
                     s[0] to listOf(read('d', "") to s[1]),
                     s[1] to listOf(rollup("", "d", "B") to s[2]),
                     s[2] to listOf(read('b', "") to s[3]),
-                    s[3] to listOf(rollup("", "Bb", "A") to s[4]),
+                    s[3] to listOf(rollup("", "bB", "A") to s[4]),
                     s[4] to listOf(rollup("", "A", "S") to s[5]),
                     s[5] to listOf(
                         read('a', "") to s[6],
                         read('c', "") to s[7],
-                        exit("\$S") to s[8]
+                        exit("S$") to s[8]
                     ),
-                    s[6] to listOf(rollup("", "Sa", "S") to s[5]),
-                    s[7] to listOf(rollup("", "Sc", "B") to s[2]),
+                    s[6] to listOf(rollup("", "aS", "S") to s[5]),
+                    s[7] to listOf(rollup("", "cS", "B") to s[2]),
                     s[8] to listOf()
                 )
             )
@@ -86,11 +86,11 @@ class RDLeftRecTest : LeftRecTest({ buildRDParser() }) {
                     s[1] to listOf(rollup("", "y", "S") to s[3]),
                     s[3] to listOf(
                         read('a', "") to s[4],
-                        exit("\$S") to s[7]
+                        exit("S$") to s[7]
                     ),
-                    s[4] to listOf(rollup("", "Sa", "A") to s[5]),
+                    s[4] to listOf(rollup("", "aS", "A") to s[5]),
                     s[5] to listOf(read('x', "") to s[6]),
-                    s[6] to listOf(rollup("", "Ax", "S") to s[3]),
+                    s[6] to listOf(rollup("", "xA", "S") to s[3]),
                     s[2] to listOf(rollup("", "b", "A") to s[5]),
                     s[7] to listOf()
                 )
@@ -110,17 +110,17 @@ class RDLeftRecTest : LeftRecTest({ buildRDParser() }) {
                     s[1] to listOf(rollup("", "s", "S") to s[3]),
                     s[3] to listOf(
                         read('a', "") to s[4],
-                        exit("\$S") to s[10]
+                        exit("S$") to s[10]
                     ),
-                    s[4] to listOf(rollup("", "Sa", "A") to s[5]),
+                    s[4] to listOf(rollup("", "aS", "A") to s[5]),
                     s[5] to listOf(
                         read('i', "") to s[6],
                         read('c', "") to s[7]
                     ),
-                    s[6] to listOf(rollup("", "Ai", "S") to s[3]),
-                    s[7] to listOf(rollup("", "Ac", "B") to s[8]),
+                    s[6] to listOf(rollup("", "iA", "S") to s[3]),
+                    s[7] to listOf(rollup("", "cA", "B") to s[8]),
                     s[8] to listOf(read('b', "") to s[9]),
-                    s[9] to listOf(rollup("", "Bb", "A") to s[5]),
+                    s[9] to listOf(rollup("", "bB", "A") to s[5]),
                     s[2] to listOf(rollup("", "d", "B") to s[8]),
                     s[10] to listOf()
                 )

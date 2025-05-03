@@ -14,7 +14,7 @@ fun <N : SyntaxNode> NSA<N>.addRollupTransitions(
 ) {
     for (stackPreview in stackPreviews) {
         addTransition(
-            StackTransition(rollupTop, rollupTarget, semanticAction, source, target, InputSlice.EMPTY, stackPreview)
+            StackTransition(rollupTop, rollupTarget, semanticAction, InputSlice.EMPTY, stackPreview, source, target)
         )
     }
 }
@@ -28,7 +28,7 @@ fun <N : SyntaxNode> NSA<N>.addReadTransitions(
 ) {
     for (stackPreview in stackPreviews) {
         addTransition(
-            InputTransition(input, stackPush, source, target, InputSlice.EMPTY, stackPreview)
+            InputTransition(input, stackPush, InputSlice.EMPTY, stackPreview, source, target)
         )
     }
 }
@@ -100,10 +100,10 @@ fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
         InputTransition(
             InputSlice(listOf(InputSignal.EOI)),
             StackSlice.EMPTY,
-            ports.getExit(startSymbol),
-            acceptState,
             InputSlice.EMPTY,
             StackSlice(listOf(StackSignal.Bottom, startSymbol.asStackLetter())),
+            ports.getExit(startSymbol),
+            acceptState,
         )
     )
     addFinalState(acceptState)

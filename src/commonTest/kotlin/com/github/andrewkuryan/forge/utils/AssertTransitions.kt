@@ -19,7 +19,7 @@ fun NSA<*>.assertTransitions(
 ) {
     initRef.value = initState
 
-    assertEquals(1, finalStates.size)
+    assertEquals(1, finalStates.size, "Only one final state expected")
     finalRef.value = finalStates.first()
 
     for ((ref, stateTransitions) in transitions) {

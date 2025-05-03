@@ -18,7 +18,7 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                 mapOf(
                     s[0] to listOf(read('a', "") to s[1]),
                     s[1] to listOf(rollup("", "a", "S") to s[2]),
-                    s[2] to listOf(exit("\$S") to s[3]),
+                    s[2] to listOf(exit("S$") to s[3]),
                     s[3] to listOf()
                 )
             )
@@ -34,12 +34,12 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                     s[1] to listOf(read('b', "") to s[2]),
                     s[2] to listOf(read('c', "") to s[3]),
                     s[3] to listOf(read('d', "") to s[4]),
-                    s[4] to listOf(rollup("", "cd", "C") to s[5]),
-                    s[5] to listOf(rollup("", "bC", "B") to s[6]),
-                    s[6] to listOf(rollup("", "aB", "A") to s[7]),
+                    s[4] to listOf(rollup("", "dc", "C") to s[5]),
+                    s[5] to listOf(rollup("", "Cb", "B") to s[6]),
+                    s[6] to listOf(rollup("", "Ba", "A") to s[7]),
                     s[7] to listOf(read('s', "") to s[8]),
-                    s[8] to listOf(rollup("", "As", "S") to s[9]),
-                    s[9] to listOf(exit("\$S") to s[10]),
+                    s[8] to listOf(rollup("", "sA", "S") to s[9]),
+                    s[9] to listOf(exit("S$") to s[10]),
                     s[10] to listOf()
                 )
             )
@@ -57,11 +57,11 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                     ),
                     s[1] to listOf(read('b', "") to s[2]),
                     s[2] to listOf(read('c', "") to s[3]),
-                    s[3] to listOf(rollup("", "abc", "A") to s[4]),
+                    s[3] to listOf(rollup("", "cba", "A") to s[4]),
                     s[4] to listOf(rollup("", "A", "S") to s[5]),
-                    s[5] to listOf(exit("\$S") to s[9]),
+                    s[5] to listOf(exit("S$") to s[9]),
                     s[6] to listOf(read('e', "") to s[7]),
-                    s[7] to listOf(rollup("", "de", "B") to s[8]),
+                    s[7] to listOf(rollup("", "ed", "B") to s[8]),
                     s[8] to listOf(rollup("", "B", "S") to s[5]),
                     s[9] to listOf()
                 )
@@ -81,12 +81,12 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                     s[1] to listOf(read('c', "") to s[2]),
                     s[2] to listOf(rollup("", "c", "C") to s[3]),
                     s[3] to listOf(
-                        rollup("", "aC", "A") to s[4],
-                        rollup("", "bC", "B") to s[5]
+                        rollup("", "Ca", "A") to s[4],
+                        rollup("", "Cb", "B") to s[5]
                     ),
                     s[4] to listOf(rollup("", "A", "S") to s[6]),
                     s[5] to listOf(rollup("", "B", "S") to s[6]),
-                    s[6] to listOf(exit("\$S") to s[7]),
+                    s[6] to listOf(exit("S$") to s[7]),
                     s[7] to listOf()
                 )
             )
@@ -108,11 +108,11 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                         read('c', "") to s[4],
                         read('d', "") to s[5],
                     ),
-                    s[4] to listOf(rollup("", "Cc", "A") to s[6]),
-                    s[5] to listOf(rollup("", "Cd", "B") to s[7]),
-                    s[6] to listOf(rollup("", "aA", "S") to s[8]),
-                    s[7] to listOf(rollup("", "bB", "S") to s[8]),
-                    s[8] to listOf(exit("\$S") to s[9]),
+                    s[4] to listOf(rollup("", "cC", "A") to s[6]),
+                    s[5] to listOf(rollup("", "dC", "B") to s[7]),
+                    s[6] to listOf(rollup("", "Aa", "S") to s[8]),
+                    s[7] to listOf(rollup("", "Bb", "S") to s[8]),
+                    s[8] to listOf(exit("S$") to s[9]),
                     s[9] to listOf()
                 )
             )
