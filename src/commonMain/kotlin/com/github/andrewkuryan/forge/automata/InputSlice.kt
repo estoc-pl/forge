@@ -19,5 +19,7 @@ value class InputSlice(val value: List<InputSignal>) {
     val size: Int get() = value.size
     val isEmpty: Boolean get() = value.isEmpty()
 
+    operator fun plus(other: InputSlice) = InputSlice(this.value + other.value)
+
     override fun toString() = if (isEmpty) "ε" else value.joinToString("")
 }

@@ -19,5 +19,7 @@ value class StackSlice(val value: List<StackSignal>) {
     val size: Int get() = value.size
     val isEmpty: Boolean get() = value.isEmpty()
 
-    override fun toString() = if (isEmpty) "*" else value.joinToString("")
+    operator fun plus(other: StackSlice) = StackSlice(this.value + other.value)
+
+    override fun toString() = if (isEmpty) "ε" else value.joinToString("")
 }

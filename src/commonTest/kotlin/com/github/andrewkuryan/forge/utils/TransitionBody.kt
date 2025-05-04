@@ -58,10 +58,16 @@ fun exit(stackPreview: String) =
         StackSlice.EMPTY,
     )
 
-private fun parseStackSignals(rawSignals: String) =
-    rawSignals.map {
-        when (it) {
-            '$' -> StackSignal.Bottom
-            else -> StackSignal.Letter(it.toString())
+ fun parseStackSignals(rawSignals: String): List<StackSignal> {
+    val bottom = if (rawSignals.endsWith("$")) listOf(StackSignal.Bottom) else listOf()
+    return listOf(
+        IntRange(0, -1),
+        *Regex("([A-Z_]+[0-9]*)").findAll(rawSignals).map { it.range }.toList().toTypedArray(),
+        IntRange(rawSignals.length - bottom.size, rawSignals.length - 1)
+    ).zipWithNext()
+        .map { (start, end) ->
+            (if (!start.isEmpty()) listOf(StackSignal.Letter(rawSignals.substring(start))) else listOf()) +
+                    (start.last + 1 until end.first).map { StackSignal.Letter(rawSignals[it].toString()) }
         }
-    }
+        .flatten() + bottom
+}
