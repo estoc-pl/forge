@@ -3,7 +3,8 @@ package com.github.andrewkuryan.forge.generator.BNFtoNSA
 import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.StackSignal.Bottom
-import com.github.andrewkuryan.forge.automata.StackSignal.Letter
+import com.github.andrewkuryan.forge.automata.StackSignal.Node
+import com.github.andrewkuryan.forge.automata.NSASignal.Symbol
 import com.github.andrewkuryan.forge.generator.collectPrefixes
 import com.github.andrewkuryan.forge.generator.resolvePrefixes
 import kotlin.test.Test
@@ -33,12 +34,12 @@ class PrefixTest {
 
             assertContains(sPrefixes, listOf(Bottom))
 
-            assertContains(aPrefixes, listOf(Bottom, Letter("a")))
-            assertContains(aPrefixes, listOf(Bottom, Letter("a"), Letter("b"), Letter("d")))
-            assertContains(aPrefixes, listOf(Letter("b"), Letter("d")))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('a')))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('a'), Symbol('b'), Symbol('d')))
+            assertContains(aPrefixes, listOf(Symbol('b'), Symbol('d')))
 
-            assertContains(bPrefixes, listOf(Bottom, Letter("a"), Letter("b")))
-            assertContains(bPrefixes, listOf(Letter("d"), Letter("b")))
+            assertContains(bPrefixes, listOf(Bottom, Symbol('a'), Symbol('b')))
+            assertContains(bPrefixes, listOf(Symbol('d'), Symbol('b')))
         }
     }
 
@@ -79,11 +80,11 @@ class PrefixTest {
             assertEquals(2, aPrefixes.size)
 
             assertContains(sPrefixes, listOf(Bottom))
-            assertContains(sPrefixes, listOf(Bottom, Letter("a"), Letter("i")))
-            assertContains(sPrefixes, listOf(Letter("a"), Letter("i")))
+            assertContains(sPrefixes, listOf(Bottom, Symbol('a'), Symbol('i')))
+            assertContains(sPrefixes, listOf(Symbol('a'), Symbol('i')))
 
-            assertContains(aPrefixes, listOf(Bottom, Letter("a")))
-            assertContains(aPrefixes, listOf(Letter("i"), Letter("a")))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('a')))
+            assertContains(aPrefixes, listOf(Symbol('i'), Symbol('a')))
         }
     }
 
@@ -107,14 +108,14 @@ class PrefixTest {
             assertEquals(2, bPrefixes.size)
 
             assertContains(sPrefixes, listOf(Bottom))
-            assertContains(sPrefixes, listOf(Bottom, Letter("a")))
-            assertContains(sPrefixes, listOf(Letter("a")))
+            assertContains(sPrefixes, listOf(Bottom, Symbol('a')))
+            assertContains(sPrefixes, listOf(Symbol('a')))
 
-            assertContains(aPrefixes, listOf(Bottom, Letter("a")))
-            assertContains(aPrefixes, listOf(Letter("a")))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('a')))
+            assertContains(aPrefixes, listOf(Symbol('a')))
 
-            assertContains(bPrefixes, listOf(Bottom, Letter("a")))
-            assertContains(bPrefixes, listOf(Letter("a")))
+            assertContains(bPrefixes, listOf(Bottom, Symbol('a')))
+            assertContains(bPrefixes, listOf(Symbol('a')))
         }
     }
 
@@ -134,7 +135,7 @@ class PrefixTest {
             assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(2, aPrefixes.size)
-            assertContains(aPrefixes, listOf(Bottom, Letter("S"), Letter("a")))
+            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a')))
             assertContains(aPrefixes, listOf(Bottom))
         }
     }
@@ -155,11 +156,11 @@ class PrefixTest {
             assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(5, aPrefixes.size)
-            assertContains(aPrefixes, listOf(Bottom, Letter("S"), Letter("a")))
+            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a')))
             assertContains(aPrefixes, listOf(Bottom))
-            assertContains(aPrefixes, listOf(Bottom, Letter("S"), Letter("a"), Letter("b")))
-            assertContains(aPrefixes, listOf(Bottom, Letter("b")))
-            assertContains(aPrefixes, listOf(Letter("b")))
+            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('b')))
+            assertContains(aPrefixes, listOf(Symbol('b')))
         }
     }
 
@@ -180,16 +181,16 @@ class PrefixTest {
             assertEquals(7, aPrefixes.size)
 
             assertContains(sPrefixes, listOf(Bottom))
-            assertContains(sPrefixes, listOf(Bottom, Letter("A"), Letter("a")))
-            assertContains(sPrefixes, listOf(Letter("A"), Letter("a")))
+            assertContains(sPrefixes, listOf(Bottom, Node("A"), Symbol('a')))
+            assertContains(sPrefixes, listOf(Node("A"), Symbol('a')))
 
             assertContains(aPrefixes, listOf(Bottom))
-            assertContains(aPrefixes, listOf(Bottom, Letter("A"), Letter("a")))
-            assertContains(aPrefixes, listOf(Letter("A"), Letter("a")))
-            assertContains(aPrefixes, listOf(Bottom, Letter("b")))
-            assertContains(aPrefixes, listOf(Bottom, Letter("A"), Letter("a"), Letter("b")))
-            assertContains(aPrefixes, listOf(Letter("A"), Letter("a"), Letter("b")))
-            assertContains(aPrefixes, listOf(Letter("b")))
+            assertContains(aPrefixes, listOf(Bottom, Node("A"), Symbol('a')))
+            assertContains(aPrefixes, listOf(Node("A"), Symbol('a')))
+            assertContains(aPrefixes, listOf(Bottom, Symbol('b')))
+            assertContains(aPrefixes, listOf(Bottom, Node("A"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(Node("A"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(Symbol('b')))
         }
     }
 }

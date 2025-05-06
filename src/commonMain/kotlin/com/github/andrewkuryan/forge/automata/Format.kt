@@ -87,8 +87,8 @@ fun InputSlice.ktSourceFormat() =
     else "InputSlice(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
 
 fun InputSignal.ktSourceFormat() = when (this) {
+    is NSASignal -> ktSourceFormatNSASignal(this)
     is InputSignal.EOI -> "InputSignal.EOI"
-    is InputSignal.Letter -> "InputSignal.Letter('${this.value}')"
 }
 
 fun StackSlice.ktSourceFormat() =
@@ -96,8 +96,21 @@ fun StackSlice.ktSourceFormat() =
     else "StackSlice(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
 
 fun StackSignal.ktSourceFormat() = when (this) {
+    is NSASignal -> ktSourceFormatNSASignal(this)
     is StackSignal.Bottom -> "StackSignal.Bottom"
-    is StackSignal.Letter -> "StackSignal.Letter(\"${this.name}\")"
+    is StackSignal.Node -> "StackSignal.Node(\"${this.name}\")"
+}
+
+fun ktSourceFormatBaseNSASignal(signal: BaseNSASignal) = when (signal) {
+    is NSASignal.Symbol -> "NSASignal.Symbol('${signal.value}')"
+    is NSASignal.Range -> "NSASignal.Range('${signal.value.first}'..'${signal.value.last}')"
+}
+
+fun ktSourceFormatNSASignal(signal: NSASignal) = when (signal) {
+    is BaseNSASignal -> ktSourceFormatBaseNSASignal(signal)
+    is NSASignal.Not -> "NSASignal.Not(" +
+            "${ktSourceFormatBaseNSASignal(signal.first)}," +
+            "listOf(${signal.rest.joinToString(",") { ktSourceFormatBaseNSASignal(it) }}))"
 }
 
 inline fun <reified N : SyntaxNode> SemanticAction<N>?.ktSourceFormat() =

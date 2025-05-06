@@ -36,10 +36,10 @@ fun TransitionBody.isSameAs(transition: Transition<*>) =
 
 fun read(input: Char, stackPreview: String) =
     InputTransitionBody(
-        InputSlice(listOf(InputSignal.Letter(input))),
+        InputSlice(listOf(NSASignal.Symbol(input))),
         InputSlice.EMPTY,
         StackSlice(parseStackSignals(stackPreview)),
-        StackSlice(listOf(StackSignal.Letter(input.toString())))
+        StackSlice(listOf(NSASignal.Symbol(input)))
     )
 
 fun rollup(stackPreview: String, stack: String, target: String) =
@@ -47,7 +47,7 @@ fun rollup(stackPreview: String, stack: String, target: String) =
         StackSlice(parseStackSignals(stack)),
         InputSlice.EMPTY,
         StackSlice(parseStackSignals(stackPreview)),
-        StackSignal.Letter(target)
+        StackSignal.Node(target)
     )
 
 fun exit(stackPreview: String) =
@@ -58,16 +58,19 @@ fun exit(stackPreview: String) =
         StackSlice.EMPTY,
     )
 
- fun parseStackSignals(rawSignals: String): List<StackSignal> {
-    val bottom = if (rawSignals.endsWith("$")) listOf(StackSignal.Bottom) else listOf()
+fun parseStackSignals(rawSignals: String): List<StackSignal> {
     return listOf(
         IntRange(0, -1),
-        *Regex("([A-Z_]+[0-9]*)").findAll(rawSignals).map { it.range }.toList().toTypedArray(),
-        IntRange(rawSignals.length - bottom.size, rawSignals.length - 1)
+        *Regex("([A-Z_]+[0-9]*)|[$]").findAll(rawSignals).map { it.range }.toList().toTypedArray(),
+        IntRange(rawSignals.length, rawSignals.length - 1)
     ).zipWithNext()
         .map { (start, end) ->
-            (if (!start.isEmpty()) listOf(StackSignal.Letter(rawSignals.substring(start))) else listOf()) +
-                    (start.last + 1 until end.first).map { StackSignal.Letter(rawSignals[it].toString()) }
+            val node = when {
+                start.isEmpty() -> listOf()
+                rawSignals.substring(start) == StackSignal.Bottom.toString() -> listOf(StackSignal.Bottom)
+                else -> listOf(StackSignal.Node(rawSignals.substring(start)))
+            }
+            node + (start.last + 1 until end.first).map { NSASignal.Symbol(rawSignals[it]) }
         }
-        .flatten() + bottom
+        .flatten()
 }

@@ -1,11 +1,11 @@
 package com.github.andrewkuryan.forge.automata
 
-sealed class StackSignal {
-    data object Bottom : StackSignal() {
+sealed interface StackSignal {
+    data object Bottom : StackSignal {
         override fun toString() = "$"
     }
 
-    data class Letter(val name: String) : StackSignal() {
+    data class Node(val name: String) : StackSignal {
         override fun toString() = name
     }
 }

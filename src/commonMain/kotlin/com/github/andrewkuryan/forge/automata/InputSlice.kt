@@ -1,12 +1,8 @@
 package com.github.andrewkuryan.forge.automata
 
-sealed class InputSignal {
-    object EOI : InputSignal() {
+sealed interface InputSignal {
+    object EOI : InputSignal {
         override fun toString() = "┴"
-    }
-
-    data class Letter(val value: Char) : InputSignal() {
-        override fun toString() = value.toString()
     }
 }
 
