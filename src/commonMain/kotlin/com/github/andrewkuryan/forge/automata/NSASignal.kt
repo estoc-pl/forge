@@ -8,17 +8,17 @@ sealed class NSASignal {
     }
 
     data class Range(val value: CharRange) : NSASignal(), BaseNSASignal, InputSignal, StackSignal {
-        fun toStringNested() = "${value.first}-${value.last}"
-
-        override fun toString() = "[${toStringNested()}]"
+        override fun toString() = "${value.first}-${value.last}"
     }
 
-    data class Not(val first: BaseNSASignal, val rest: List<BaseNSASignal>) : NSASignal(), InputSignal, StackSignal {
-        override fun toString() = (listOf(first) + rest).joinToString("", "[^", "]") {
-            when (it) {
-                is Symbol -> it.toString()
-                is Range -> it.toStringNested()
-            }
-        }
+    data class Not(
+        val first: BaseNSASignal,
+        val rest: List<BaseNSASignal> = listOf(),
+    ) : NSASignal(), InputSignal, StackSignal {
+        override fun toString() = (listOf(first) + rest).joinToString(
+            "",
+            if (rest.isEmpty()) "^" else "[^",
+            if (rest.isEmpty()) "" else "]"
+        )
     }
 }
