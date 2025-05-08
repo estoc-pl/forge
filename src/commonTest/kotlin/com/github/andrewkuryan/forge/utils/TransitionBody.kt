@@ -42,6 +42,14 @@ fun read(input: Char, stackPreview: String) =
         StackSlice(listOf(NSASignal.Symbol(input)))
     )
 
+fun read(input: String, stackPreview: String) =
+    InputTransitionBody(
+        InputSlice(parseInputSignals(input)),
+        InputSlice.EMPTY,
+        StackSlice(parseStackSignals(stackPreview)),
+        StackSlice(parseStackSignals(input))
+    )
+
 fun rollup(stackPreview: String, stack: String, target: String) =
     StackTransitionBody(
         StackSlice(parseStackSignals(stack)),
@@ -58,19 +66,64 @@ fun exit(stackPreview: String) =
         StackSlice.EMPTY,
     )
 
-fun parseStackSignals(rawSignals: String): List<StackSignal> {
-    return listOf(
-        IntRange(0, -1),
-        *Regex("([A-Z_]+[0-9]*)|[$]").findAll(rawSignals).map { it.range }.toList().toTypedArray(),
-        IntRange(rawSignals.length, rawSignals.length - 1)
-    ).zipWithNext()
-        .map { (start, end) ->
-            val node = when {
-                start.isEmpty() -> listOf()
-                rawSignals.substring(start) == StackSignal.Bottom.toString() -> listOf(StackSignal.Bottom)
-                else -> listOf(StackSignal.Node(rawSignals.substring(start)))
-            }
-            node + (start.last + 1 until end.first).map { NSASignal.Symbol(rawSignals[it]) }
-        }
-        .flatten()
+private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>
+
+private val RANGE_TRANSFORMER: Transformer<NSASignal.Range> =
+    Regex(".-.") to { range, input -> NSASignal.Range(input[range.first]..input[range.last]) }
+private val SINGLE_NOT_TRANSFORMER: Transformer<NSASignal.Not> =
+    Regex("\\^[^\\[]") to { range, input -> NSASignal.Not(NSASignal.Symbol(input[range.first + 1])) }
+private val COMPLEX_NOT_TRANSFORMER: Transformer<NSASignal.Not> = Regex("\\^\\[..+]") to { range, input ->
+    val nestedSignals = parseBaseNSASignals(input.substring(range.first + 2 until range.last))
+    NSASignal.Not(nestedSignals.first(), nestedSignals.slice(1 until nestedSignals.size))
 }
+private val EOI_TRANSFORMER: Transformer<InputSignal.EOI> =
+    Regex(InputSignal.EOI.toString()) to { _, _ -> InputSignal.EOI }
+
+private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.Node> =
+    Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.Node(input.substring(range)) }
+private val STACK_BOTTOM_TRANSFORMER: Transformer<StackSignal.Bottom> =
+    Regex("\\$") to { _, _ -> StackSignal.Bottom }
+
+private val DEFAULT_TRANSFORMER = { symbol: Char -> NSASignal.Symbol(symbol) }
+
+fun <T, D : T> parseSignals(transformers: List<Transformer<T>>, parseDefault: (Char) -> D): (String) -> List<T> {
+    fun parseFragment(input: String, restTransformers: List<Transformer<T>>): List<T> {
+        val (regex, transformerFn) = restTransformers.first()
+        val foundSignals = regex.findAll(input)
+            .map { it.range to transformerFn(it.range, input) }
+            .toList()
+            .toTypedArray()
+        return listOf(IntRange(0, -1) to null, *foundSignals, IntRange(input.length, input.length - 1) to null)
+            .zipWithNext()
+            .map { (start, end) -> start.second to ((start.first.last + 1) until end.first.first) }
+            .fold(listOf()) { acc, (symbol, nextRange) ->
+                val nestedSymbols =
+                    if (restTransformers.size > 1) parseFragment(input.substring(nextRange), restTransformers.drop(1))
+                    else nextRange.map { parseDefault(input[it]) }
+                acc + (if (symbol != null) listOf(symbol) else listOf()) + nestedSymbols
+            }
+    }
+
+    return { input -> parseFragment(input, transformers) }
+}
+
+val parseBaseNSASignals = parseSignals(listOf<Transformer<BaseNSASignal>>(RANGE_TRANSFORMER), DEFAULT_TRANSFORMER)
+val parseInputSignals = parseSignals(
+    listOf(
+        EOI_TRANSFORMER,
+        SINGLE_NOT_TRANSFORMER,
+        COMPLEX_NOT_TRANSFORMER,
+        RANGE_TRANSFORMER
+    ),
+    DEFAULT_TRANSFORMER
+)
+val parseStackSignals = parseSignals(
+    listOf(
+        STACK_BOTTOM_TRANSFORMER,
+        STACK_NODE_TRANSFORMER,
+        SINGLE_NOT_TRANSFORMER,
+        COMPLEX_NOT_TRANSFORMER,
+        RANGE_TRANSFORMER
+    ),
+    DEFAULT_TRANSFORMER
+)
