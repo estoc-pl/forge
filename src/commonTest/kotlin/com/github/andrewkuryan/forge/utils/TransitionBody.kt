@@ -12,14 +12,20 @@ data class InputTransitionBody(
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
     val stackPush: StackSlice,
-) : TransitionBody()
+) : TransitionBody() {
+
+    override fun toString() = "$input⟨$inputPreview⟩, ⟨$stackPreview⟩ / $stackPush"
+}
 
 data class StackTransitionBody(
     val stack: StackSlice,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
     val stackPush: StackSignal,
-) : TransitionBody()
+) : TransitionBody() {
+
+    override fun toString() = "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / $stackPush"
+}
 
 fun TransitionBody.isSameAs(transition: Transition<*>) =
     when {

@@ -33,9 +33,9 @@ fun NSA<*>.assertTransitions(
 
 fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<TransitionBody, StateRef>>) {
     if (transitions.isEmpty()) {
-        assertNull(transitionTable[source], "State $source has outgoing transitions")
+        assertNull(transitionTable[source], "State $source should not have outgoing transitions")
     } else {
-        assertNotNull(transitionTable[source], "State $source does not have transitions")
+        assertNotNull(transitionTable[source], "State $source should have outgoing transitions")
         assertEquals(
             transitions.size,
             transitionTable.getValue(source).size,
@@ -43,18 +43,21 @@ fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<TransitionBod
         )
     }
 
+    val originalTransitions = transitionTable[source]?.toMutableSet() ?: mutableSetOf()
     for ((transition, target) in transitions) {
-        val foundTransitions = transitionTable.getValue(source).filter { transition.isSameAs(it) }
-        assertEquals(1, foundTransitions.size, "Cannot find an unambiguous transition $transition in $source")
+        val foundTransitions = originalTransitions.filter { transition.isSameAs(it) }
+        assertEquals(1, foundTransitions.size, "Cannot find an unambiguous transition [$transition] in $source")
 
+        val originalTransition = foundTransitions.first()
         if (target.value != null) {
             assertEquals(
                 target.value,
-                foundTransitions.first().target,
-                "Transition ${foundTransitions.first().defaultFormat()} was expected to lead to ${target.value}"
+                originalTransition.target,
+                "Transition ${originalTransition.defaultFormat()} was expected to lead to ${target.value}"
             )
         } else {
             target.value = foundTransitions.first().target
         }
+        originalTransitions.remove(originalTransition)
     }
 }

@@ -76,7 +76,7 @@ class RDLinearGrammarTest : LinearGrammarTest({ buildRDParser() }) {
                 mapOf(
                     s[0] to listOf(
                         read('a', "") to s[1],
-                        read('a', "") to s[1]
+                        read('b', "") to s[1]
                     ),
                     s[1] to listOf(read('c', "") to s[2]),
                     s[2] to listOf(rollup("", "c", "C") to s[3]),
