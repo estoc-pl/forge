@@ -27,18 +27,12 @@ data class StackTransitionBody(
     override fun toString() = "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / $stackPush"
 }
 
-fun TransitionBody.isSameAs(transition: Transition<*>) =
+fun TransitionBody.isSameAs(transition: MeaningfulTransition<*>) =
     when {
-        this is InputTransitionBody && transition is InputTransition ->
-            input == transition.input && stackPush == transition.stackPush &&
-                    inputPreview == transition.inputPreview && stackPreview == transition.stackPreview
-
-        this is StackTransitionBody && transition is StackTransition ->
-            stack == transition.stack && stackPush == transition.stackPush &&
-                    inputPreview == transition.inputPreview && stackPreview == transition.stackPreview
-
+        this is InputTransitionBody && transition is InputTransition -> input == transition.input && stackPush == transition.stackPush
+        this is StackTransitionBody && transition is StackTransition -> stack == transition.stack && stackPush == transition.stackPush
         else -> false
-    }
+    } && inputPreview == transition.inputPreview && stackPreview == transition.stackPreview
 
 fun read(input: Char, stackPreview: String) =
     InputTransitionBody(

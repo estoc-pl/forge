@@ -36,7 +36,7 @@ fun <N : SyntaxNode> NSA<N>.addReadTransitions(
 fun <N : SyntaxNode> NSA<N>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<Production<N>>>,
-    ports: Ports<N>,
+    ports: Ports<NSA<N>>,
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->

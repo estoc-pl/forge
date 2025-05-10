@@ -3,10 +3,10 @@ package com.github.andrewkuryan.forge.generator
 import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.*
 
-fun <N : SyntaxNode> NSA<N>.processNonterm(
+fun <N : SyntaxNode> ENSA<N>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<Production<N>>>,
-    ports: Ports<N>,
+    ports: Ports<ENSA<N>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
         val lastState = production.symbols.fold(ports.getEntry(nonterm)) { prevState, symbol ->
@@ -45,7 +45,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     }
 }
 
-fun <N : SyntaxNode> Grammar<N>.buildRDParser() = NSA<N>().apply {
+fun <N : SyntaxNode> Grammar<N>.buildRDParser() = ENSA<N>().apply {
     val ports = Ports(this, productions.keys)
 
     for (nonterm in productions.keys) {

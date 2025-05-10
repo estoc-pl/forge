@@ -1,10 +1,10 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
 import com.github.andrewkuryan.BNF.SyntaxNode
+import com.github.andrewkuryan.forge.automata.MeaningfulTransition
 import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.automata.Transition
 
-typealias Optimizer<N> = NSA<N>.(List<Transition<N>>) -> List<Transition<N>>
+typealias Optimizer<N> = NSA<N>.(List<MeaningfulTransition<N>>) -> List<MeaningfulTransition<N>>
 
 fun <N : SyntaxNode> NSA<N>.optimize(optimizers: List<Optimizer<N>> = listOf(NSA<N>::hCombine)) {
     val queue = mutableListOf(initState)
