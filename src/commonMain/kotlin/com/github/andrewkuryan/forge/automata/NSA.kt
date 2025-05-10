@@ -1,55 +1,9 @@
 package com.github.andrewkuryan.forge.automata
 
-import com.github.andrewkuryan.BNF.SemanticAction
 import com.github.andrewkuryan.BNF.SyntaxNode
 
 data class State(val index: Int) {
     override fun toString() = "S${index}"
-}
-
-sealed class Transition<N : SyntaxNode> {
-    abstract val source: State
-    abstract val target: State
-
-    abstract val inputSize: Int
-    abstract val stackSize: Int
-
-    val isLoop: Boolean get() = source == target
-}
-
-data class EmptyTransition<N : SyntaxNode>(
-    override val source: State,
-    override val target: State,
-) : Transition<N>() {
-    override val inputSize = 0
-    override val stackSize = 0
-}
-
-data class InputTransition<N : SyntaxNode>(
-    val input: InputSlice,
-    val stackPush: StackSlice,
-    val inputPreview: InputSlice,
-    val stackPreview: StackSlice,
-    override val source: State,
-    override val target: State,
-) : Transition<N>() {
-
-    override val inputSize = input.size + inputPreview.size
-    override val stackSize = stackPreview.size
-}
-
-data class StackTransition<N : SyntaxNode>(
-    val stack: StackSlice,
-    val stackPush: StackSignal,
-    val semanticAction: SemanticAction<N>?,
-    val inputPreview: InputSlice,
-    val stackPreview: StackSlice,
-    override val source: State,
-    override val target: State,
-) : Transition<N>() {
-
-    override val inputSize = inputPreview.size
-    override val stackSize = stack.size + stackPreview.size
 }
 
 fun <N : SyntaxNode> Transition<N>.replaceVertexes(source: State, target: State): Transition<N> {
@@ -106,10 +60,6 @@ class NSA<N : SyntaxNode> {
         return transition
     }
 
-    private fun removeTransitions(transitions: List<Transition<N>>): List<Transition<N>> {
-        return transitions.onEach { removeTransition(it) }
-    }
-
     fun setInitState(state: State) {
         internalInitState = state
     }
@@ -162,30 +112,6 @@ class NSA<N : SyntaxNode> {
             newState
         } else states.first()
 
-    private fun mergeStates(states: Set<State>): State =
-        if (states.size > 1) {
-            val newState = nextState()
-            if (initState in states) {
-                internalInitState = newState
-            }
-            val intersectedFinalStates = states.intersect(finalStates)
-            if (intersectedFinalStates.isNotEmpty()) {
-                internalFinalStates.add(newState)
-                internalFinalStates.removeAll(intersectedFinalStates)
-            }
-            val newOutTransitions = getOutTransitions(states)
-                .apply { removeTransitions(this) }
-                .map { it.replaceVertexes(newState, if (it.target in states) newState else it.target) }
-            val newInTransitions = getInTransitions(states)
-                .apply { removeTransitions(this) }
-                .map { it.replaceVertexes(if (it.source in states) newState else it.source, newState) }
-
-            for (transition in newOutTransitions + newInTransitions) {
-                addTransition(transition)
-            }
-            newState
-        } else states.first()
-
     private fun hasInTransitions(state: State) =
         transitionTable.values.flatten().any { it.target == state }
 
@@ -219,19 +145,55 @@ class NSA<N : SyntaxNode> {
             ?.let { eClosure(it, visited + it) } ?: visited
     }
 
-    fun removeEmptyTransitions() {
-        val queue = mutableListOf(initState)
-        val visited = mutableSetOf<State>()
-        while (queue.isNotEmpty()) {
-            val current = queue.removeAt(0)
-            visited.add(current)
-            val newState = mergeStates(eClosure(setOf(current)))
+    fun meaningfulClosure(start: State) =
+        eClosure(setOf(start))
+            .filter { state ->
+                state in finalStates || !transitionTable[state]?.filter { it !is EmptyTransition }.isNullOrEmpty()
+            }
+            .toSet()
+}
 
-            val emptyLoops = transitionTable[newState]?.filter { it is EmptyTransition && it.isLoop } ?: emptyList()
-            removeTransitions(emptyLoops)
+fun <N : SyntaxNode> NSA<N>.removeEmptyTransitions(): NSA<N> {
+    val nsa = NSA<N>()
+    val initialClosure = meaningfulClosure(initState)
+    val newInitialState = nsa.nextState()
 
-            val nextStates = transitionTable[newState]?.map { it.target }?.filter { it !in visited } ?: emptyList()
-            queue.addAll(nextStates)
+    val queue = mutableListOf(newInitialState to initialClosure)
+    val processed = mutableMapOf(initialClosure to newInitialState)
+
+    while (queue.isNotEmpty()) {
+        val (newState, oldStates) = queue.removeAt(0)
+        val nextStates = oldStates.flatMap { state ->
+            transitionTable[state]?.filter { it !is EmptyTransition }?.map { transition ->
+                val targetClosure = meaningfulClosure(transition.target)
+                val newTarget = processed[targetClosure] ?: nsa.nextState()
+                val newTransition = nsa.addTransition(transition.replaceVertexes(newState, newTarget))
+                newTransition to targetClosure
+            } ?: listOf()
         }
+            .filter { it.second !in processed }
+            .groupBy { it.second }
+            .values
+            .map { transitions ->
+                val combinedTarget = if (transitions.size > 1) nsa.nextState() else transitions.first().first.target
+                val targetClosure = transitions.first().second
+                transitions.onEach { (transition) ->
+                    nsa.removeTransition(transition)
+                    nsa.addTransition(transition.replaceVertexes(newState, combinedTarget))
+                }
+                combinedTarget to targetClosure
+            }
+            .onEach {
+                processed[it.second] = it.first
+                if (it.second.intersect(finalStates).isNotEmpty()) {
+                    nsa.addFinalState(it.first)
+                }
+            }
+
+        queue.addAll(nextStates)
     }
+
+    nsa.setInitState(newInitialState)
+
+    return nsa
 }

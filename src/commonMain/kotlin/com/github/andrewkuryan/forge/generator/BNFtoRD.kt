@@ -65,5 +65,4 @@ fun <N : SyntaxNode> Grammar<N>.buildRDParser() = NSA<N>().apply {
     )
     addFinalState(acceptState)
 
-    removeEmptyTransitions()
-}
+}.removeEmptyTransitions()
