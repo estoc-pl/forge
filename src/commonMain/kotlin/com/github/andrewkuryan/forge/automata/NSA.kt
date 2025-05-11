@@ -207,6 +207,9 @@ fun <N : SyntaxNode> ENSA<N>.removeEmptyTransitions(): NSA<N> {
     }
 
     nsa.setInitState(newInitialState)
+    if (initialClosure.intersect(finalStates).isNotEmpty()) {
+        nsa.addFinalState(newInitialState)
+    }
 
     return nsa
 }

@@ -1,25 +1,17 @@
 package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.BNF.Grammar
+import com.github.andrewkuryan.BNF.RegExp
 import com.github.andrewkuryan.BNF.SyntaxNode
-import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.automata.NSAFormatPattern
-import com.github.andrewkuryan.forge.automata.format
+import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.generator.Port
+import com.github.andrewkuryan.forge.generator.buildDFAParser
 import kotlin.test.assertEquals
 
 abstract class GrammarTest(val buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNode>) {
 
-    protected fun assertBuilding(grammar: Grammar<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertion) {
-        val nsa = grammar.buildNSA()
-        val provider = StateProvider()
-        val (initRef, finalRef, transitions, verbose) = getAssertion(provider)
-
-        if (verbose) {
-            println(nsa.format(NSAFormatPattern.VIZ))
-        }
-        assertEquals(provider.numOfStates, nsa.states.size, "Total number of states does not match the expected")
-        nsa.assertTransitions(initRef, finalRef, transitions)
-    }
+    protected fun assertBuilding(grammar: Grammar<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertion) =
+        assertNSA(grammar.buildNSA(), getAssertion)
 }
 
 class StateProvider {
@@ -39,7 +31,37 @@ class StateProvider {
 
 data class NSAAssertion(
     val initRef: StateRef,
-    val finalRef: StateRef,
+    val finalRefs: List<StateRef>,
     val transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
     val verbose: Boolean = false,
-)
+) {
+
+    constructor(
+        initRef: StateRef,
+        finalRef: StateRef,
+        transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
+        verbose: Boolean = false,
+    ) : this(initRef, listOf(finalRef), transitions, verbose)
+}
+
+fun assertNSA(nsa: NSA<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertion) {
+    val provider = StateProvider()
+    val (initRef, finalRef, transitions, verbose) = getAssertion(provider)
+
+    if (verbose) {
+        println(nsa.format(NSAFormatPattern.VIZ))
+    }
+    assertEquals(provider.numOfStates, nsa.states.size, "Total number of states does not match the expected")
+    nsa.assertTransitions(initRef, finalRef, transitions)
+}
+
+fun assertDFABuilding(regexp: RegExp, getAssertion: (StateProvider) -> NSAAssertion) {
+    val nsa = ENSA<SyntaxNode>()
+    val port = Port(nsa.nextState(), nsa.nextState())
+
+    nsa.buildDFAParser(port, regexp)
+    nsa.setInitState(port.entry)
+    nsa.addFinalState(port.exit)
+
+    assertNSA(nsa.removeEmptyTransitions(), getAssertion)
+}
