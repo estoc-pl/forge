@@ -13,22 +13,22 @@ inline fun <reified N : SyntaxNode> NSA<N>.format(pattern: NSAFormatPattern) =
     }
 
 fun NSA<*>.defaultFormat() = """NSA(
-        |   Q = ${(transitionTable.keys + finalStates).joinToString(", ", "{", "}")}
-        |   ẟ = ${
+        |    Q = ${states.joinToString(", ", "{", "}")}
+        |    ẟ = ${
     transitionTable.entries.flatMap { entry -> entry.value }
         .joinToString(",\n", "{\n", "\n\t}") { transition -> "\t\t${transition.defaultFormat()}" }
 }
-        |   q₀ = $initState
-        |   F = ${finalStates.joinToString(", ", "{", "}")}
+        |    q₀ = $initState
+        |    F = ${finalStates.joinToString(", ", "{", "}")}
         |)""".trimMargin()
 
 fun NSA<*>.vizFormat() = """digraph {
-        |   rankdir=LR;
-        |   ${finalStates.joinToString(";\n") { "node [shape = doublecircle] \"${it}\";" }}
-        |   node [shape = circle];
-        |   secret_node [style=invis, shape=point];
-        |   secret_node -> "$initState" [style=bold];
-        |   ${
+        |    rankdir=LR;
+        |    ${finalStates.joinToString(";\n\t", postfix = ";") { "node [shape = doublecircle] \"${it}\"" }}
+        |    node [shape = circle];
+        |    secret_node [style=invis, shape=point];
+        |    secret_node -> "$initState" [style=bold];
+        |${
     transitionTable.entries.flatMap { entry -> entry.value }
         .joinToString("\n") { transition -> "\t${transition.vizFormat()}" }
 }
