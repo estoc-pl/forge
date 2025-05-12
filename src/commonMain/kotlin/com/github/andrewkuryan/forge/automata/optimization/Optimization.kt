@@ -12,10 +12,10 @@ fun <N : SyntaxNode> NSA<N>.optimize(optimizers: List<Optimizer<N>> = listOf(NSA
 
     while (queue.isNotEmpty()) {
         val currentState = queue.removeAt(0)
-        val currentTransitions = transitionTable[currentState]
+        val currentTransitions = getOutTransitions(currentState)
 
         val newTransitions =
-            if (currentTransitions.isNullOrEmpty()) emptyList()
+            if (currentTransitions.isEmpty()) emptyList()
             else optimizers.fold(currentTransitions.toList()) { transitions, optimizer -> optimizer(transitions) }
 
         for (transition in newTransitions) {

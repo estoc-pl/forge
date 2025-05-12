@@ -1,15 +1,20 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.Nonterminal
+import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.AbstractNSA
+import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.State
 
-class Ports<A : AbstractNSA<*, *>>(private val nsa: A, nonterms: Set<Nonterminal>) {
-    private val ports = nonterms.associateWith { Port(nsa.nextState(), nsa.nextState()) }.toMutableMap()
-    private val entries = ports.entries.associate { it.value.entry to setOf(it.key) }.toMutableMap()
+open class Ports<A : AbstractNSA<*, *>>(protected val nsa: A, nonterms: Set<Nonterminal>) {
+    protected val ports = nonterms.associateWith { Port(nsa.nextState(), nsa.nextState()) }.toMutableMap()
+    protected val entries = ports.entries.associate { it.value.entry to setOf(it.key) }.toMutableMap()
 
     fun getEntry(nonterm: Nonterminal) = ports.getValue(nonterm).entry
     fun getExit(nonterm: Nonterminal) = ports.getValue(nonterm).exit
+}
+
+class NSAPorts<N : SyntaxNode>(nsa: NSA<N>, nonterms: Set<Nonterminal>) : Ports<NSA<N>>(nsa, nonterms) {
 
     private fun mergeStates(state1: State, state2: State) {
         if (state1 != state2) {

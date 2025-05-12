@@ -5,7 +5,6 @@ import com.github.andrewkuryan.forge.automata.State
 import com.github.andrewkuryan.forge.automata.defaultFormat
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class StateRef(var value: State? = null) {
 
@@ -44,18 +43,9 @@ fun NSA<*>.assertTransitions(
 }
 
 fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<TransitionBody, StateRef>>) {
-    if (transitions.isEmpty()) {
-        assertNull(transitionTable[source], "State $source should not have outgoing transitions")
-    } else {
-        assertNotNull(transitionTable[source], "State $source should have outgoing transitions")
-        assertEquals(
-            transitions.size,
-            transitionTable.getValue(source).size,
-            "Number of transitions from $source does not match"
-        )
-    }
+    assertEquals(transitions.size, getOutTransitions(source).size, "Number of transitions from $source does not match")
 
-    val originalTransitions = transitionTable[source]?.toMutableSet() ?: mutableSetOf()
+    val originalTransitions = getOutTransitions(source).toMutableSet()
     for ((transition, target) in transitions) {
         val foundTransitions = originalTransitions.filter { transition.isSameAs(it) }
         assertEquals(1, foundTransitions.size, "Cannot find an unambiguous transition [$transition] in $source")

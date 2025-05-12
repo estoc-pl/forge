@@ -15,7 +15,7 @@ inline fun <reified N : SyntaxNode> NSA<N>.format(pattern: NSAFormatPattern) =
 fun NSA<*>.defaultFormat() = """NSA(
         |    Q = ${states.joinToString(", ", "{", "}")}
         |    ẟ = ${
-    transitionTable.entries.flatMap { entry -> entry.value }
+    states.flatMap { state -> getOutTransitions(state) }
         .joinToString(",\n", "{\n", "\n\t}") { transition -> "\t\t${transition.defaultFormat()}" }
 }
         |    q₀ = $initState
@@ -29,7 +29,7 @@ fun NSA<*>.vizFormat() = """digraph {
         |    secret_node [style=invis, shape=point];
         |    secret_node -> "$initState" [style=bold];
         |${
-    transitionTable.entries.flatMap { entry -> entry.value }
+    states.flatMap { state -> getOutTransitions(state) }
         .joinToString("\n") { transition -> "\t${transition.vizFormat()}" }
 }
         |}""".trimMargin()
@@ -37,13 +37,13 @@ fun NSA<*>.vizFormat() = """digraph {
 inline fun <reified N : SyntaxNode> NSA<N>.ktSourceFormat() = """val initState = ${initState.ktSourceFormat()}
     |val finalStates = listOf(${finalStates.joinToString(",") { it.ktSourceFormat() }})
     |val transitions = mapOf(
-    |${transitionTable.entries.joinToString(",\n") { it.ktSourceFormat() }}
+    |${states.map { it to getOutTransitions(it) }.joinToString(",\n") { it.ktSourceFormat() }}
     |)
 """.trimMargin()
 
-inline fun <reified N : SyntaxNode> Map.Entry<State, Set<Transition<N>>>.ktSourceFormat(): String {
-    return "\t${this.key.ktSourceFormat()} to setOf(" +
-            this.value.joinToString(",\n\t\t", "\n\t\t", "\n") { it.ktSourceFormat() } +
+inline fun <reified N : SyntaxNode> Pair<State, List<MeaningfulTransition<N>>>.ktSourceFormat(): String {
+    return "\t${this.first.ktSourceFormat()} to setOf(" +
+            this.second.joinToString(",\n\t\t", "\n\t\t", "\n") { it.ktSourceFormat() } +
             "\t)"
 }
 

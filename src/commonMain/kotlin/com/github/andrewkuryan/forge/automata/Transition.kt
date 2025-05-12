@@ -52,3 +52,10 @@ data class StackTransition<N : SyntaxNode>(
     override val inputSize = inputPreview.size
     override val stackSize = stack.size + stackPreview.size
 }
+
+fun <N : SyntaxNode> MeaningfulTransition<N>.replaceVertexes(source: State, target: State): MeaningfulTransition<N> {
+    return when (this) {
+        is InputTransition<N> -> copy(source = source, target = target)
+        is StackTransition<N> -> copy(source = source, target = target)
+    }
+}

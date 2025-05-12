@@ -36,7 +36,7 @@ fun <N : SyntaxNode> NSA<N>.addReadTransitions(
 fun <N : SyntaxNode> NSA<N>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<Production<N>>>,
-    ports: Ports<NSA<N>>,
+    ports: NSAPorts<N>,
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
@@ -85,7 +85,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
 fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
     val prefixes = collectPrefixes()
 
-    val ports = Ports(this, productions.keys)
+    val ports = NSAPorts(this, productions.keys)
 
     for (nonterm in productions.keys) {
         processNonterm(nonterm, productions, ports, prefixes)
