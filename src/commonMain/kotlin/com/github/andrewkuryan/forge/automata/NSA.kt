@@ -29,15 +29,17 @@ abstract class AbstractNSA<N : SyntaxNode, T : Transition<N>> {
 
     fun nextState() = State(stateCount++)
 
-    fun setInitState(state: State) {
+    fun setInitState(state: State): State {
         internalInitState = state
+        return state
     }
 
-    fun addFinalState(state: State) {
+    fun addFinalState(state: State): State {
         internalFinalStates.add(state)
+        return state
     }
 
-    fun addTransition(transition: T): T {
+    fun <NT : T> addTransition(transition: NT): NT {
         transitionTable.getOrPut(transition.source) { mutableSetOf() }.add(transition)
         reversedTransitionTable.getOrPut(transition.target) { mutableSetOf() }.add(transition)
 
@@ -47,7 +49,7 @@ abstract class AbstractNSA<N : SyntaxNode, T : Transition<N>> {
         return transition
     }
 
-    fun removeTransition(transition: T): T {
+    fun <NT : T> removeTransition(transition: NT): NT {
         if (transitionTable[transition.source] != null) {
             inputSizes[transition.inputSize] = inputSizes.getValue(transition.inputSize) - 1
             stackPreviewSizes[transition.stackSize] = stackPreviewSizes.getValue(transition.stackSize) - 1
