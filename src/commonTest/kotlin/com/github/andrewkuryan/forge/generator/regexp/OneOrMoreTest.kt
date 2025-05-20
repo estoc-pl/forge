@@ -13,7 +13,7 @@ class OneOrMoreTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read("def", "") to s[1]),
+                    s[0] to listOf(read("def", "", "⁅(def)+⁆") to s[1]),
                     s[1] to listOf(read("def", "") to s[1])
                 )
             )
@@ -26,9 +26,9 @@ class OneOrMoreTest {
                 s[0], s[1],
                 mapOf(
                     s[0] to listOf(
-                        read('a', "") to s[1],
-                        read("bc", "") to s[1],
-                        read("g-i", "") to s[1]
+                        read('a', "", "⁅(a|bc|[g-i])+⁆") to s[1],
+                        read("bc", "", "⁅(a|bc|[g-i])+⁆") to s[1],
+                        read("g-i", "", "⁅(a|bc|[g-i])+⁆") to s[1]
                     ),
                     s[1] to listOf(
                         read('a', "") to s[1],
@@ -43,17 +43,28 @@ class OneOrMoreTest {
     fun `should build DFA for OneOrMore❨Or❨Symbol，Row，OneOrMore❨Symbol❩❩❩`() =
         assertDFABuilding(regexp { ('a' / "bc" / 'f'.oneOrMore()).oneOrMore() }) { s ->
             NSAAssertion(
-                s[0], s[1],
+                s[0], listOf(s[1], s[2], s[3]),
                 mapOf(
                     s[0] to listOf(
-                        read('a', "") to s[1],
-                        read("bc", "") to s[1],
-                        read('f', "") to s[1]
+                        read('a', "", "⁅(a|bc|f+)+⁆") to s[1],
+                        read("bc", "", "⁅(a|bc|f+)+⁆") to s[1],
+                        read('f', "", "⁅(a|bc|f+)+⁆") to s[2]
                     ),
                     s[1] to listOf(
                         read('a', "") to s[1],
                         read("bc", "") to s[1],
-                        read('f', "") to s[1]
+                        read('f', "") to s[3]
+                    ),
+                    s[2] to listOf(
+                        read('a', "") to s[1],
+                        read("bc", "") to s[1],
+                        read('f', "") to s[2],
+                        read('f', "") to s[3]
+                    ),
+                    s[3] to listOf(
+                        read('a', "") to s[1],
+                        read("bc", "") to s[1],
+                        read('f', "") to s[3]
                     )
                 )
             )

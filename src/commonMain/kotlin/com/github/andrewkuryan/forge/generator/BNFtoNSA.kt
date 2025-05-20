@@ -21,14 +21,13 @@ fun <N : SyntaxNode> NSA<N>.addRollupTransitions(
 
 fun <N : SyntaxNode> NSA<N>.addReadTransitions(
     input: InputSlice,
-    stackPush: StackSlice,
     source: State,
     target: State,
     stackPreviews: List<StackSlice>,
 ) {
     for (stackPreview in stackPreviews) {
         addTransition(
-            InputTransition(input, stackPush, InputSlice.EMPTY, stackPreview, source, target)
+            InputTransition(input, InputSlice.EMPTY, stackPreview, source, target)
         )
     }
 }
@@ -40,22 +39,22 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
-        val stackSymbols = production.symbols.map { it.asStackLetter() }
+        val stackSymbols = production.symbols.flatMap { it.asStackSignal() }
         val (lastState, lastStackPreview) = production.symbols
             .foldIndexed(ports.getEntry(nonterm) to listOf<StackSlice>()) { index, (prevState, prevStack), symbol ->
                 when (symbol) {
                     is Terminal -> {
                         val stackPreviews = prevStack.ifEmpty { listOf(StackSlice(stackSymbols.take(index))) }
-                        val signal = NSASignal.Symbol(symbol.value)
                         val nextState = nextState()
                         addReadTransitions(
-                            InputSlice(listOf(signal)),
-                            StackSlice(listOf(signal)),
+                            InputSlice(listOf(InputSignal.Symbol(symbol.value))),
                             prevState, nextState,
                             stackPreviews,
                         )
                         nextState to listOf()
                     }
+
+                    is RegExp -> TODO("Not implemented")
 
                     is Nonterminal -> {
                         if (index == 0) {
@@ -97,7 +96,6 @@ fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
     addTransition(
         InputTransition(
             InputSlice(listOf(InputSignal.EOI)),
-            StackSlice.EMPTY,
             InputSlice.EMPTY, StackSlice(listOf(StackSignal.Bottom, StackSignal.Node(startSymbol.name))),
             ports.getExit(startSymbol), acceptState,
         )

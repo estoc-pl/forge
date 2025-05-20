@@ -9,39 +9,47 @@ fun <N : SyntaxNode> ENSA<N>.processNonterm(
     ports: Ports<ENSA<N>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
-        val lastState = production.symbols.fold(ports.getEntry(nonterm)) { prevState, symbol ->
-            when (symbol) {
-                is Terminal -> {
-                    val nextState = nextState()
-                    val signal = NSASignal.Symbol(symbol.value)
-                    addTransition(
-                        InputTransition(
-                            InputSlice(listOf(signal)),
-                            StackSlice(listOf(signal)),
-                            InputSlice.EMPTY, StackSlice.EMPTY,
-                            prevState, nextState,
-                        )
-                    )
-                    nextState
-                }
+        val lastStates = production.symbols
+            .fold(listOf(ports.getEntry(nonterm) to listOf<StackSignal>())) { prevStates, symbol ->
+                prevStates.flatMap { (prevState, currentStack) ->
+                    when (symbol) {
+                        is Terminal -> {
+                            val nextState = nextState()
+                            addTransition(
+                                InputTransition(
+                                    InputSlice(listOf(InputSignal.Symbol(symbol.value))),
+                                    InputSlice.EMPTY, StackSlice.EMPTY,
+                                    prevState, nextState,
+                                )
+                            )
+                            listOf(nextState to currentStack + StackSignal.Symbol(symbol.value))
+                        }
 
-                is Nonterminal -> {
-                    addTransition(EmptyTransition(prevState, ports.getEntry(symbol)))
+                        is RegExp -> processRegExp(symbol).map { (port, marker) ->
+                            val nextStack = marker?.let { currentStack + marker } ?: currentStack
+                            port.exit to nextStack
+                        }
 
-                    ports.getExit(symbol)
+                        is Nonterminal -> {
+                            addTransition(EmptyTransition(prevState, ports.getEntry(symbol)))
+
+                            listOf(ports.getExit(symbol) to currentStack + symbol.asStackSignal())
+                        }
+                    }
                 }
             }
-        }
 
-        addTransition(
-            StackTransition(
-                StackSlice(production.symbols.reversed().map { it.asStackLetter() }),
-                StackSignal.Node(nonterm.name),
-                production.action,
-                InputSlice.EMPTY, StackSlice.EMPTY,
-                lastState, ports.getExit(nonterm),
+        lastStates.forEach { (lastState, stackPreview) ->
+            addTransition(
+                StackTransition(
+                    StackSlice(stackPreview.reversed()),
+                    StackSignal.Node(nonterm.name),
+                    production.action,
+                    InputSlice.EMPTY, StackSlice.EMPTY,
+                    lastState, ports.getExit(nonterm),
+                )
             )
-        )
+        }
     }
 }
 
@@ -58,7 +66,6 @@ fun <N : SyntaxNode> Grammar<N>.buildRDParser() = ENSA<N>().apply {
     addTransition(
         InputTransition(
             InputSlice(listOf(InputSignal.EOI)),
-            StackSlice.EMPTY,
             InputSlice.EMPTY, StackSlice(listOf(StackSignal.Node(startSymbol.name), StackSignal.Bottom)),
             ports.getExit(startSymbol), acceptState,
         )

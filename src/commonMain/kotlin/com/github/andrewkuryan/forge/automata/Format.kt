@@ -47,70 +47,79 @@ inline fun <reified N : SyntaxNode> Pair<State, List<MeaningfulTransition<N>>>.k
             "\t)"
 }
 
+fun MeaningfulTransition<*>.stackPushFormat() = when (this) {
+    is InputTransition -> "$stackPushBefore|$stackPushAfter"
+    is StackTransition -> "$stackPushBefore|$rollupTarget|$stackPushAfter"
+}
+
 fun Transition<*>.defaultFormat() = when (this) {
-    is InputTransition -> "$source -> $input⟨$inputPreview⟩, ⟨$stackPreview⟩ / $stackPush -> $target"
-    is StackTransition -> "$source -> ⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / $stackPush -> $target"
+    is InputTransition -> "$source -> $input⟨$inputPreview⟩, ⟨$stackPreview⟩ / ${stackPushFormat()} -> $target"
+    is StackTransition -> "$source -> ⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / ${stackPushFormat()} -> $target"
     is EmptyTransition -> "$source -> $target"
 }
 
 fun Transition<*>.vizFormat() = when (this) {
-    is InputTransition -> """"$source" -> "$target" [label=<$input⟨$inputPreview⟩ / ⟨$stackPreview⟩<br/>$stackPush>]"""
-    is StackTransition -> """"$source" -> "$target" [label=<⟨$inputPreview⟩ / $stack⟨$stackPreview⟩<br/>$stackPush>]"""
+    is InputTransition -> """"$source" -> "$target" [label=<$input⟨$inputPreview⟩ / ⟨$stackPreview⟩<br/>${stackPushFormat()}>]"""
+    is StackTransition -> """"$source" -> "$target" [label=<⟨$inputPreview⟩ / $stack⟨$stackPreview⟩<br/>${stackPushFormat()}>]"""
     is EmptyTransition -> """"$source" -> "$target""""
 }
 
 inline fun <reified N : SyntaxNode> Transition<N>.ktSourceFormat() = when (this) {
     is InputTransition -> "InputTransition<${N::class.simpleName}>(" +
             "${input.ktSourceFormat()}," +
-            "${stackPush.ktSourceFormat()}," +
             "${inputPreview.ktSourceFormat()}," +
             "${stackPreview.ktSourceFormat()}," +
             "${source.ktSourceFormat()}," +
-            "${target.ktSourceFormat()})"
+            "${target.ktSourceFormat()}," +
+            "${stackPushBefore.ktSourceFormat()}," +
+            "${stackPushAfter.ktSourceFormat()})"
 
     is StackTransition -> "StackTransition<${N::class.simpleName}>(" +
             "${stack.ktSourceFormat()}," +
-            "${stackPush.ktSourceFormat()}," +
+            "${rollupTarget.ktSourceFormat()}," +
             "${semanticAction.ktSourceFormat()}," +
             "${inputPreview.ktSourceFormat()}," +
             "${stackPreview.ktSourceFormat()}," +
             "${source.ktSourceFormat()}," +
-            "${target.ktSourceFormat()})"
+            "${target.ktSourceFormat()}," +
+            "${stackPushBefore.ktSourceFormat()}," +
+            "${stackPushAfter.ktSourceFormat()})"
 
     is EmptyTransition -> "EmptyTransition<${N::class.simpleName}>(${source.ktSourceFormat()},${target.ktSourceFormat()})"
 }
 
 fun State.ktSourceFormat() = "State(${this.index})"
 
-fun InputSlice.ktSourceFormat() =
-    if (this.isEmpty) "InputSlice.EMPTY"
-    else "InputSlice(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
-
-fun InputSignal.ktSourceFormat() = when (this) {
-    is NSASignal -> ktSourceFormatNSASignal(this)
-    is InputSignal.EOI -> "InputSignal.EOI"
-}
-
 fun StackSlice.ktSourceFormat() =
     if (this.isEmpty) "StackSlice.EMPTY"
     else "StackSlice(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
 
+fun StackPush.ktSourceFormat() =
+    if (this.isEmpty) "StackPush.EMPTY"
+    else "StackPush(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
+
 fun StackSignal.ktSourceFormat() = when (this) {
-    is NSASignal -> ktSourceFormatNSASignal(this)
     is StackSignal.Bottom -> "StackSignal.Bottom"
+    is StackSignal.Symbol -> "StackSignal.Symbol('${this.value}')"
     is StackSignal.Node -> "StackSignal.Node(\"${this.name}\")"
+    is StackSignal.Marker -> "StackSignal.Marker(\"${this.name}\")"
 }
 
-fun ktSourceFormatBaseNSASignal(signal: BaseNSASignal) = when (signal) {
-    is NSASignal.Symbol -> "NSASignal.Symbol('${signal.value}')"
-    is NSASignal.Range -> "NSASignal.Range('${signal.value.first}'..'${signal.value.last}')"
+fun InputSlice.ktSourceFormat() =
+    if (this.isEmpty) "InputSlice.EMPTY"
+    else "InputSlice(listOf(${this.value.joinToString(",") { ktSourceFormatInputSignal(it) }}))"
+
+fun ktSourceFormatBaseInputSignal(signal: BaseInputSignal) = when (signal) {
+    is InputSignal.EOI -> "InputSignal.EOI"
+    is InputSignal.Symbol -> "InputSignal.Symbol('${signal.value}')"
+    is InputSignal.Range -> "InputSignal.Range('${signal.value.first}'..'${signal.value.last}')"
 }
 
-fun ktSourceFormatNSASignal(signal: NSASignal) = when (signal) {
-    is BaseNSASignal -> ktSourceFormatBaseNSASignal(signal)
-    is NSASignal.Not -> "NSASignal.Not(" +
-            "${ktSourceFormatBaseNSASignal(signal.first)}," +
-            "listOf(${signal.rest.joinToString(",") { ktSourceFormatBaseNSASignal(it) }}))"
+fun ktSourceFormatInputSignal(signal: InputSignal) = when (signal) {
+    is BaseInputSignal -> ktSourceFormatBaseInputSignal(signal)
+    is InputSignal.Not -> "InputSignal.Not(" +
+            "${ktSourceFormatBaseInputSignal(signal.first)}," +
+            "listOf(${signal.rest.joinToString(",") { ktSourceFormatBaseInputSignal(it) }}))"
 }
 
 inline fun <reified N : SyntaxNode> SemanticAction<N>?.ktSourceFormat() =

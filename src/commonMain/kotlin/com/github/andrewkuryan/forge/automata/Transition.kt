@@ -24,15 +24,18 @@ data class EmptyTransition<N : SyntaxNode>(
 sealed class MeaningfulTransition<N : SyntaxNode> : Transition<N>() {
     abstract val inputPreview: InputSlice
     abstract val stackPreview: StackSlice
+    abstract val stackPushBefore: StackPush
+    abstract val stackPushAfter: StackPush
 }
 
 data class InputTransition<N : SyntaxNode>(
     val input: InputSlice,
-    val stackPush: StackSlice,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
     override val source: State,
     override val target: State,
+    override val stackPushBefore: StackPush = StackPush.EMPTY,
+    override val stackPushAfter: StackPush = StackPush.EMPTY,
 ) : MeaningfulTransition<N>() {
 
     override val inputSize = input.size + inputPreview.size
@@ -41,12 +44,14 @@ data class InputTransition<N : SyntaxNode>(
 
 data class StackTransition<N : SyntaxNode>(
     val stack: StackSlice,
-    val stackPush: StackSignal,
+    val rollupTarget: StackSignal.Node,
     val semanticAction: SemanticAction<N>?,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
     override val source: State,
     override val target: State,
+    override val stackPushBefore: StackPush = StackPush.EMPTY,
+    override val stackPushAfter: StackPush = StackPush.EMPTY,
 ) : MeaningfulTransition<N>() {
 
     override val inputSize = inputPreview.size

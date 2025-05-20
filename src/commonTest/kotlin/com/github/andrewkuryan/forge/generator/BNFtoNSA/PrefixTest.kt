@@ -4,7 +4,7 @@ import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.StackSignal.Bottom
 import com.github.andrewkuryan.forge.automata.StackSignal.Node
-import com.github.andrewkuryan.forge.automata.NSASignal.Symbol
+import com.github.andrewkuryan.forge.automata.StackSignal.Symbol
 import com.github.andrewkuryan.forge.generator.collectPrefixes
 import com.github.andrewkuryan.forge.generator.resolvePrefixes
 import kotlin.test.Test

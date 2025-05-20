@@ -5,86 +5,113 @@ import com.github.andrewkuryan.forge.automata.*
 sealed class TransitionBody {
     abstract val inputPreview: InputSlice
     abstract val stackPreview: StackSlice
+    abstract val stackPushBefore: StackPush
+    abstract val stackPushAfter: StackPush
+}
+
+fun TransitionBody.stackPushFormat() = when (this) {
+    is InputTransitionBody -> "$stackPushBefore|$stackPushAfter"
+    is StackTransitionBody -> "$stackPushBefore|$rollupTarget$stackPushAfter"
 }
 
 data class InputTransitionBody(
     val input: InputSlice,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
-    val stackPush: StackSlice,
+    override val stackPushBefore: StackPush,
+    override val stackPushAfter: StackPush,
 ) : TransitionBody() {
 
-    override fun toString() = "$input⟨$inputPreview⟩, ⟨$stackPreview⟩ / $stackPush"
+    override fun toString() = "$input⟨$inputPreview⟩, ⟨$stackPreview⟩ / ${stackPushFormat()}"
 }
 
 data class StackTransitionBody(
     val stack: StackSlice,
+    val rollupTarget: StackSignal.Node,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
-    val stackPush: StackSignal,
+    override val stackPushBefore: StackPush,
+    override val stackPushAfter: StackPush,
 ) : TransitionBody() {
 
-    override fun toString() = "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / $stackPush"
+    override fun toString() = "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / ${stackPushFormat()}"
 }
 
 fun TransitionBody.isSameAs(transition: MeaningfulTransition<*>) =
     when {
-        this is InputTransitionBody && transition is InputTransition -> input == transition.input && stackPush == transition.stackPush
-        this is StackTransitionBody && transition is StackTransition -> stack == transition.stack && stackPush == transition.stackPush
-        else -> false
-    } && inputPreview == transition.inputPreview && stackPreview == transition.stackPreview
+        this is InputTransitionBody && transition is InputTransition -> input == transition.input
+        this is StackTransitionBody && transition is StackTransition ->
+            stack == transition.stack && rollupTarget == transition.rollupTarget
 
-fun read(input: Char, stackPreview: String) =
+        else -> false
+    } && inputPreview == transition.inputPreview &&
+            stackPreview == transition.stackPreview &&
+            stackPushBefore == transition.stackPushBefore &&
+            stackPushAfter == transition.stackPushAfter
+
+fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     InputTransitionBody(
-        InputSlice(listOf(NSASignal.Symbol(input))),
+        InputSlice(listOf(InputSignal.Symbol(input))),
         InputSlice.EMPTY,
         StackSlice(parseStackSignals(stackPreview)),
-        StackSlice(listOf(NSASignal.Symbol(input)))
+        StackPush(parseStackPush(stackPushBefore)),
+        StackPush(parseStackPush(stackPushAfter))
     )
 
-fun read(input: String, stackPreview: String) =
+fun read(input: String, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     InputTransitionBody(
         InputSlice(parseInputSignals(input)),
         InputSlice.EMPTY,
         StackSlice(parseStackSignals(stackPreview)),
-        StackSlice(parseStackSignals(input))
+        StackPush(parseStackPush(stackPushBefore)),
+        StackPush(parseStackPush(stackPushAfter))
     )
 
-fun rollup(stackPreview: String, stack: String, target: String) =
-    StackTransitionBody(
-        StackSlice(parseStackSignals(stack)),
-        InputSlice.EMPTY,
-        StackSlice(parseStackSignals(stackPreview)),
-        StackSignal.Node(target)
-    )
+fun rollup(
+    stackPreview: String,
+    stack: String,
+    target: String,
+    stackPushBefore: String = "",
+    stackPushAfter: String = "",
+) = StackTransitionBody(
+    StackSlice(parseStackSignals(stack)),
+    StackSignal.Node(target),
+    InputSlice.EMPTY,
+    StackSlice(parseStackSignals(stackPreview)),
+    StackPush(parseStackPush(stackPushBefore)),
+    StackPush(parseStackPush(stackPushAfter))
+)
 
 fun exit(stackPreview: String) =
     InputTransitionBody(
         InputSlice(listOf(InputSignal.EOI)),
         InputSlice.EMPTY,
         StackSlice(parseStackSignals(stackPreview)),
-        StackSlice.EMPTY,
+        StackPush.EMPTY,
+        StackPush.EMPTY
     )
 
 private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>
 
-private val RANGE_TRANSFORMER: Transformer<NSASignal.Range> =
-    Regex(".-.") to { range, input -> NSASignal.Range(input[range.first]..input[range.last]) }
-private val SINGLE_NOT_TRANSFORMER: Transformer<NSASignal.Not> =
-    Regex("\\^[^\\[]") to { range, input -> NSASignal.Not(NSASignal.Symbol(input[range.first + 1])) }
-private val COMPLEX_NOT_TRANSFORMER: Transformer<NSASignal.Not> = Regex("\\^\\[..+]") to { range, input ->
-    val nestedSignals = parseBaseNSASignals(input.substring(range.first + 2 until range.last))
-    NSASignal.Not(nestedSignals.first(), nestedSignals.slice(1 until nestedSignals.size))
-}
 private val EOI_TRANSFORMER: Transformer<InputSignal.EOI> =
     Regex(InputSignal.EOI.toString()) to { _, _ -> InputSignal.EOI }
+private val INPUT_SYMBOL_TRANSFORMER = { symbol: Char -> InputSignal.Symbol(symbol) }
+private val RANGE_TRANSFORMER: Transformer<InputSignal.Range> =
+    Regex(".-.") to { range, input -> InputSignal.Range(input[range.first]..input[range.last]) }
+private val SINGLE_NOT_TRANSFORMER: Transformer<InputSignal.Not> =
+    Regex("\\^[^\\[]") to { range, input -> InputSignal.Not(InputSignal.Symbol(input[range.first + 1])) }
+private val COMPLEX_NOT_TRANSFORMER: Transformer<InputSignal.Not> = Regex("\\^\\[..+]") to { range, input ->
+    val nestedSignals = parseBaseInputSignals(input.substring(range.first + 2 until range.last))
+    InputSignal.Not(nestedSignals.first(), nestedSignals.slice(1 until nestedSignals.size))
+}
 
-private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.Node> =
-    Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.Node(input.substring(range)) }
 private val STACK_BOTTOM_TRANSFORMER: Transformer<StackSignal.Bottom> =
     Regex("\\$") to { _, _ -> StackSignal.Bottom }
-
-private val DEFAULT_TRANSFORMER = { symbol: Char -> NSASignal.Symbol(symbol) }
+private val STACK_SYMBOL_TRANSFORMER = { symbol: Char -> StackSignal.Symbol(symbol) }
+private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.Node> =
+    Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.Node(input.substring(range)) }
+private val STACK_MARKER_TRANSFORMER: Transformer<StackSignal.Marker> =
+    Regex("⁅.+⁆") to { range, input -> StackSignal.Marker(input.substring(range).drop(1).dropLast(1)) }
 
 fun <T, D : T> parseSignals(transformers: List<Transformer<T>>, parseDefault: (Char) -> D): (String) -> List<T> {
     fun parseFragment(input: String, restTransformers: List<Transformer<T>>): List<T> {
@@ -107,23 +134,19 @@ fun <T, D : T> parseSignals(transformers: List<Transformer<T>>, parseDefault: (C
     return { input -> parseFragment(input, transformers) }
 }
 
-val parseBaseNSASignals = parseSignals(listOf<Transformer<BaseNSASignal>>(RANGE_TRANSFORMER), DEFAULT_TRANSFORMER)
+val parseBaseInputSignals = parseSignals(
+    listOf<Transformer<BaseInputSignal>>(RANGE_TRANSFORMER),
+    INPUT_SYMBOL_TRANSFORMER
+)
 val parseInputSignals = parseSignals(
-    listOf(
-        EOI_TRANSFORMER,
-        SINGLE_NOT_TRANSFORMER,
-        COMPLEX_NOT_TRANSFORMER,
-        RANGE_TRANSFORMER
-    ),
-    DEFAULT_TRANSFORMER
+    listOf(EOI_TRANSFORMER, SINGLE_NOT_TRANSFORMER, COMPLEX_NOT_TRANSFORMER, RANGE_TRANSFORMER),
+    INPUT_SYMBOL_TRANSFORMER
 )
 val parseStackSignals = parseSignals(
-    listOf(
-        STACK_BOTTOM_TRANSFORMER,
-        STACK_NODE_TRANSFORMER,
-        SINGLE_NOT_TRANSFORMER,
-        COMPLEX_NOT_TRANSFORMER,
-        RANGE_TRANSFORMER
-    ),
-    DEFAULT_TRANSFORMER
+    listOf(STACK_BOTTOM_TRANSFORMER, STACK_MARKER_TRANSFORMER, STACK_NODE_TRANSFORMER),
+    STACK_SYMBOL_TRANSFORMER
+)
+val parseStackPush = parseSignals(
+    listOf(STACK_MARKER_TRANSFORMER, STACK_NODE_TRANSFORMER),
+    STACK_SYMBOL_TRANSFORMER
 )

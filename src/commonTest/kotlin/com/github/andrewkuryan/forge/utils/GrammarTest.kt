@@ -4,8 +4,7 @@ import com.github.andrewkuryan.BNF.Grammar
 import com.github.andrewkuryan.BNF.RegExp
 import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.generator.Port
-import com.github.andrewkuryan.forge.generator.buildDFAParser
+import com.github.andrewkuryan.forge.generator.processRegExp
 import kotlin.test.assertEquals
 
 abstract class GrammarTest(val buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNode>) {
@@ -57,11 +56,11 @@ fun assertNSA(nsa: NSA<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertio
 
 fun assertDFABuilding(regexp: RegExp, getAssertion: (StateProvider) -> NSAAssertion) {
     val nsa = ENSA<SyntaxNode>()
-    val port = Port(nsa.nextState(), nsa.nextState())
 
-    nsa.buildDFAParser(port, regexp)
-    nsa.setInitState(port.entry)
-    nsa.addFinalState(port.exit)
+    nsa.processRegExp(regexp).forEach { (regexpPort) ->
+        nsa.addTransition(EmptyTransition(nsa.initState, regexpPort.entry))
+        nsa.addFinalState(regexpPort.exit)
+    }
 
     assertNSA(nsa.removeEmptyTransitions(), getAssertion)
 }

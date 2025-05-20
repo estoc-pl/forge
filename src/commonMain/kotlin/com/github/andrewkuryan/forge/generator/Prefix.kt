@@ -1,9 +1,6 @@
 package com.github.andrewkuryan.forge.generator
 
-import com.github.andrewkuryan.BNF.Grammar
-import com.github.andrewkuryan.BNF.Nonterminal
-import com.github.andrewkuryan.BNF.SyntaxNode
-import com.github.andrewkuryan.BNF.Terminal
+import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.StackSignal
 
 data class Prefix(val head: Nonterminal?, val body: List<StackSignal>)
@@ -41,9 +38,10 @@ fun <N : SyntaxNode> Grammar<N>.collectPrefixes(): Map<Nonterminal, Set<Prefix>>
                 production.symbols.fold(nontermResult to listOf<StackSignal>()) { (prodResult, prefix), symbol ->
                     when (symbol) {
                         is Terminal -> prodResult
+                        is RegExp -> prodResult
                         is Nonterminal -> prodResult +
                                 (symbol to (prodResult[symbol] ?: emptySet()) + Prefix(nonterm, prefix))
-                    } to (prefix + symbol.asStackLetter())
+                    } to (prefix + symbol.asStackSignal())
                 }.first
             }
         }

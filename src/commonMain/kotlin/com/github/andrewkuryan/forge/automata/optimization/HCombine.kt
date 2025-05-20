@@ -5,11 +5,10 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.commonPrefix
 import com.github.andrewkuryan.forge.extensions.commonSuffix
 
-private fun InputTransition<*>.canHCombine(other: InputTransition<*>) =
-    input == other.input && stackPush == other.stackPush
+private fun InputTransition<*>.canHCombine(other: InputTransition<*>) = input == other.input
 
 private fun StackTransition<*>.canHCombine(other: StackTransition<*>) =
-    stack == other.stack && stackPush == other.stackPush && semanticAction == other.semanticAction
+    stack == other.stack && rollupTarget == other.rollupTarget && semanticAction == other.semanticAction
 
 private fun InputSlice.canHCombine(other: InputSlice) =
     isEmpty || other.isEmpty || commonPrefix(value, other.value).isNotEmpty()
@@ -22,7 +21,11 @@ private fun MeaningfulTransition<*>.canHCombine(other: MeaningfulTransition<*>) 
         this is InputTransition && other is InputTransition -> canHCombine(other)
         this is StackTransition && other is StackTransition -> canHCombine(other)
         else -> false
-    } && inputPreview.canHCombine(other.inputPreview) && stackPreview.canHCombine(other.stackPreview) && !isLoop && !other.isLoop
+    } && inputPreview.canHCombine(other.inputPreview) &&
+            stackPreview.canHCombine(other.stackPreview) &&
+            stackPushBefore == other.stackPushBefore &&
+            stackPushAfter == other.stackPushAfter &&
+            !isLoop && !other.isLoop
 
 private fun InputSlice.hCombine(other: InputSlice) = InputSlice(commonPrefix(value, other.value))
 private fun StackSlice.hCombine(other: StackSlice) = StackSlice(commonSuffix(value, other.value))

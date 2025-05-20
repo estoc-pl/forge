@@ -11,7 +11,7 @@ class AtomicRegexpTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read('a', "") to s[1]),
+                    s[0] to listOf(read('a', "", "⁅a⁆") to s[1]),
                     s[1] to listOf()
                 )
             )
@@ -23,7 +23,7 @@ class AtomicRegexpTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read("abc", "") to s[1]),
+                    s[0] to listOf(read("abc", "", "⁅abc⁆") to s[1]),
                     s[1] to listOf()
                 )
             )
@@ -35,7 +35,7 @@ class AtomicRegexpTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read("0-9", "") to s[1]),
+                    s[0] to listOf(read("0-9", "", "⁅[0-9]⁆") to s[1]),
                     s[1] to listOf()
                 )
             )
@@ -47,7 +47,7 @@ class AtomicRegexpTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read("^p", "") to s[1]),
+                    s[0] to listOf(read("^p", "", "⁅[^p]⁆") to s[1]),
                     s[1] to listOf()
                 )
             )
@@ -59,7 +59,7 @@ class AtomicRegexpTest {
             NSAAssertion(
                 s[0], s[1],
                 mapOf(
-                    s[0] to listOf(read("^[ka-cfdx-z]", "") to s[1]),
+                    s[0] to listOf(read("^[ka-cfdx-z]", "", "⁅[^ka-cfdx-z]⁆") to s[1]),
                     s[1] to listOf()
                 )
             )

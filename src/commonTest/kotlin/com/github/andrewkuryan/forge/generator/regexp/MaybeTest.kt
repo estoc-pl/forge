@@ -23,7 +23,8 @@ class MaybeTest {
             NSAAssertion(
                 s[0], listOf(s[0], s[1]),
                 mapOf(
-                    s[0] to listOf(read("a-z", "") to s[1])
+                    s[0] to listOf(read("a-z", "", "⁅[a-z]⁆") to s[1]),
+                    s[1] to listOf()
                 )
             )
         }
@@ -32,9 +33,10 @@ class MaybeTest {
     fun `should build DFA for Maybe❨OneOrMore❨Row❩❩`() =
         assertDFABuilding(regexp { "klm".oneOrMore().maybe() }) { s ->
             NSAAssertion(
-                s[0], s[0],
+                s[0], listOf(s[0], s[1]),
                 mapOf(
-                    s[0] to listOf(read("klm", "") to s[0])
+                    s[0] to listOf(read("klm", "", "⁅(klm)+⁆") to s[1]),
+                    s[1] to listOf(read("klm", "") to s[1])
                 )
             )
         }
@@ -46,10 +48,11 @@ class MaybeTest {
                 s[0], listOf(s[0], s[1]),
                 mapOf(
                     s[0] to listOf(
-                        read("test", "") to s[1],
-                        read('p', "") to s[1],
-                        read("0-3", "") to s[1]
-                    )
+                        read("test", "", "⁅(test|p|[0-3])⁆") to s[1],
+                        read('p', "", "⁅(test|p|[0-3])⁆") to s[1],
+                        read("0-3", "", "⁅(test|p|[0-3])⁆") to s[1]
+                    ),
+                    s[1] to listOf()
                 )
             )
         }
@@ -58,11 +61,15 @@ class MaybeTest {
     fun `should build DFA for Maybe❨OneOrMore❨Or❨Symbol，Symbol❩❩❩`() =
         assertDFABuilding(regexp { ('a' / 'b').oneOrMore().maybe() }) { s ->
             NSAAssertion(
-                s[0], s[0],
+                s[0], listOf(s[0], s[1]),
                 mapOf(
                     s[0] to listOf(
-                        read('a', "") to s[0],
-                        read('b', "") to s[0],
+                        read('a', "", "⁅[ab]+⁆") to s[1],
+                        read('b', "", "⁅[ab]+⁆") to s[1]
+                    ),
+                    s[1] to listOf(
+                        read('a', "") to s[1],
+                        read('b', "") to s[1]
                     )
                 )
             )
@@ -75,9 +82,9 @@ class MaybeTest {
                 s[0], listOf(s[0], s[1], s[2]),
                 mapOf(
                     s[0] to listOf(
-                        read("^.", "") to s[1],
-                        read('k', "") to s[1],
-                        read("a-d", "") to s[2],
+                        read("^.", "", "⁅([^.]|k|[a-d]+)⁆") to s[1],
+                        read('k', "", "⁅([^.]|k|[a-d]+)⁆") to s[1],
+                        read("a-d", "", "⁅([^.]|k|[a-d]+)⁆") to s[2],
                     ),
                     s[1] to listOf(),
                     s[2] to listOf(read("a-d", "") to s[2])
