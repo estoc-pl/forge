@@ -1,10 +1,8 @@
 package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.BNF.Grammar
-import com.github.andrewkuryan.BNF.RegExp
 import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.generator.processRegExp
 import kotlin.test.assertEquals
 
 abstract class GrammarTest(val buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNode>) {
@@ -52,15 +50,4 @@ fun assertNSA(nsa: NSA<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertio
     }
     assertEquals(provider.numOfStates, nsa.states.size, "Total number of states does not match the expected")
     nsa.assertTransitions(initRef, finalRef, transitions)
-}
-
-fun assertDFABuilding(regexp: RegExp, getAssertion: (StateProvider) -> NSAAssertion) {
-    val nsa = ENSA<SyntaxNode>()
-
-    nsa.processRegExp(regexp).forEach { (regexpPort) ->
-        nsa.addTransition(EmptyTransition(nsa.initState, regexpPort.entry))
-        nsa.addFinalState(regexpPort.exit)
-    }
-
-    assertNSA(nsa.removeEmptyTransitions(), getAssertion)
 }

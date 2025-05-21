@@ -25,10 +25,12 @@ fun <N : SyntaxNode> ENSA<N>.processNonterm(
                             listOf(nextState to currentStack + StackSignal.Symbol(symbol.value))
                         }
 
-                        is RegExp -> processRegExp(symbol).map { (port, marker) ->
-                            val nextStack = marker?.let { currentStack + marker } ?: currentStack
-                            port.exit to nextStack
-                        }
+                        is RegExp -> processRegExp(symbol)
+                            .onEach { (port) -> addTransition(EmptyTransition(prevState, port.entry)) }
+                            .map { (port, marker) ->
+                                val nextStack = marker?.let { currentStack + marker } ?: currentStack
+                                port.exit to nextStack
+                            }
 
                         is Nonterminal -> {
                             addTransition(EmptyTransition(prevState, ports.getEntry(symbol)))
