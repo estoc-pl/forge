@@ -13,26 +13,20 @@ inline fun <reified N : SyntaxNode> NSA<N>.format(pattern: NSAFormatPattern) =
     }
 
 fun NSA<*>.defaultFormat() = """NSA(
-        |    Q = ${states.joinToString(", ", "{", "}")}
-        |    ẟ = ${
-    states.flatMap { state -> getOutTransitions(state) }
-        .joinToString(",\n", "{\n", "\n\t}") { transition -> "\t\t${transition.defaultFormat()}" }
-}
-        |    q₀ = $initState
-        |    F = ${finalStates.joinToString(", ", "{", "}")}
-        |)""".trimMargin()
+    |    Q = ${states.joinToString(", ", "{", "}")}
+    |    ẟ = ${states.flatMap(::getOutTransitions).joinToString(",\n\t\t", "{\n\t\t", "\n\t}") { it.defaultFormat() }}
+    |    q₀ = $initState
+    |    F = ${finalStates.joinToString(", ", "{", "}")}
+    |)""".trimMargin()
 
 fun NSA<*>.vizFormat() = """digraph {
-        |    rankdir=LR;
-        |    ${finalStates.joinToString(";\n\t", postfix = ";") { "node [shape = doublecircle] \"${it}\"" }}
-        |    node [shape = circle];
-        |    secret_node [style=invis, shape=point];
-        |    secret_node -> "$initState" [style=bold];
-        |${
-    states.flatMap { state -> getOutTransitions(state) }
-        .joinToString("\n") { transition -> "\t${transition.vizFormat()}" }
-}
-        |}""".trimMargin()
+    |    rankdir=LR;
+    |${finalStates.joinToString(";\n\t", "\t", ";") { "node [shape = doublecircle] \"${it}\"" }}
+    |    node [shape = circle];
+    |    secret_node [style=invis, shape=point];
+    |    secret_node -> "$initState" [style=bold];
+    |${states.flatMap(::getOutTransitions).joinToString("\n\t", "\t") { it.vizFormat() }}
+    |}""".trimMargin()
 
 inline fun <reified N : SyntaxNode> NSA<N>.ktSourceFormat() = """val initState = ${initState.ktSourceFormat()}
     |val finalStates = listOf(${finalStates.joinToString(",") { it.ktSourceFormat() }})

@@ -5,11 +5,13 @@ import com.github.andrewkuryan.forge.automata.BaseInputSignal
 import com.github.andrewkuryan.forge.automata.InputSignal
 import com.github.andrewkuryan.forge.automata.StackSignal
 
-fun GrammarSymbol.asStackSignal(): List<StackSignal> =
+fun RegExp.asStackSignal() = StackSignal.Marker(this.toString())
+
+fun GrammarSymbol.asStackSignal(): StackSignal =
     when (this) {
-        is Terminal -> listOf(StackSignal.Symbol(value))
-        is Nonterminal -> listOf(StackSignal.Node(name))
-        is RegExp -> listOf(StackSignal.Marker(this.toString()))
+        is Terminal -> StackSignal.Symbol(value)
+        is Nonterminal -> StackSignal.Node(name)
+        is RegExp -> asStackSignal()
     }
 
 fun NegatableRegexp.asInputSignal(): BaseInputSignal =

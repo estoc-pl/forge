@@ -11,7 +11,7 @@ sealed class TransitionBody {
 
 fun TransitionBody.stackPushFormat() = when (this) {
     is InputTransitionBody -> "$stackPushBefore|$stackPushAfter"
-    is StackTransitionBody -> "$stackPushBefore|$rollupTarget$stackPushAfter"
+    is StackTransitionBody -> "$stackPushBefore|$rollupTarget|$stackPushAfter"
 }
 
 data class InputTransitionBody(

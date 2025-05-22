@@ -39,7 +39,7 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
-        val stackSymbols = production.symbols.flatMap { it.asStackSignal() }
+        val stackSymbols = production.symbols.map { it.asStackSignal() }
         val (lastState, lastStackPreview) = production.symbols
             .foldIndexed(ports.getEntry(nonterm) to listOf<StackSlice>()) { index, (prevState, prevStack), symbol ->
                 when (symbol) {
