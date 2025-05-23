@@ -27,7 +27,7 @@ data class InputTransitionBody(
 
 data class StackTransitionBody(
     val stack: StackSlice,
-    val rollupTarget: StackSignal.Node,
+    val rollupTarget: StackSignal.NodeView,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,
     override val stackPushBefore: StackPush,
@@ -75,7 +75,7 @@ fun rollup(
     stackPushAfter: String = "",
 ) = StackTransitionBody(
     StackSlice(parseStackSignals(stack)),
-    StackSignal.Node(target),
+    StackSignal.NodeView(target),
     InputSlice.EMPTY,
     StackSlice(parseStackSignals(stackPreview)),
     StackPush(parseStackPush(stackPushBefore)),
@@ -108,8 +108,8 @@ private val COMPLEX_NOT_TRANSFORMER: Transformer<InputSignal.Not> = Regex("\\^\\
 private val STACK_BOTTOM_TRANSFORMER: Transformer<StackSignal.Bottom> =
     Regex("\\$") to { _, _ -> StackSignal.Bottom }
 private val STACK_SYMBOL_TRANSFORMER = { symbol: Char -> StackSignal.Symbol(symbol) }
-private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.Node> =
-    Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.Node(input.substring(range)) }
+private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.NodeView> =
+    Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.NodeView(input.substring(range)) }
 private val STACK_MARKER_TRANSFORMER: Transformer<StackSignal.Marker> =
     Regex("⁅.+⁆") to { range, input -> StackSignal.Marker(input.substring(range).drop(1).dropLast(1)) }
 

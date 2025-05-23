@@ -10,7 +10,7 @@ fun RegExp.asStackSignal() = StackSignal.Marker(this.toString())
 fun GrammarSymbol.asStackSignal(): StackSignal =
     when (this) {
         is Terminal -> StackSignal.Symbol(value)
-        is Nonterminal -> StackSignal.Node(name)
+        is Nonterminal -> StackSignal.NodeView(name)
         is RegExp -> asStackSignal()
     }
 

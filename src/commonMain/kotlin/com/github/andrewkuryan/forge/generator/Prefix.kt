@@ -31,7 +31,7 @@ fun resolvePrefix(prefix: Prefix, prefixes: Map<Nonterminal, Set<Prefix>>): Set<
 fun resolvePrefixes(nonterm: Nonterminal, prefixes: Map<Nonterminal, Set<Prefix>>): Set<List<StackSignal>> =
     prefixes.getValue(nonterm).flatMap { prefix -> resolvePrefix(prefix, prefixes) }.toSet()
 
-fun <N : SyntaxNode> Grammar<N>.collectPrefixes(): Map<Nonterminal, Set<Prefix>> =
+fun Grammar.collectPrefixes(): Map<Nonterminal, Set<Prefix>> =
     productions.keys
         .fold(mapOf(startSymbol to setOf(Prefix(null, listOf(StackSignal.Bottom))))) { result, nonterm ->
             productions.getValue(nonterm).fold(result) { nontermResult, production ->

@@ -1,5 +1,7 @@
 package com.github.andrewkuryan.forge.automata
 
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
+
 sealed class StackPushSignal : StackSignal()
 
 sealed class StackSignal {
@@ -7,16 +9,23 @@ sealed class StackSignal {
         override fun toString() = "$"
     }
 
-    data class Symbol(val value: Char) : StackPushSignal() {
+    data class Symbol(val value: Char) : StackPushSignal(), StackFrame {
         override fun toString() = value.toString()
     }
 
-    data class Node(val name: String) : StackPushSignal() {
+    data class NodeView(val name: String) : StackPushSignal() {
         override fun toString() = name
     }
 
     data class Marker(val name: String) : StackPushSignal() {
         override fun toString() = "⁅$name⁆"
+    }
+}
+
+sealed interface StackFrame {
+
+    data class Node<N : SyntaxNode>(val name: String, val value: N?) : StackFrame {
+        override fun toString() = "($name, $value)"
     }
 }
 

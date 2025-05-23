@@ -1,15 +1,13 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
 import com.github.andrewkuryan.BNF.Grammar.Companion.S
-import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.BNF.grammar
-import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.generator.buildNSAParser
 import com.github.andrewkuryan.forge.utils.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class HCombineTest {
+class LeftFactorizationTest {
 
     @Test
     fun `should build optimized NSA for S → A ⏐ B；A → abc；B → abd`() {
@@ -21,8 +19,7 @@ class HCombineTest {
             A /= 'a'..'b'..'c'
             B /= 'a'..'b'..'d'
 
-            val nsa = buildNSAParser()
-            nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
+            val nsa = buildNSAParser().leftFactorize()
 
             with(nsa) {
                 assertEquals(9, states.size)
@@ -61,8 +58,7 @@ class HCombineTest {
             B /= 'a'..C
             C /= 'b'
 
-            val nsa = buildNSAParser()
-            nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
+            val nsa = buildNSAParser().leftFactorize()
 
             with(nsa) {
                 assertEquals(9, states.size)
@@ -97,8 +93,7 @@ class HCombineTest {
             S /= S..'c' / A / 's'
             A /= 's'..'a'
 
-            val nsa = buildNSAParser()
-            nsa.optimize(listOf(NSA<SyntaxNode>::hCombine))
+            val nsa = buildNSAParser().leftFactorize()
 
             with(nsa) {
                 assertEquals(7, states.size)

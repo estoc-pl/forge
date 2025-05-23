@@ -2,40 +2,33 @@ package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.removeSuffix
 
-fun <N : SyntaxNode> NSA<N>.addRollupTransitions(
+fun NSA<SyntaxNode>.addRollupTransitions(
     rollupTop: StackSlice,
-    rollupTarget: StackSignal.Node,
-    semanticAction: SemanticAction<N>?,
+    rollupTarget: StackSignal.NodeView,
     source: State,
     target: State,
     stackPreviews: List<StackSlice>,
-) {
-    for (stackPreview in stackPreviews) {
-        addTransition(
-            StackTransition(rollupTop, rollupTarget, semanticAction, InputSlice.EMPTY, stackPreview, source, target)
-        )
-    }
-}
+) =
+    addTransitions(
+        stackPreviews.map {
+            StackTransition(rollupTop, rollupTarget, null, InputSlice.EMPTY, it, source, target)
+        }
+    )
 
-fun <N : SyntaxNode> NSA<N>.addReadTransitions(
+fun NSA<SyntaxNode>.addReadTransitions(
     input: InputSlice,
     source: State,
     target: State,
     stackPreviews: List<StackSlice>,
-) {
-    for (stackPreview in stackPreviews) {
-        addTransition(
-            InputTransition(input, InputSlice.EMPTY, stackPreview, source, target)
-        )
-    }
-}
+) = addTransitions(stackPreviews.map { InputTransition(input, InputSlice.EMPTY, it, source, target) })
 
-fun <N : SyntaxNode> NSA<N>.processNonterm(
+fun NSA<SyntaxNode>.processNonterm(
     nonterm: Nonterminal,
-    productions: Map<Nonterminal, Set<Production<N>>>,
-    ports: NSAPorts<N>,
+    productions: Map<Nonterminal, Set<Production>>,
+    ports: NSAPorts<SyntaxNode>,
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
@@ -73,15 +66,14 @@ fun <N : SyntaxNode> NSA<N>.processNonterm(
             .ifEmpty { listOf(StackSlice.EMPTY) }
         addRollupTransitions(
             StackSlice(stackSymbols),
-            StackSignal.Node(nonterm.name),
-            production.action,
+            StackSignal.NodeView(nonterm.name),
             lastState, ports.getExit(nonterm),
             stackPreviews,
         )
     }
 }
 
-fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
+fun Grammar.buildNSAParser() = NSA<SyntaxNode>().apply {
     val prefixes = collectPrefixes()
 
     val ports = NSAPorts(this, productions.keys)
@@ -96,7 +88,7 @@ fun <N : SyntaxNode> Grammar<N>.buildNSAParser() = NSA<N>().apply {
     addTransition(
         InputTransition(
             InputSlice(listOf(InputSignal.EOI)),
-            InputSlice.EMPTY, StackSlice(listOf(StackSignal.Bottom, StackSignal.Node(startSymbol.name))),
+            InputSlice.EMPTY, StackSlice(listOf(StackSignal.Bottom, StackSignal.NodeView(startSymbol.name))),
             ports.getExit(startSymbol), acceptState,
         )
     )

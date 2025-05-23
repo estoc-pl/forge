@@ -3,7 +3,7 @@ package com.github.andrewkuryan.forge.generator.BNFtoNSA
 import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.StackSignal.Bottom
-import com.github.andrewkuryan.forge.automata.StackSignal.Node
+import com.github.andrewkuryan.forge.automata.StackSignal.NodeView
 import com.github.andrewkuryan.forge.automata.StackSignal.Symbol
 import com.github.andrewkuryan.forge.generator.collectPrefixes
 import com.github.andrewkuryan.forge.generator.resolvePrefixes
@@ -135,7 +135,7 @@ class PrefixTest {
             assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(2, aPrefixes.size)
-            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a')))
+            assertContains(aPrefixes, listOf(Bottom, NodeView("S"), Symbol('a')))
             assertContains(aPrefixes, listOf(Bottom))
         }
     }
@@ -156,9 +156,9 @@ class PrefixTest {
             assertEquals(setOf(listOf(Bottom)), sPrefixes)
 
             assertEquals(5, aPrefixes.size)
-            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a')))
+            assertContains(aPrefixes, listOf(Bottom, NodeView("S"), Symbol('a')))
             assertContains(aPrefixes, listOf(Bottom))
-            assertContains(aPrefixes, listOf(Bottom, Node("S"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(Bottom, NodeView("S"), Symbol('a'), Symbol('b')))
             assertContains(aPrefixes, listOf(Bottom, Symbol('b')))
             assertContains(aPrefixes, listOf(Symbol('b')))
         }
@@ -181,15 +181,15 @@ class PrefixTest {
             assertEquals(7, aPrefixes.size)
 
             assertContains(sPrefixes, listOf(Bottom))
-            assertContains(sPrefixes, listOf(Bottom, Node("A"), Symbol('a')))
-            assertContains(sPrefixes, listOf(Node("A"), Symbol('a')))
+            assertContains(sPrefixes, listOf(Bottom, NodeView("A"), Symbol('a')))
+            assertContains(sPrefixes, listOf(NodeView("A"), Symbol('a')))
 
             assertContains(aPrefixes, listOf(Bottom))
-            assertContains(aPrefixes, listOf(Bottom, Node("A"), Symbol('a')))
-            assertContains(aPrefixes, listOf(Node("A"), Symbol('a')))
+            assertContains(aPrefixes, listOf(Bottom, NodeView("A"), Symbol('a')))
+            assertContains(aPrefixes, listOf(NodeView("A"), Symbol('a')))
             assertContains(aPrefixes, listOf(Bottom, Symbol('b')))
-            assertContains(aPrefixes, listOf(Bottom, Node("A"), Symbol('a'), Symbol('b')))
-            assertContains(aPrefixes, listOf(Node("A"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(Bottom, NodeView("A"), Symbol('a'), Symbol('b')))
+            assertContains(aPrefixes, listOf(NodeView("A"), Symbol('a'), Symbol('b')))
             assertContains(aPrefixes, listOf(Symbol('b')))
         }
     }

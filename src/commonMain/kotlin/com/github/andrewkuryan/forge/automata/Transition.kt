@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.automata
 
-import com.github.andrewkuryan.BNF.SemanticAction
-import com.github.andrewkuryan.BNF.SyntaxNode
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
+import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
 
 sealed class Transition<N : SyntaxNode> {
     abstract val source: State
@@ -44,7 +44,7 @@ data class InputTransition<N : SyntaxNode>(
 
 data class StackTransition<N : SyntaxNode>(
     val stack: StackSlice,
-    val rollupTarget: StackSignal.Node,
+    val rollupTarget: StackSignal.NodeView,
     val semanticAction: SemanticAction<N>?,
     override val inputPreview: InputSlice,
     override val stackPreview: StackSlice,

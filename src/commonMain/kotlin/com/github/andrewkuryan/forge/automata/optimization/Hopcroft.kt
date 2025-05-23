@@ -1,35 +1,10 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
-import com.github.andrewkuryan.BNF.SemanticAction
-import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
+import com.github.andrewkuryan.forge.extensions.hasIntersection
 import com.github.andrewkuryan.forge.extensions.minOfSize
-
-private data class Behaviour<N : SyntaxNode>(
-    val input: InputSlice,
-    val stack: StackSlice,
-    val inputPreview: InputSlice,
-    val stackSlice: StackSlice,
-    val stackPush: StackPush,
-    val semanticAction: SemanticAction<N>?,
-)
-
-private fun <N : SyntaxNode> MeaningfulTransition<N>.getBehavior(): Behaviour<N> =
-    when (this) {
-        is InputTransition -> Behaviour(
-            input, StackSlice.EMPTY,
-            inputPreview, stackPreview,
-            StackPush(stackPushBefore.value + stackPushAfter.value),
-            null
-        )
-
-        is StackTransition -> Behaviour(
-            InputSlice.EMPTY, stack,
-            inputPreview, stackPreview,
-            StackPush(stackPushBefore.value + rollupTarget + stackPushAfter.value),
-            semanticAction
-        )
-    }
 
 fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
     var finalSets = setOf(finalStates, states - finalStates)
@@ -70,15 +45,41 @@ fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
         if (initState in group) {
             newNSA.setInitState(newStates.getValue(group.first()))
         }
-        if (group.intersect(finalStates).isNotEmpty()) {
+        if (group.hasIntersection(finalStates)) {
             newNSA.addFinalState(newStates.getValue(group.first()))
         }
-        for (transition in getInTransitions(group) + getOutTransitions(group)) {
-            newNSA.addTransition(
-                transition.replaceVertexes(newStates.getValue(transition.source), newStates.getValue(transition.target))
-            )
-        }
+        newNSA.addTransitions(
+            (getInTransitions(group) + getOutTransitions(group)).map {
+                it.replaceVertexes(newStates.getValue(it.source), newStates.getValue(it.target))
+            }
+        )
     }
 
     return newNSA
 }
+
+private data class Behaviour<N : SyntaxNode>(
+    val input: InputSlice,
+    val stack: StackSlice,
+    val inputPreview: InputSlice,
+    val stackSlice: StackSlice,
+    val stackPush: StackPush,
+    val semanticAction: SemanticAction<N>?,
+)
+
+private fun <N : SyntaxNode> MeaningfulTransition<N>.getBehavior(): Behaviour<N> =
+    when (this) {
+        is InputTransition -> Behaviour(
+            input, StackSlice.EMPTY,
+            inputPreview, stackPreview,
+            StackPush(stackPushBefore.value + stackPushAfter.value),
+            null
+        )
+
+        is StackTransition -> Behaviour(
+            InputSlice.EMPTY, stack,
+            inputPreview, stackPreview,
+            StackPush(stackPushBefore.value + rollupTarget + stackPushAfter.value),
+            semanticAction
+        )
+    }

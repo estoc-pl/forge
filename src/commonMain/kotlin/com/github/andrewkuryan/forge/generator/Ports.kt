@@ -1,12 +1,12 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.Nonterminal
-import com.github.andrewkuryan.BNF.SyntaxNode
-import com.github.andrewkuryan.forge.automata.AbstractNSA
+import com.github.andrewkuryan.forge.automata.ENSA
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.State
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
-open class Ports<A : AbstractNSA<*, *>>(protected val nsa: A, nonterms: Set<Nonterminal>) {
+open class Ports<A : ENSA<*, *>>(protected val nsa: A, nonterms: Set<Nonterminal>) {
     protected val ports = nonterms.associateWith { Port(nsa.nextState(), nsa.nextState()) }.toMutableMap()
     protected val entries = ports.entries.associate { it.value.entry to setOf(it.key) }.toMutableMap()
 

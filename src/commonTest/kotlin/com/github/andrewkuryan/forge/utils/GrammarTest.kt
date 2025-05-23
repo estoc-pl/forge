@@ -1,13 +1,13 @@
 package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.BNF.Grammar
-import com.github.andrewkuryan.BNF.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import kotlin.test.assertEquals
 
-abstract class GrammarTest(val buildNSA: Grammar<SyntaxNode>.() -> NSA<SyntaxNode>) {
+abstract class GrammarTest(val buildNSA: Grammar.() -> NSA<SyntaxNode>) {
 
-    protected fun assertBuilding(grammar: Grammar<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertion) =
+    protected fun assertBuilding(grammar: Grammar, getAssertion: (StateProvider) -> NSAAssertion) =
         assertNSA(grammar.buildNSA(), getAssertion)
 }
 

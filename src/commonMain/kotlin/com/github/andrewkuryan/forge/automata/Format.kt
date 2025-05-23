@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.automata
 
-import com.github.andrewkuryan.BNF.SemanticAction
-import com.github.andrewkuryan.BNF.SyntaxNode
+import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 enum class NSAFormatPattern { DEFAULT, VIZ, KT_SOURCE }
 
@@ -95,7 +95,7 @@ fun StackPush.ktSourceFormat() =
 fun StackSignal.ktSourceFormat() = when (this) {
     is StackSignal.Bottom -> "StackSignal.Bottom"
     is StackSignal.Symbol -> "StackSignal.Symbol('${this.value}')"
-    is StackSignal.Node -> "StackSignal.Node(\"${this.name}\")"
+    is StackSignal.NodeView -> "StackSignal.NodeView(\"${this.name}\")"
     is StackSignal.Marker -> "StackSignal.Marker(\"${this.name}\")"
 }
 
