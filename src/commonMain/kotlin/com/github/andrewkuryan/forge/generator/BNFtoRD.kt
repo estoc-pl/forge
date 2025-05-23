@@ -2,6 +2,7 @@ package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.automata.optimization.applyHopcroft
 
 fun <N : SyntaxNode> ENSA<N>.processNonterm(
     nonterm: Nonterminal,
@@ -74,4 +75,4 @@ fun <N : SyntaxNode> Grammar<N>.buildRDParser() = ENSA<N>().apply {
     )
     addFinalState(acceptState)
 
-}.removeEmptyTransitions()
+}.removeEmptyTransitions().applyHopcroft()
