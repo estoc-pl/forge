@@ -63,7 +63,7 @@ private data class Behaviour<N : SyntaxNode>(
     val stack: StackSlice,
     val inputPreview: InputSlice,
     val stackSlice: StackSlice,
-    val stackPush: StackPush,
+    val combinedStackPush: List<StackSignal.Preview>,
     val semanticAction: SemanticAction<N>?,
 )
 
@@ -72,14 +72,14 @@ private fun <N : SyntaxNode> MeaningfulTransition<N>.getBehavior(): Behaviour<N>
         is InputTransition -> Behaviour(
             input, StackSlice.EMPTY,
             inputPreview, stackPreview,
-            StackPush(stackPushBefore.value + stackPushAfter.value),
+            stackPushBefore.value + stackPushAfter.value,
             null
         )
 
         is StackTransition -> Behaviour(
             InputSlice.EMPTY, stack,
             inputPreview, stackPreview,
-            StackPush(stackPushBefore.value + rollupTarget + stackPushAfter.value),
+            stackPushBefore.value + rollupTarget + stackPushAfter.value,
             semanticAction
         )
     }

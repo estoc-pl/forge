@@ -147,6 +147,6 @@ val parseStackSignals = parseSignals(
     STACK_SYMBOL_TRANSFORMER
 )
 val parseStackPush = parseSignals(
-    listOf(STACK_MARKER_TRANSFORMER, STACK_NODE_TRANSFORMER),
+    listOf(STACK_MARKER_TRANSFORMER),
     STACK_SYMBOL_TRANSFORMER
 )

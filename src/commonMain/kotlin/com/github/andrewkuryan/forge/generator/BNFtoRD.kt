@@ -17,7 +17,7 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
 ) {
     productions.getValue(nonterm).forEach { production ->
         val lastStates = production.symbols
-            .fold(listOf(ports.getEntry(nonterm) to listOf<StackSignal>())) { prevStates, symbol ->
+            .fold(listOf(ports.getEntry(nonterm) to listOf<StackSignal.Preview>())) { prevStates, symbol ->
                 prevStates.flatMap { (prevState, currentStack) ->
                     when (symbol) {
                         is Terminal -> {

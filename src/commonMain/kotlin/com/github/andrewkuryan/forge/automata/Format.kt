@@ -92,7 +92,7 @@ fun StackPush.ktSourceFormat() =
     if (this.isEmpty) "StackPush.EMPTY"
     else "StackPush(listOf(${this.value.joinToString(",") { it.ktSourceFormat() }}))"
 
-fun StackSignal.ktSourceFormat() = when (this) {
+fun StackSignal.Preview.ktSourceFormat() = when (this) {
     is StackSignal.Bottom -> "StackSignal.Bottom"
     is StackSignal.Symbol -> "StackSignal.Symbol('${this.value}')"
     is StackSignal.NodeView -> "StackSignal.NodeView(\"${this.name}\")"

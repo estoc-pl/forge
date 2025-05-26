@@ -2,34 +2,36 @@ package com.github.andrewkuryan.forge.automata
 
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
-sealed class StackPushSignal : StackSignal()
+sealed interface StackSignal {
+    sealed interface Frame : StackSignal
+    sealed interface Preview : StackSignal
 
-sealed class StackSignal {
-    data object Bottom : StackSignal() {
+    sealed interface Read : Frame {
+        data class Node<N : SyntaxNode>(val name: String, val value: N?) : Read {
+            override fun toString() = "($name, $value)"
+        }
+    }
+
+    sealed interface Push : Frame, Preview
+
+    data object Bottom : Frame, Preview {
         override fun toString() = "$"
     }
 
-    data class Symbol(val value: Char) : StackPushSignal(), StackFrame {
+    data class Symbol(val value: Char) : Read, Push, Preview {
         override fun toString() = value.toString()
     }
 
-    data class NodeView(val name: String) : StackPushSignal() {
+    data class NodeView(val name: String) : Preview {
         override fun toString() = name
     }
 
-    data class Marker(val name: String) : StackPushSignal() {
+    data class Marker(val name: String) : Push, Preview {
         override fun toString() = "⁅$name⁆"
     }
 }
 
-sealed interface StackFrame {
-
-    data class Node<N : SyntaxNode>(val name: String, val value: N?) : StackFrame {
-        override fun toString() = "($name, $value)"
-    }
-}
-
-value class StackSlice(val value: List<StackSignal>) {
+value class StackSlice(val value: List<StackSignal.Preview>) {
 
     companion object {
         val EMPTY = StackSlice(emptyList())
@@ -43,7 +45,7 @@ value class StackSlice(val value: List<StackSignal>) {
     override fun toString() = if (isEmpty) "ε" else value.joinToString("")
 }
 
-value class StackPush(val value: List<StackPushSignal>) {
+value class StackPush(val value: List<StackSignal.Push>) {
 
     companion object {
         val EMPTY = StackPush(emptyList())
