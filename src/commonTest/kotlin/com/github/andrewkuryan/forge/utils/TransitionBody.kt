@@ -101,7 +101,7 @@ private val RANGE_TRANSFORMER: Transformer<InputSignal.Range> =
 private val SINGLE_NOT_TRANSFORMER: Transformer<InputSignal.Not> =
     Regex("\\^[^\\[]") to { range, input -> InputSignal.Not(InputSignal.Symbol(input[range.first + 1])) }
 private val COMPLEX_NOT_TRANSFORMER: Transformer<InputSignal.Not> = Regex("\\^\\[..+]") to { range, input ->
-    val nestedSignals = parseBaseInputSignals(input.substring(range.first + 2 until range.last))
+    val nestedSignals = parseUnitaryInputSignals(input.substring(range.first + 2 until range.last))
     InputSignal.Not(nestedSignals.first(), nestedSignals.slice(1 until nestedSignals.size))
 }
 
@@ -134,8 +134,8 @@ fun <T, D : T> parseSignals(transformers: List<Transformer<T>>, parseDefault: (C
     return { input -> parseFragment(input, transformers) }
 }
 
-val parseBaseInputSignals = parseSignals(
-    listOf<Transformer<BaseInputSignal>>(RANGE_TRANSFORMER),
+val parseUnitaryInputSignals = parseSignals(
+    listOf(EOI_TRANSFORMER, RANGE_TRANSFORMER),
     INPUT_SYMBOL_TRANSFORMER
 )
 val parseInputSignals = parseSignals(

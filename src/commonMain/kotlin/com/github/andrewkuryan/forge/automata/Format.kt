@@ -103,14 +103,14 @@ fun InputSlice.ktSourceFormat() =
     if (this.isEmpty) "InputSlice.EMPTY"
     else "InputSlice(listOf(${this.value.joinToString(",") { ktSourceFormatInputSignal(it) }}))"
 
-fun ktSourceFormatBaseInputSignal(signal: BaseInputSignal) = when (signal) {
+fun ktSourceFormatBaseInputSignal(signal: InputSignal.Unitary) = when (signal) {
     is InputSignal.EOI -> "InputSignal.EOI"
     is InputSignal.Symbol -> "InputSignal.Symbol('${signal.value}')"
     is InputSignal.Range -> "InputSignal.Range('${signal.value.first}'..'${signal.value.last}')"
 }
 
 fun ktSourceFormatInputSignal(signal: InputSignal) = when (signal) {
-    is BaseInputSignal -> ktSourceFormatBaseInputSignal(signal)
+    is InputSignal.Unitary -> ktSourceFormatBaseInputSignal(signal)
     is InputSignal.Not -> "InputSignal.Not(" +
             "${ktSourceFormatBaseInputSignal(signal.first)}," +
             "listOf(${signal.rest.joinToString(",") { ktSourceFormatBaseInputSignal(it) }}))"

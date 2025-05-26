@@ -1,7 +1,6 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
-import com.github.andrewkuryan.forge.automata.BaseInputSignal
 import com.github.andrewkuryan.forge.automata.InputSignal
 import com.github.andrewkuryan.forge.automata.StackSignal
 
@@ -14,7 +13,7 @@ fun GrammarSymbol.asStackSignal(): StackSignal.Preview =
         is RegExp -> asStackSignal()
     }
 
-fun NegatableRegexp.asInputSignal(): BaseInputSignal =
+fun NegatableRegexp.asInputSignal(): InputSignal.Unitary =
     when (this) {
         is RegExp.Symbol -> InputSignal.Symbol(value)
         is RegExp.Range -> InputSignal.Range(value)
