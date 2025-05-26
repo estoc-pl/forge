@@ -6,7 +6,12 @@ import kotlin.reflect.KProperty0
 class ParserProduction<N : SyntaxNode>(
     symbols: List<GrammarSymbol>,
     val action: SemanticAction<N>?,
-) : Production(symbols)
+) : Production(symbols) {
+
+    override fun toString() = "${symbols.joinToString(" ")}${action?.let { " (${it.name})" } ?: ""}"
+    override fun equals(other: Any?) = other is ParserProduction<*> && super.equals(other) && action == other.action
+    override fun hashCode() = 31 * symbols.hashCode() + (action?.hashCode() ?: 0)
+}
 
 class ParserGrammar<N : SyntaxNode> : AbstractGrammar<ParserProduction<N>>(Grammar.S) {
 

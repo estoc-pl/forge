@@ -18,11 +18,9 @@ fun <N : SyntaxNode> ENSA<N, Transition<N>>.processAtomicRegExp(
         is RegExp.Not -> listOf(InputSignal.Not(regexp.first.asInputSignal(), regexp.rest.map { it.asInputSignal() }))
     }
     addTransition(
-        InputTransition(
-            InputSlice(inputSignals),
-            InputSlice.EMPTY, StackSlice.EMPTY,
+        MeaningfulTransition(
             port.entry, port.exit,
-            marker?.let { StackPush(listOf(it)) } ?: StackPush.EMPTY
+            Guard.Input(input = InputSlice(inputSignals), stackPushBefore = StackPush(listOfNotNull(marker)))
         )
     )
     return port

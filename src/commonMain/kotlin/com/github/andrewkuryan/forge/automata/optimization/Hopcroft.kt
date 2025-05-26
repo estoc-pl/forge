@@ -14,7 +14,7 @@ fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
         val currentSet = currentSets.first()
 
         val (newFinalSets, newCurrentSets) = getInTransitions(currentSet)
-            .groupBy { it.getBehavior() }
+            .groupBy { it.guard.getBehavior() }
             .values
             .map { transitions -> transitions.map { it.source }.toSet() }
             .fold(finalSets to currentSets.minusElement(currentSet)) { result, sourceSet ->
@@ -50,7 +50,7 @@ fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
         }
         newNSA.addTransitions(
             (getInTransitions(group) + getOutTransitions(group)).map {
-                it.replaceVertexes(newStates.getValue(it.source), newStates.getValue(it.target))
+                it.copy(source = newStates.getValue(it.source), target = newStates.getValue(it.target))
             }
         )
     }
@@ -67,16 +67,16 @@ private data class Behaviour<N : SyntaxNode>(
     val semanticAction: SemanticAction<N>?,
 )
 
-private fun <N : SyntaxNode> MeaningfulTransition<N>.getBehavior(): Behaviour<N> =
+private fun <N : SyntaxNode> Guard.Meaningful<N>.getBehavior(): Behaviour<N> =
     when (this) {
-        is InputTransition -> Behaviour(
+        is Guard.Input -> Behaviour(
             input, StackSlice.EMPTY,
             inputPreview, stackPreview,
             stackPushBefore.value + stackPushAfter.value,
             null
         )
 
-        is StackTransition -> Behaviour(
+        is Guard.Stack -> Behaviour(
             InputSlice.EMPTY, stack,
             inputPreview, stackPreview,
             stackPushBefore.value + rollupTarget + stackPushAfter.value,

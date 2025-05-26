@@ -1,70 +1,22 @@
 package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.forge.automata.*
-
-sealed class TransitionBody {
-    abstract val inputPreview: InputSlice
-    abstract val stackPreview: StackSlice
-    abstract val stackPushBefore: StackPush
-    abstract val stackPushAfter: StackPush
-}
-
-fun TransitionBody.stackPushFormat() = when (this) {
-    is InputTransitionBody -> "$stackPushBefore|$stackPushAfter"
-    is StackTransitionBody -> "$stackPushBefore|$rollupTarget|$stackPushAfter"
-}
-
-data class InputTransitionBody(
-    val input: InputSlice,
-    override val inputPreview: InputSlice,
-    override val stackPreview: StackSlice,
-    override val stackPushBefore: StackPush,
-    override val stackPushAfter: StackPush,
-) : TransitionBody() {
-
-    override fun toString() = "$input⟨$inputPreview⟩, ⟨$stackPreview⟩ / ${stackPushFormat()}"
-}
-
-data class StackTransitionBody(
-    val stack: StackSlice,
-    val rollupTarget: StackSignal.NodeView,
-    override val inputPreview: InputSlice,
-    override val stackPreview: StackSlice,
-    override val stackPushBefore: StackPush,
-    override val stackPushAfter: StackPush,
-) : TransitionBody() {
-
-    override fun toString() = "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / ${stackPushFormat()}"
-}
-
-fun TransitionBody.isSameAs(transition: MeaningfulTransition<*>) =
-    when {
-        this is InputTransitionBody && transition is InputTransition -> input == transition.input
-        this is StackTransitionBody && transition is StackTransition ->
-            stack == transition.stack && rollupTarget == transition.rollupTarget
-
-        else -> false
-    } && inputPreview == transition.inputPreview &&
-            stackPreview == transition.stackPreview &&
-            stackPushBefore == transition.stackPushBefore &&
-            stackPushAfter == transition.stackPushAfter
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
-    InputTransitionBody(
-        InputSlice(listOf(InputSignal.Symbol(input))),
-        InputSlice.EMPTY,
-        StackSlice(parseStackSignals(stackPreview)),
-        StackPush(parseStackPush(stackPushBefore)),
-        StackPush(parseStackPush(stackPushAfter))
+    Guard.Input<SyntaxNode>(
+        input = InputSlice(listOf(InputSignal.Symbol(input))),
+        stackPreview = StackSlice(parseStackSignals(stackPreview)),
+        stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
+        stackPushAfter = StackPush(parseStackPush(stackPushAfter))
     )
 
 fun read(input: String, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
-    InputTransitionBody(
-        InputSlice(parseInputSignals(input)),
-        InputSlice.EMPTY,
-        StackSlice(parseStackSignals(stackPreview)),
-        StackPush(parseStackPush(stackPushBefore)),
-        StackPush(parseStackPush(stackPushAfter))
+    Guard.Input<SyntaxNode>(
+        input = InputSlice(parseInputSignals(input)),
+        stackPreview = StackSlice(parseStackSignals(stackPreview)),
+        stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
+        stackPushAfter = StackPush(parseStackPush(stackPushAfter))
     )
 
 fun rollup(
@@ -73,22 +25,18 @@ fun rollup(
     target: String,
     stackPushBefore: String = "",
     stackPushAfter: String = "",
-) = StackTransitionBody(
-    StackSlice(parseStackSignals(stack)),
-    StackSignal.NodeView(target),
-    InputSlice.EMPTY,
-    StackSlice(parseStackSignals(stackPreview)),
-    StackPush(parseStackPush(stackPushBefore)),
-    StackPush(parseStackPush(stackPushAfter))
+) = Guard.Stack<SyntaxNode>(
+    stack = StackSlice(parseStackSignals(stack)),
+    rollupTarget = StackSignal.NodeView(target),
+    stackPreview = StackSlice(parseStackSignals(stackPreview)),
+    stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
+    stackPushAfter = StackPush(parseStackPush(stackPushAfter))
 )
 
 fun exit(stackPreview: String) =
-    InputTransitionBody(
-        InputSlice(listOf(InputSignal.EOI)),
-        InputSlice.EMPTY,
-        StackSlice(parseStackSignals(stackPreview)),
-        StackPush.EMPTY,
-        StackPush.EMPTY
+    Guard.Input<SyntaxNode>(
+        input = InputSlice(listOf(InputSignal.EOI)),
+        stackPreview = StackSlice(parseStackSignals(stackPreview))
     )
 
 private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>

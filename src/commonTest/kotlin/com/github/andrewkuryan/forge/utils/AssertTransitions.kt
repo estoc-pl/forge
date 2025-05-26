@@ -1,8 +1,7 @@
 package com.github.andrewkuryan.forge.utils
 
-import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.automata.State
-import com.github.andrewkuryan.forge.automata.defaultFormat
+import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
@@ -15,13 +14,13 @@ class StateRef(var value: State? = null) {
 fun NSA<*>.assertTransitions(
     initRef: StateRef,
     finalRef: StateRef,
-    transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
+    transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
 ) = assertTransitions(initRef, listOf(finalRef), transitions)
 
 fun NSA<*>.assertTransitions(
     initRef: StateRef,
     finalRefs: List<StateRef>,
-    transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
+    transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
 ) {
     initRef.value = initState
 
@@ -43,13 +42,13 @@ fun NSA<*>.assertTransitions(
     }
 }
 
-fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<TransitionBody, StateRef>>) {
+fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>) {
     assertEquals(transitions.size, getOutTransitions(source).size, "Number of transitions from $source does not match")
 
     val originalTransitions = getOutTransitions(source).toMutableSet()
-    for ((transition, target) in transitions) {
-        val foundTransitions = originalTransitions.filter { transition.isSameAs(it) }
-        assertNotEquals(0, foundTransitions.size, "Cannot find transition [$transition] in $source")
+    for ((guard, target) in transitions) {
+        val foundTransitions = originalTransitions.filter { guard == it.guard }
+        assertNotEquals(0, foundTransitions.size, "Cannot find transition [${guard.defaultFormat()}] in $source")
 
         val originalTransition = foundTransitions.first()
         if (target.value != null) {

@@ -41,45 +41,56 @@ inline fun <reified N : SyntaxNode> Pair<State, List<MeaningfulTransition<N>>>.k
             "\t)"
 }
 
-fun MeaningfulTransition<*>.stackPushFormat() = when (this) {
-    is InputTransition -> "$stackPushBefore|$stackPushAfter"
-    is StackTransition -> "$stackPushBefore|$rollupTarget|$stackPushAfter"
+fun Transition<*>.defaultFormat() = when (val transitionGuard = guard) {
+    is Guard.Meaningful<*> -> "$source -> ${transitionGuard.defaultFormat()} -> $target"
+    is Guard.Empty -> "$source -> $target"
 }
 
-fun Transition<*>.defaultFormat() = when (this) {
-    is InputTransition -> "$source -> $input⟨$inputPreview⟩, ⟨$stackPreview⟩ / ${stackPushFormat()} -> $target"
-    is StackTransition -> "$source -> ⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / ${stackPushFormat()} -> $target"
-    is EmptyTransition -> "$source -> $target"
+fun Guard.Meaningful<*>.defaultFormat() = when (this) {
+    is Guard.Input<*> -> "$input⟨$inputPreview⟩, ⟨$stackPreview⟩ / ${stackPushFormat()}"
+    is Guard.Stack<*> -> "⟨$inputPreview⟩, $stack⟨$stackPreview⟩ / ${stackPushFormat()}"
 }
 
-fun Transition<*>.vizFormat() = when (this) {
-    is InputTransition -> """"$source" -> "$target" [label=<$input⟨$inputPreview⟩ / ⟨$stackPreview⟩<br/>${stackPushFormat()}>]"""
-    is StackTransition -> """"$source" -> "$target" [label=<⟨$inputPreview⟩ / $stack⟨$stackPreview⟩<br/>${stackPushFormat()}>]"""
-    is EmptyTransition -> """"$source" -> "$target""""
+fun Transition<*>.vizFormat() = when (val transitionGuard = guard) {
+    is Guard.Meaningful<*> -> """"$source" -> "$target" ${transitionGuard.vizFormat()}"""
+    is Guard.Empty -> """"$source" -> "$target""""
 }
 
-inline fun <reified N : SyntaxNode> Transition<N>.ktSourceFormat() = when (this) {
-    is InputTransition -> "InputTransition<${N::class.simpleName}>(" +
+fun Guard.Meaningful<*>.vizFormat() = when (this) {
+    is Guard.Input<*> -> "[label=<$input⟨$inputPreview⟩ / ⟨$stackPreview⟩<br/>${stackPushFormat()}>]"
+    is Guard.Stack<*> -> "[label=<⟨$inputPreview⟩ / $stack⟨$stackPreview⟩<br/>${stackPushFormat()}>]"
+}
+
+fun Guard.Meaningful<*>.stackPushFormat() = when (this) {
+    is Guard.Input -> "$stackPushBefore|$stackPushAfter"
+    is Guard.Stack -> "$stackPushBefore|$rollupTarget|$stackPushAfter"
+}
+
+inline fun <reified N : SyntaxNode> Transition<N>.ktSourceFormat() = when (val transitionGuard = guard) {
+    is Guard.Meaningful<*> -> "MeaningfulTransition<${N::class.simpleName}>(" +
+            "${source.ktSourceFormat()}," +
+            "${target.ktSourceFormat()}," +
+            "${transitionGuard.ktSourceFormat()})"
+
+    is Guard.Empty -> "EmptyTransition<${N::class.simpleName}>(${source.ktSourceFormat()},${target.ktSourceFormat()})"
+}
+
+fun Guard.Meaningful<*>.ktSourceFormat() = when (this) {
+    is Guard.Input<*> -> "Guard.Input(" +
             "${input.ktSourceFormat()}," +
             "${inputPreview.ktSourceFormat()}," +
             "${stackPreview.ktSourceFormat()}," +
-            "${source.ktSourceFormat()}," +
-            "${target.ktSourceFormat()}," +
             "${stackPushBefore.ktSourceFormat()}," +
             "${stackPushAfter.ktSourceFormat()})"
 
-    is StackTransition -> "StackTransition<${N::class.simpleName}>(" +
+    is Guard.Stack<*> -> "Guard.Stack(" +
             "${stack.ktSourceFormat()}," +
             "${rollupTarget.ktSourceFormat()}," +
             "${semanticAction.ktSourceFormat()}," +
             "${inputPreview.ktSourceFormat()}," +
             "${stackPreview.ktSourceFormat()}," +
-            "${source.ktSourceFormat()}," +
-            "${target.ktSourceFormat()}," +
             "${stackPushBefore.ktSourceFormat()}," +
             "${stackPushAfter.ktSourceFormat()})"
-
-    is EmptyTransition -> "EmptyTransition<${N::class.simpleName}>(${source.ktSourceFormat()},${target.ktSourceFormat()})"
 }
 
 fun State.ktSourceFormat() = "State(${this.index})"
@@ -116,6 +127,6 @@ fun ktSourceFormatInputSignal(signal: InputSignal) = when (signal) {
             "listOf(${signal.rest.joinToString(",") { ktSourceFormatBaseInputSignal(it) }}))"
 }
 
-inline fun <reified N : SyntaxNode> SemanticAction<N>?.ktSourceFormat() =
+fun SemanticAction<*>?.ktSourceFormat() =
     if (this == null) "null"
-    else "SemanticAction<${N::class.simpleName}>(\"${this.name}\",::${this.name})"
+    else "SemanticAction(\"${this.name}\",::${this.name})"

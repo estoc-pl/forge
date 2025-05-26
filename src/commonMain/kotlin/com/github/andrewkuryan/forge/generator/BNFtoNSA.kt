@@ -11,19 +11,25 @@ fun NSA<SyntaxNode>.addRollupTransitions(
     source: State,
     target: State,
     stackPreviews: List<StackSlice>,
-) =
-    addTransitions(
-        stackPreviews.map {
-            StackTransition(rollupTop, rollupTarget, null, InputSlice.EMPTY, it, source, target)
-        }
-    )
+) = addTransitions(
+    stackPreviews.map {
+        MeaningfulTransition(
+            source, target,
+            Guard.Stack(stack = rollupTop, rollupTarget = rollupTarget, stackPreview = it)
+        )
+    }
+)
 
 fun NSA<SyntaxNode>.addReadTransitions(
     input: InputSlice,
     source: State,
     target: State,
     stackPreviews: List<StackSlice>,
-) = addTransitions(stackPreviews.map { InputTransition(input, InputSlice.EMPTY, it, source, target) })
+) = addTransitions(
+    stackPreviews.map {
+        MeaningfulTransition(source, target, Guard.Input(input = input, stackPreview = it))
+    }
+)
 
 fun NSA<SyntaxNode>.processNonterm(
     nonterm: Nonterminal,
@@ -86,10 +92,12 @@ fun Grammar.buildNSAParser() = NSA<SyntaxNode>().apply {
 
     val acceptState = nextState()
     addTransition(
-        InputTransition(
-            InputSlice(listOf(InputSignal.EOI)),
-            InputSlice.EMPTY, StackSlice(listOf(StackSignal.Bottom, StackSignal.NodeView(startSymbol.name))),
+        MeaningfulTransition(
             ports.getExit(startSymbol), acceptState,
+            Guard.Input(
+                input = InputSlice(listOf(InputSignal.EOI)),
+                stackPreview = StackSlice(listOf(StackSignal.Bottom, StackSignal.NodeView(startSymbol.name)))
+            )
         )
     )
     addFinalState(acceptState)

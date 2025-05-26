@@ -3,7 +3,7 @@ package com.github.andrewkuryan.forge.automata
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
-data class State(val index: Int) {
+value class State(val index: Int) {
     override fun toString() = "S${index}"
 }
 
@@ -37,8 +37,8 @@ open class ENSA<N : SyntaxNode, T : Transition<N>> {
         transitionTable.getOrPut(transition.source) { mutableSetOf() }.add(transition)
         reversedTransitionTable.getOrPut(transition.target) { mutableSetOf() }.add(transition)
 
-        inputSizes[transition.inputSize] = (inputSizes[transition.inputSize] ?: 0) + 1
-        stackPreviewSizes[transition.stackSize] = (stackPreviewSizes[transition.stackSize] ?: 0) + 1
+        inputSizes[transition.guard.inputSize] = (inputSizes[transition.guard.inputSize] ?: 0) + 1
+        stackPreviewSizes[transition.guard.stackSize] = (stackPreviewSizes[transition.guard.stackSize] ?: 0) + 1
 
         return transition
     }
@@ -47,8 +47,8 @@ open class ENSA<N : SyntaxNode, T : Transition<N>> {
 
     private fun <NT : T> removeTransition(transition: NT): NT {
         if (transitionTable[transition.source] != null) {
-            inputSizes[transition.inputSize] = inputSizes.getValue(transition.inputSize) - 1
-            stackPreviewSizes[transition.stackSize] = stackPreviewSizes.getValue(transition.stackSize) - 1
+            inputSizes[transition.guard.inputSize] = inputSizes.getValue(transition.guard.inputSize) - 1
+            stackPreviewSizes[transition.guard.stackSize] = stackPreviewSizes.getValue(transition.guard.stackSize) - 1
         }
 
         removeTableTransition(transitionTable, transition.source, transition)
@@ -95,9 +95,9 @@ class NSA<N : SyntaxNode> : ENSA<N, MeaningfulTransition<N>>() {
                 addFinalState(newState)
             }
             val newOutTransitions = getOutTransitions(states)
-                .map { it.replaceVertexes(newState, if (it.target in states) newState else it.target) }
+                .map { it.copy(source = newState, target = if (it.target in states) newState else it.target) }
             val newInTransitions = getInTransitions(states)
-                .map { it.replaceVertexes(if (it.source in states) newState else it.source, newState) }
+                .map { it.copy(source = if (it.source in states) newState else it.source, target = newState) }
 
             addTransitions(newOutTransitions + newInTransitions)
 

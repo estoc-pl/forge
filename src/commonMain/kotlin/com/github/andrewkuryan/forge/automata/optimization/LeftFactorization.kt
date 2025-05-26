@@ -6,8 +6,6 @@ import com.github.andrewkuryan.forge.extensions.commonSuffix
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
-private val STUB_STATE = State(-1)
-
 fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
     val newNSA = NSA<N>()
 
@@ -17,18 +15,18 @@ fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
     while (queue.isNotEmpty()) {
         val (oldStates, newState) = queue.removeAt(0)
         val newProcessed = getOutTransitions(oldStates)
-            .fold(setOf<Pair<MeaningfulTransition<N>, Set<State>>>()) { acc, transition ->
-                acc.find { it.first.canHCombine(transition) }
+            .fold(setOf<Triple<Guard.Meaningful<N>, Boolean, Set<State>>>()) { acc, transition ->
+                acc.find { it.first.canHCombine(transition.guard) && !it.second && !transition.isLoop }
                     ?.let { entry ->
-                        val (combinable, states) = entry
-                        acc - entry + (combinable.hCombine(transition, STUB_STATE) to (states + transition.target))
+                        val (combinable, _, states) = entry
+                        acc - entry + Triple(combinable.hCombine(transition.guard), false, states + transition.target)
                     }
-                    ?: (acc + (transition to setOf(transition.target)))
+                    ?: (acc + Triple(transition.guard, transition.isLoop, setOf(transition.target)))
             }
-            .groupBy { it.second }
+            .groupBy { it.third }
             .mapValues { (states, transitions) ->
                 processed.getOrElse(states) { newNSA.nextState() }.apply {
-                    newNSA.addTransitions(transitions.map { it.first.replaceVertexes(newState, this) })
+                    newNSA.addTransitions(transitions.map { MeaningfulTransition(newState, this, it.first) })
                 }
             }
             .filter { it.key !in processed }
@@ -50,47 +48,41 @@ fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
     return newNSA
 }
 
-private fun <N : SyntaxNode> MeaningfulTransition<N>.hCombine(
-    other: MeaningfulTransition<N>,
-    commonTarget: State,
-): MeaningfulTransition<N> =
+private fun <N : SyntaxNode> Guard.Meaningful<N>.hCombine(other: Guard.Meaningful<N>): Guard.Meaningful<N> =
     when {
-        this is InputTransition && other is InputTransition -> hCombine(other, commonTarget)
-        this is StackTransition && other is StackTransition -> hCombine(other, commonTarget)
+        this is Guard.Input && other is Guard.Input -> hCombine(other)
+        this is Guard.Stack && other is Guard.Stack -> hCombine(other)
         else -> throw Exception("Cannot combine transitions of different types")
     }
 
-private fun <N : SyntaxNode> InputTransition<N>.hCombine(other: InputTransition<N>, commonTarget: State) =
+private fun <N : SyntaxNode> Guard.Input<N>.hCombine(other: Guard.Input<N>) =
     copy(
         inputPreview = inputPreview.hCombine(other.inputPreview),
-        stackPreview = stackPreview.hCombine(other.stackPreview),
-        target = commonTarget
+        stackPreview = stackPreview.hCombine(other.stackPreview)
     )
 
-private fun <N : SyntaxNode> StackTransition<N>.hCombine(other: StackTransition<N>, commonTarget: State) =
+private fun <N : SyntaxNode> Guard.Stack<N>.hCombine(other: Guard.Stack<N>) =
     copy(
         inputPreview = inputPreview.hCombine(other.inputPreview),
-        stackPreview = stackPreview.hCombine(other.stackPreview),
-        target = commonTarget
+        stackPreview = stackPreview.hCombine(other.stackPreview)
     )
 
 private fun InputSlice.hCombine(other: InputSlice) = InputSlice(commonPrefix(value, other.value))
 private fun StackSlice.hCombine(other: StackSlice) = StackSlice(commonSuffix(value, other.value))
 
-private fun MeaningfulTransition<*>.canHCombine(other: MeaningfulTransition<*>) =
+private fun Guard.Meaningful<*>.canHCombine(other: Guard.Meaningful<*>) =
     when {
-        this is InputTransition && other is InputTransition -> canHCombine(other)
-        this is StackTransition && other is StackTransition -> canHCombine(other)
+        this is Guard.Input && other is Guard.Input -> canHCombine(other)
+        this is Guard.Stack && other is Guard.Stack -> canHCombine(other)
         else -> false
     } && inputPreview.canHCombine(other.inputPreview) &&
             stackPreview.canHCombine(other.stackPreview) &&
             stackPushBefore == other.stackPushBefore &&
-            stackPushAfter == other.stackPushAfter &&
-            !isLoop && !other.isLoop
+            stackPushAfter == other.stackPushAfter
 
-private fun InputTransition<*>.canHCombine(other: InputTransition<*>) = input == other.input
+private fun Guard.Input<*>.canHCombine(other: Guard.Input<*>) = input == other.input
 
-private fun StackTransition<*>.canHCombine(other: StackTransition<*>) =
+private fun Guard.Stack<*>.canHCombine(other: Guard.Stack<*>) =
     stack == other.stack && rollupTarget == other.rollupTarget && semanticAction == other.semanticAction
 
 private fun InputSlice.canHCombine(other: InputSlice) =

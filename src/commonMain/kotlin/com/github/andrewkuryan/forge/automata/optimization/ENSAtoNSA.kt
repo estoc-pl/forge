@@ -34,9 +34,9 @@ fun <N : SyntaxNode> ENSA<N, *>.removeEmptyTransitions(): NSA<N> {
             }
             .groupBy { it.first }
             .mapValues { (targetClosure, transitions) ->
-                processed
-                    .getOrElse(targetClosure) { newNSA.nextState() }
-                    .apply { newNSA.addTransitions(transitions.map { it.second.replaceVertexes(newState, this) }) }
+                processed.getOrElse(targetClosure) { newNSA.nextState() }.apply {
+                    newNSA.addTransitions(transitions.map { it.second.copy(source = newState, target = this) })
+                }
             }
             .filter { it.key !in processed }
             .onEach {

@@ -29,14 +29,14 @@ class StateProvider {
 data class NSAAssertion(
     val initRef: StateRef,
     val finalRefs: List<StateRef>,
-    val transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
+    val transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
     val verbose: Boolean = false,
 ) {
 
     constructor(
         initRef: StateRef,
         finalRef: StateRef,
-        transitions: Map<StateRef, List<Pair<TransitionBody, StateRef>>>,
+        transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
         verbose: Boolean = false,
     ) : this(initRef, listOf(finalRef), transitions, verbose)
 }

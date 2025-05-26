@@ -23,10 +23,9 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
                         is Terminal -> {
                             val nextState = nextState()
                             addTransition(
-                                InputTransition(
-                                    InputSlice(listOf(InputSignal.Symbol(symbol.value))),
-                                    InputSlice.EMPTY, StackSlice.EMPTY,
+                                MeaningfulTransition(
                                     prevState, nextState,
+                                    Guard.Input(input = InputSlice(listOf(InputSignal.Symbol(symbol.value))))
                                 )
                             )
                             listOf(nextState to currentStack + StackSignal.Symbol(symbol.value))
@@ -50,12 +49,13 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
 
         addTransitions(
             lastStates.map { (lastState, stackPreview) ->
-                StackTransition(
-                    StackSlice(stackPreview.reversed()),
-                    StackSignal.NodeView(nonterm.name),
-                    getProductionAction(production),
-                    InputSlice.EMPTY, StackSlice.EMPTY,
+                MeaningfulTransition(
                     lastState, ports.getExit(nonterm),
+                    Guard.Stack(
+                        stack = StackSlice(stackPreview.reversed()),
+                        rollupTarget = StackSignal.NodeView(nonterm.name),
+                        semanticAction = getProductionAction(production)
+                    )
                 )
             }
         )
@@ -94,10 +94,12 @@ private fun <N : SyntaxNode> ENSA<N, Transition<N>>.wrapAndOptimize(
 
     val acceptState = nextState()
     addTransition(
-        InputTransition(
-            InputSlice(listOf(InputSignal.EOI)),
-            InputSlice.EMPTY, StackSlice(listOf(StackSignal.NodeView(startSymbol.name), StackSignal.Bottom)),
+        MeaningfulTransition(
             ports.getExit(startSymbol), acceptState,
+            Guard.Input(
+                input = InputSlice(listOf(InputSignal.EOI)),
+                stackPreview = StackSlice(listOf(StackSignal.NodeView(startSymbol.name), StackSignal.Bottom)),
+            )
         )
     )
     addFinalState(acceptState)
