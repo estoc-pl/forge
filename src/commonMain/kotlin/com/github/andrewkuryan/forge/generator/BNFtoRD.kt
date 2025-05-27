@@ -52,8 +52,8 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
                 MeaningfulTransition(
                     lastState, ports.getExit(nonterm),
                     Guard.Stack(
-                        stack = StackSlice(stackPreview.reversed()),
                         rollupTarget = StackSignal.NodeView(nonterm.name),
+                        stack = StackSlice(stackPreview.reversed()),
                         semanticAction = getProductionAction(production)
                     )
                 )

@@ -15,7 +15,7 @@ fun NSA<SyntaxNode>.addRollupTransitions(
     stackPreviews.map {
         MeaningfulTransition(
             source, target,
-            Guard.Stack(stack = rollupTop, rollupTarget = rollupTarget, stackPreview = it)
+            Guard.Stack(rollupTarget = rollupTarget, stack = rollupTop, stackPreview = it)
         )
     }
 )

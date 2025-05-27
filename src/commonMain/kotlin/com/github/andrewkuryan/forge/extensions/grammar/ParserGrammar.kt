@@ -16,6 +16,10 @@ class ParserProduction<N : SyntaxNode>(
 class ParserGrammar<N : SyntaxNode> : AbstractGrammar<ParserProduction<N>>(Grammar.S) {
 
     override fun List<GrammarSymbol>.prod() = ParserProduction<N>(this, null)
+    override fun ParserProduction<N>.drop(n: Int) = ParserProduction(symbols.drop(n), action)
+    override fun ParserProduction<N>.plus(symbol: GrammarSymbol) = ParserProduction(symbols + symbol, action)
+    override fun ParserProduction<N>.plus(other: ParserProduction<N>) =
+        ParserProduction(symbols + other.symbols, action)
 
     operator fun Production.invoke(action: SemanticAction<N>) = ParserProduction(symbols, action)
     operator fun Char.invoke(action: SemanticAction<N>) = prod().invoke(action)

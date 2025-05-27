@@ -56,8 +56,8 @@ sealed class Guard {
     }
 
     data class Stack<N : SyntaxNode>(
-        val stack: StackSlice,
         val rollupTarget: StackSignal.NodeView,
+        val stack: StackSlice = StackSlice.EMPTY,
         val semanticAction: SemanticAction<N>? = null,
         override val inputPreview: InputSlice = InputSlice.EMPTY,
         override val stackPreview: StackSlice = StackSlice.EMPTY,
