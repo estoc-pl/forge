@@ -67,8 +67,8 @@ private fun <N : SyntaxNode> Guard.Stack<N>.hCombine(other: Guard.Stack<N>) =
         stackPreview = stackPreview.hCombine(other.stackPreview)
     )
 
-private fun InputSlice.hCombine(other: InputSlice) = InputSlice(commonPrefix(value, other.value))
-private fun StackSlice.hCombine(other: StackSlice) = StackSlice(commonSuffix(value, other.value))
+private fun InputSlice.hCombine(other: InputSlice) = commonPrefix(this, other)
+private fun StackSlice.hCombine(other: StackSlice) = commonSuffix(this, other)
 
 private fun Guard.Meaningful<*>.canHCombine(other: Guard.Meaningful<*>) =
     when {
@@ -86,7 +86,7 @@ private fun Guard.Stack<*>.canHCombine(other: Guard.Stack<*>) =
     stack == other.stack && rollupTarget == other.rollupTarget && semanticAction == other.semanticAction
 
 private fun InputSlice.canHCombine(other: InputSlice) =
-    isEmpty || other.isEmpty || commonPrefix(value, other.value).isNotEmpty()
+    isEmpty() || other.isEmpty() || commonPrefix(this, other).isNotEmpty()
 
 private fun StackSlice.canHCombine(other: StackSlice) =
-    isEmpty || other.isEmpty || commonSuffix(value, other.value).isNotEmpty()
+    isEmpty() || other.isEmpty() || commonSuffix(this, other).isNotEmpty()

@@ -25,7 +25,7 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
                             addTransition(
                                 MeaningfulTransition(
                                     prevState, nextState,
-                                    Guard.Input(input = InputSlice(listOf(InputSignal.Symbol(symbol.value))))
+                                    Guard.Input(input = listOf(InputSignal.Symbol(symbol.value)))
                                 )
                             )
                             listOf(nextState to currentStack + StackSignal.Symbol(symbol.value))
@@ -53,7 +53,7 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
                     lastState, ports.getExit(nonterm),
                     Guard.Stack(
                         rollupTarget = StackSignal.NodeView(nonterm.name),
-                        stack = StackSlice(stackPreview.reversed()),
+                        stack = stackPreview.reversed(),
                         semanticAction = getProductionAction(production)
                     )
                 )
@@ -97,8 +97,8 @@ private fun <N : SyntaxNode> ENSA<N, Transition<N>>.wrapAndOptimize(
         MeaningfulTransition(
             ports.getExit(startSymbol), acceptState,
             Guard.Input(
-                input = InputSlice(listOf(InputSignal.EOI)),
-                stackPreview = StackSlice(listOf(StackSignal.NodeView(startSymbol.name), StackSignal.Bottom)),
+                input = listOf(InputSignal.EOI),
+                stackPreview = listOf(StackSignal.NodeView(startSymbol.name), StackSignal.Bottom),
             )
         )
     )

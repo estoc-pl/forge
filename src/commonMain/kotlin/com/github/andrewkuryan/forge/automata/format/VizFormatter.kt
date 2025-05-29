@@ -22,5 +22,5 @@ object VizFormatter : Formatter by DefaultFormatter {
         is Guard.Stack -> "[label=<⟨${inputPreview.format()}⟩ / ${stack.format()}⟨${stackPreview.format()}⟩<br/>${combinedPushFormat()}>]"
     }
 
-    private fun Guard.Meaningful<*>.combinedPushFormat() = with(DefaultFormatter) { format() }
+    private fun Guard.Meaningful<*>.combinedPushFormat() = with(DefaultFormatter) { combinedPushFormat() }
 }

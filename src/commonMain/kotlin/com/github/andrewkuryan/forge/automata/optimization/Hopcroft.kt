@@ -70,16 +70,16 @@ private data class Behaviour<N : SyntaxNode>(
 private fun <N : SyntaxNode> Guard.Meaningful<N>.getBehavior(): Behaviour<N> =
     when (this) {
         is Guard.Input -> Behaviour(
-            input, StackSlice.EMPTY,
+            input, emptyList(),
             inputPreview, stackPreview,
-            stackPushBefore.value + stackPushAfter.value,
+            stackPushBefore + stackPushAfter,
             null
         )
 
         is Guard.Stack -> Behaviour(
-            InputSlice.EMPTY, stack,
+            emptyList(), stack,
             inputPreview, stackPreview,
-            stackPushBefore.value + rollupTarget + stackPushAfter.value,
+            stackPushBefore + rollupTarget + stackPushAfter,
             semanticAction
         )
     }

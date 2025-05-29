@@ -20,7 +20,7 @@ fun <N : SyntaxNode> ENSA<N, Transition<N>>.processAtomicRegExp(
     addTransition(
         MeaningfulTransition(
             port.entry, port.exit,
-            Guard.Input(input = InputSlice(inputSignals), stackPushBefore = StackPush(listOfNotNull(marker)))
+            Guard.Input(input = inputSignals, stackPushBefore = listOfNotNull(marker))
         )
     )
     return port

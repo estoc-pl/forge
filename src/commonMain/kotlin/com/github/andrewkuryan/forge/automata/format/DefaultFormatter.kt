@@ -23,9 +23,9 @@ object DefaultFormatter : Formatter {
         is Guard.Stack -> "⟨${inputPreview.format()}⟩, ${stack.format()}⟨${stackPreview.format()}⟩ / ${combinedPushFormat()}"
     }
 
-    override fun InputSlice.format() = if (isEmpty) "ε" else value.joinToString("") { it.format() }
-    override fun StackSlice.format() = if (isEmpty) "ε" else value.joinToString("") { it.format() }
-    override fun StackPush.format() = if (isEmpty) "ε" else value.joinToString("") { it.format() }
+    override fun InputSlice.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
+    override fun StackSlice.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
+    override fun StackPush.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
 
     override fun InputSignal.format() = when (this) {
         is InputSignal.Unitary -> format()
@@ -51,7 +51,7 @@ object DefaultFormatter : Formatter {
 
     override fun SemanticAction<*>?.format() = if (this == null) "" else "\uD835\uDF06(${name})"
 
-    private fun Guard.Meaningful<*>.combinedPushFormat() = when (this) {
+    fun Guard.Meaningful<*>.combinedPushFormat() = when (this) {
         is Guard.Input -> "${stackPushBefore.format()}|${stackPushAfter.format()}"
         is Guard.Stack -> "${stackPushBefore.format()}|${rollupTarget.format()}|${stackPushAfter.format()}"
     }

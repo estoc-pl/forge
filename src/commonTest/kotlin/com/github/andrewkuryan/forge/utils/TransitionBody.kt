@@ -5,18 +5,18 @@ import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     Guard.Input<SyntaxNode>(
-        input = InputSlice(listOf(InputSignal.Symbol(input))),
-        stackPreview = StackSlice(parseStackSignals(stackPreview)),
-        stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
-        stackPushAfter = StackPush(parseStackPush(stackPushAfter))
+        input = listOf(InputSignal.Symbol(input)),
+        stackPreview = parseStackSignals(stackPreview),
+        stackPushBefore = parseStackPush(stackPushBefore),
+        stackPushAfter = parseStackPush(stackPushAfter)
     )
 
 fun read(input: String, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     Guard.Input<SyntaxNode>(
-        input = InputSlice(parseInputSignals(input)),
-        stackPreview = StackSlice(parseStackSignals(stackPreview)),
-        stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
-        stackPushAfter = StackPush(parseStackPush(stackPushAfter))
+        input = parseInputSignals(input),
+        stackPreview = parseStackSignals(stackPreview),
+        stackPushBefore = parseStackPush(stackPushBefore),
+        stackPushAfter = parseStackPush(stackPushAfter)
     )
 
 fun rollup(
@@ -26,18 +26,15 @@ fun rollup(
     stackPushBefore: String = "",
     stackPushAfter: String = "",
 ) = Guard.Stack<SyntaxNode>(
-    stack = StackSlice(parseStackSignals(stack)),
+    stack = parseStackSignals(stack),
     rollupTarget = StackSignal.NodeView(target),
-    stackPreview = StackSlice(parseStackSignals(stackPreview)),
-    stackPushBefore = StackPush(parseStackPush(stackPushBefore)),
-    stackPushAfter = StackPush(parseStackPush(stackPushAfter))
+    stackPreview = parseStackSignals(stackPreview),
+    stackPushBefore = parseStackPush(stackPushBefore),
+    stackPushAfter = parseStackPush(stackPushAfter)
 )
 
 fun exit(stackPreview: String) =
-    Guard.Input<SyntaxNode>(
-        input = InputSlice(listOf(InputSignal.EOI)),
-        stackPreview = StackSlice(parseStackSignals(stackPreview))
-    )
+    Guard.Input<SyntaxNode>(input = listOf(InputSignal.EOI), stackPreview = parseStackSignals(stackPreview))
 
 private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>
 

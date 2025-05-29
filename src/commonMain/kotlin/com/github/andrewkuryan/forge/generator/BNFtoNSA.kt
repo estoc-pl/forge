@@ -43,10 +43,10 @@ fun NSA<SyntaxNode>.processNonterm(
             .foldIndexed(ports.getEntry(nonterm) to listOf<StackSlice>()) { index, (prevState, prevStack), symbol ->
                 when (symbol) {
                     is Terminal -> {
-                        val stackPreviews = prevStack.ifEmpty { listOf(StackSlice(stackSymbols.take(index))) }
+                        val stackPreviews = prevStack.ifEmpty { listOf(stackSymbols.take(index)) }
                         val nextState = nextState()
                         addReadTransitions(
-                            InputSlice(listOf(InputSignal.Symbol(symbol.value))),
+                            listOf(InputSignal.Symbol(symbol.value)),
                             prevState, nextState,
                             stackPreviews,
                         )
@@ -63,15 +63,13 @@ fun NSA<SyntaxNode>.processNonterm(
                         }
 
                         ports.getExit(symbol) to resolvePrefix(Prefix(nonterm, stackSymbols.take(index)), prefixes)
-                            .map { StackSlice(it + stackSymbols[index]) }
+                            .map { it + stackSymbols[index] }
                     }
                 }
             }
-        val stackPreviews = lastStackPreview
-            .map { StackSlice(it.value.removeSuffix(stackSymbols)) }
-            .ifEmpty { listOf(StackSlice.EMPTY) }
+        val stackPreviews = lastStackPreview.map { it.removeSuffix(stackSymbols) }.ifEmpty { listOf(emptyList()) }
         addRollupTransitions(
-            StackSlice(stackSymbols),
+            stackSymbols,
             StackSignal.NodeView(nonterm.name),
             lastState, ports.getExit(nonterm),
             stackPreviews,
@@ -95,8 +93,8 @@ fun Grammar.buildNSAParser() = NSA<SyntaxNode>().apply {
         MeaningfulTransition(
             ports.getExit(startSymbol), acceptState,
             Guard.Input(
-                input = InputSlice(listOf(InputSignal.EOI)),
-                stackPreview = StackSlice(listOf(StackSignal.Bottom, StackSignal.NodeView(startSymbol.name)))
+                input = listOf(InputSignal.EOI),
+                stackPreview = listOf(StackSignal.Bottom, StackSignal.NodeView(startSymbol.name))
             )
         )
     )

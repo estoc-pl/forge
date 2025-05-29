@@ -18,23 +18,5 @@ sealed interface StackSignal {
     data class Marker(val name: String) : Push, Preview
 }
 
-value class StackSlice(val value: List<StackSignal.Preview>) {
-
-    companion object {
-        val EMPTY = StackSlice(emptyList())
-    }
-
-    val size: Int get() = value.size
-    val isEmpty: Boolean get() = value.isEmpty()
-
-    operator fun plus(other: StackSlice) = StackSlice(this.value + other.value)
-}
-
-value class StackPush(val value: List<StackSignal.Push>) {
-
-    companion object {
-        val EMPTY = StackPush(emptyList())
-    }
-
-    val isEmpty: Boolean get() = value.isEmpty()
-}
+typealias StackSlice = List<StackSignal.Preview>
+typealias StackPush = List<StackSignal.Push>

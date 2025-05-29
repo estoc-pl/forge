@@ -32,8 +32,8 @@ object KtSourceFormatter : Formatter {
                 "${stackPushAfter.format()})"
 
         is Guard.Stack -> "Guard.Stack(" +
-                "${stack.format()}," +
                 "${rollupTarget.format()}," +
+                "${stack.format()}," +
                 "${semanticAction.format()}," +
                 "${inputPreview.format()}," +
                 "${stackPreview.format()}," +
@@ -41,17 +41,9 @@ object KtSourceFormatter : Formatter {
                 "${stackPushAfter.format()})"
     }
 
-    override fun InputSlice.format() =
-        if (this.isEmpty) "InputSlice.EMPTY"
-        else "InputSlice(listOf(${value.joinToString(",") { it.format() }}))"
-
-    override fun StackSlice.format() =
-        if (this.isEmpty) "StackSlice.EMPTY"
-        else "StackSlice(listOf(${value.joinToString(",") { it.format() }}))"
-
-    override fun StackPush.format() =
-        if (this.isEmpty) "StackPush.EMPTY"
-        else "StackPush(listOf(${value.joinToString(",") { it.format() }}))"
+    override fun InputSlice.format() = "listOf(${joinToString(",") { it.format() }})"
+    override fun StackSlice.format() = "listOf(${joinToString(",") { it.format() }})"
+    override fun StackPush.format() = "listOf(${joinToString(",") { it.format() }})"
 
     override fun InputSignal.format() = when (this) {
         is InputSignal.Unitary -> format()

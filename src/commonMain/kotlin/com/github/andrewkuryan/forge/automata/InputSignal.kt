@@ -9,14 +9,4 @@ sealed class InputSignal {
     data class Not(val first: Unitary, val rest: List<Unitary> = listOf()) : InputSignal()
 }
 
-value class InputSlice(val value: List<InputSignal>) {
-
-    companion object {
-        val EMPTY = InputSlice(listOf())
-    }
-
-    val size: Int get() = value.size
-    val isEmpty: Boolean get() = value.isEmpty()
-
-    operator fun plus(other: InputSlice) = InputSlice(this.value + other.value)
-}
+typealias InputSlice = List<InputSignal>

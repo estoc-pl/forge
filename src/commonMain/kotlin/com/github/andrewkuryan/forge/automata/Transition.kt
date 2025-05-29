@@ -45,10 +45,10 @@ sealed class Guard {
 
     data class Input<N : SyntaxNode>(
         val input: InputSlice,
-        override val inputPreview: InputSlice = InputSlice.EMPTY,
-        override val stackPreview: StackSlice = StackSlice.EMPTY,
-        override val stackPushBefore: StackPush = StackPush.EMPTY,
-        override val stackPushAfter: StackPush = StackPush.EMPTY,
+        override val inputPreview: InputSlice = emptyList(),
+        override val stackPreview: StackSlice = emptyList(),
+        override val stackPushBefore: StackPush = emptyList(),
+        override val stackPushAfter: StackPush = emptyList(),
     ) : Meaningful<N>() {
 
         override val inputSize = input.size + inputPreview.size
@@ -57,12 +57,12 @@ sealed class Guard {
 
     data class Stack<N : SyntaxNode>(
         val rollupTarget: StackSignal.NodeView,
-        val stack: StackSlice = StackSlice.EMPTY,
+        val stack: StackSlice = emptyList(),
         val semanticAction: SemanticAction<N>? = null,
-        override val inputPreview: InputSlice = InputSlice.EMPTY,
-        override val stackPreview: StackSlice = StackSlice.EMPTY,
-        override val stackPushBefore: StackPush = StackPush.EMPTY,
-        override val stackPushAfter: StackPush = StackPush.EMPTY,
+        override val inputPreview: InputSlice = emptyList(),
+        override val stackPreview: StackSlice = emptyList(),
+        override val stackPushBefore: StackPush = emptyList(),
+        override val stackPushAfter: StackPush = emptyList(),
     ) : Meaningful<N>() {
 
         override val inputSize = inputPreview.size
