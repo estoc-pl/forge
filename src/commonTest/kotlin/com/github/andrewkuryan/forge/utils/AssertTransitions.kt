@@ -1,6 +1,7 @@
 package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.automata.format.format
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -8,7 +9,7 @@ import kotlin.test.assertNotNull
 
 class StateRef(var value: State? = null) {
 
-    override fun toString() = "StateRef(value=$value)"
+    override fun toString() = "StateRef(value=${value?.format()})"
 }
 
 fun NSA<*>.assertTransitions(
@@ -37,25 +38,29 @@ fun NSA<*>.assertTransitions(
     val originalFinalStates = finalStates.toMutableSet()
     for (finalRef in finalRefs) {
         val originalFinalState = originalFinalStates.find { finalRef.value == it }
-        assertNotNull(originalFinalState, "Cannot find final state ${finalRef.value}")
+        assertNotNull(originalFinalState, "Cannot find final state ${finalRef.value?.format()}")
         originalFinalStates.remove(originalFinalState)
     }
 }
 
 fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>) {
-    assertEquals(transitions.size, getOutTransitions(source).size, "Number of transitions from $source does not match")
+    assertEquals(
+        transitions.size,
+        getOutTransitions(source).size,
+        "Number of transitions from ${source.format()} does not match"
+    )
 
     val originalTransitions = getOutTransitions(source).toMutableSet()
     for ((guard, target) in transitions) {
         val foundTransitions = originalTransitions.filter { guard == it.guard }
-        assertNotEquals(0, foundTransitions.size, "Cannot find transition [${guard.defaultFormat()}] in $source")
+        assertNotEquals(0, foundTransitions.size, "Cannot find transition [${guard.format()}] in $source")
 
         val originalTransition = foundTransitions.first()
         if (target.value != null) {
             assertEquals(
                 target.value,
                 originalTransition.target,
-                "Transition ${originalTransition.defaultFormat()} was expected to lead to ${target.value}"
+                "Transition ${originalTransition.format()} was expected to lead to ${target.value?.format()}"
             )
         } else {
             target.value = foundTransitions.first().target

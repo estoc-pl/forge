@@ -2,6 +2,8 @@ package com.github.andrewkuryan.forge.utils
 
 import com.github.andrewkuryan.BNF.Grammar
 import com.github.andrewkuryan.forge.automata.*
+import com.github.andrewkuryan.forge.automata.format.VizFormatter
+import com.github.andrewkuryan.forge.automata.format.format
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import kotlin.test.assertEquals
 
@@ -46,7 +48,7 @@ fun assertNSA(nsa: NSA<SyntaxNode>, getAssertion: (StateProvider) -> NSAAssertio
     val (initRef, finalRef, transitions, verbose) = getAssertion(provider)
 
     if (verbose) {
-        println(nsa.format(NSAFormatPattern.VIZ))
+        println(nsa.format(VizFormatter))
     }
     assertEquals(provider.numOfStates, nsa.states.size, "Total number of states does not match the expected")
     nsa.assertTransitions(initRef, finalRef, transitions)

@@ -3,9 +3,7 @@ package com.github.andrewkuryan.forge.automata
 import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
-value class State(val index: Int) {
-    override fun toString() = "S${index}"
-}
+value class State(val index: Int)
 
 typealias TransitionTable<T> = MutableMap<State, MutableSet<T>>
 

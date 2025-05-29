@@ -7,28 +7,15 @@ sealed interface StackSignal {
     sealed interface Preview : StackSignal
 
     sealed interface Read : Frame {
-        data class Node<N : SyntaxNode>(val name: String, val value: N?) : Read {
-            override fun toString() = "($name, $value)"
-        }
+        data class Node<N : SyntaxNode>(val name: String, val value: N?) : Read
     }
 
     sealed interface Push : Frame, Preview
 
-    data object Bottom : Frame, Preview {
-        override fun toString() = "$"
-    }
-
-    data class Symbol(val value: Char) : Read, Push, Preview {
-        override fun toString() = value.toString()
-    }
-
-    data class NodeView(val name: String) : Preview {
-        override fun toString() = name
-    }
-
-    data class Marker(val name: String) : Push, Preview {
-        override fun toString() = "⁅$name⁆"
-    }
+    data object Bottom : Frame, Preview
+    data class Symbol(val value: Char) : Read, Push, Preview
+    data class NodeView(val name: String) : Preview
+    data class Marker(val name: String) : Push, Preview
 }
 
 value class StackSlice(val value: List<StackSignal.Preview>) {
@@ -41,8 +28,6 @@ value class StackSlice(val value: List<StackSignal.Preview>) {
     val isEmpty: Boolean get() = value.isEmpty()
 
     operator fun plus(other: StackSlice) = StackSlice(this.value + other.value)
-
-    override fun toString() = if (isEmpty) "ε" else value.joinToString("")
 }
 
 value class StackPush(val value: List<StackSignal.Push>) {
@@ -52,6 +37,4 @@ value class StackPush(val value: List<StackSignal.Push>) {
     }
 
     val isEmpty: Boolean get() = value.isEmpty()
-
-    override fun toString() = if (isEmpty) "ε" else value.joinToString("")
 }

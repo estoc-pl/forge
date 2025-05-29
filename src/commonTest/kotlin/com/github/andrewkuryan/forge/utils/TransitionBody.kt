@@ -41,8 +41,7 @@ fun exit(stackPreview: String) =
 
 private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>
 
-private val EOI_TRANSFORMER: Transformer<InputSignal.EOI> =
-    Regex(InputSignal.EOI.toString()) to { _, _ -> InputSignal.EOI }
+private val EOI_TRANSFORMER: Transformer<InputSignal.EOI> = Regex("┴") to { _, _ -> InputSignal.EOI }
 private val INPUT_SYMBOL_TRANSFORMER = { symbol: Char -> InputSignal.Symbol(symbol) }
 private val RANGE_TRANSFORMER: Transformer<InputSignal.Range> =
     Regex(".-.") to { range, input -> InputSignal.Range(input[range.first]..input[range.last]) }
@@ -53,8 +52,7 @@ private val COMPLEX_NOT_TRANSFORMER: Transformer<InputSignal.Not> = Regex("\\^\\
     InputSignal.Not(nestedSignals.first(), nestedSignals.slice(1 until nestedSignals.size))
 }
 
-private val STACK_BOTTOM_TRANSFORMER: Transformer<StackSignal.Bottom> =
-    Regex("\\$") to { _, _ -> StackSignal.Bottom }
+private val STACK_BOTTOM_TRANSFORMER: Transformer<StackSignal.Bottom> = Regex("\\$") to { _, _ -> StackSignal.Bottom }
 private val STACK_SYMBOL_TRANSFORMER = { symbol: Char -> StackSignal.Symbol(symbol) }
 private val STACK_NODE_TRANSFORMER: Transformer<StackSignal.NodeView> =
     Regex("([A-Z_]+[0-9]*)") to { range, input -> StackSignal.NodeView(input.substring(range)) }
