@@ -6,7 +6,7 @@ import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
 
 object DefaultFormatter : Formatter {
 
-    override fun NSA<*>.format(nodeType: KClass<*>?) = """NSA(
+    override fun NSA<*>.format(nodeType: KClass<*>) = """NSA(
     |    Q = ${states.joinToString(", ", "{", "}") { it.format() }}
     |    ẟ = ${states.flatMap(::getOutTransitions).joinToString(",\n\t\t", "{\n\t\t", "\n\t}") { it.format() }}
     |    q₀ = ${initState.format()}
@@ -15,8 +15,7 @@ object DefaultFormatter : Formatter {
 
     override fun State.format() = "S${index}"
 
-    override fun MeaningfulTransition<*>.format(nodeType: KClass<*>?) =
-        "${source.format()} -> ${guard.format()} -> ${target.format()}"
+    override fun MeaningfulTransition<*>.format() = "${source.format()} -> ${guard.format()} -> ${target.format()}"
 
     override fun Guard.Meaningful<*>.format() = when (this) {
         is Guard.Input -> "${input.format()}⟨${inputPreview.format()}⟩, ⟨${stackPreview.format()}⟩ / ${combinedPushFormat()}"

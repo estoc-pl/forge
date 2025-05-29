@@ -5,7 +5,7 @@ import com.github.andrewkuryan.forge.automata.*
 
 object VizFormatter : Formatter by DefaultFormatter {
 
-    override fun NSA<*>.format(nodeType: KClass<*>?) = """digraph {
+    override fun NSA<*>.format(nodeType: KClass<*>) = """digraph {
     |    rankdir=LR;
     |${finalStates.joinToString(";\n\t", "\t", ";") { "node [shape = doublecircle] \"${it.format()}\"" }}
     |    node [shape = circle];
@@ -14,8 +14,7 @@ object VizFormatter : Formatter by DefaultFormatter {
     |${states.flatMap(::getOutTransitions).joinToString("\n\t", "\t") { it.format() }}
     |}""".trimMargin()
 
-    override fun MeaningfulTransition<*>.format(nodeType: KClass<*>?) =
-        "\"${source.format()}\" -> \"${target.format()}\" ${guard.format()}"
+    override fun MeaningfulTransition<*>.format() = "\"${source.format()}\" -> \"${target.format()}\" ${guard.format()}"
 
     override fun Guard.Meaningful<*>.format() = when (this) {
         is Guard.Input -> "[label=<${input.format()}⟨${inputPreview.format()}⟩ / ⟨${stackPreview.format()}⟩<br/>${combinedPushFormat()}>]"
