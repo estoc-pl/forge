@@ -1,15 +1,15 @@
 package com.github.andrewkuryan.forge.generator.BNFtoNSA
 
-import com.github.andrewkuryan.BNF.Grammar.Companion.S
-import com.github.andrewkuryan.BNF.grammar
-import com.github.andrewkuryan.forge.automata.StackSignal.Bottom
-import com.github.andrewkuryan.forge.automata.StackSignal.NodeView
-import com.github.andrewkuryan.forge.automata.StackSignal.Symbol
-import com.github.andrewkuryan.forge.generator.collectPrefixes
-import com.github.andrewkuryan.forge.generator.resolvePrefixes
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import com.github.andrewkuryan.BNF.Grammar.Companion.S
+import com.github.andrewkuryan.BNF.grammar
+import com.github.andrewkuryan.forgeKit.StackSignal.Bottom
+import com.github.andrewkuryan.forgeKit.StackSignal.NodeView
+import com.github.andrewkuryan.forgeKit.StackSignal.Symbol
+import com.github.andrewkuryan.forge.generator.collectPrefixes
+import com.github.andrewkuryan.forge.generator.resolvePrefixes
 
 class PrefixTest {
 

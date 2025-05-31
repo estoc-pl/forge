@@ -1,7 +1,9 @@
 package com.github.andrewkuryan.forge.utils
 
-import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
+import com.github.andrewkuryan.forgeKit.Guard
+import com.github.andrewkuryan.forgeKit.InputSignal
+import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.StackSignal
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     Guard.Input<SyntaxNode>(

@@ -1,7 +1,10 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
+import com.github.andrewkuryan.forgeKit.EmptyTransition
+import com.github.andrewkuryan.forgeKit.MeaningfulTransition
+import com.github.andrewkuryan.forgeKit.State
+import com.github.andrewkuryan.forgeKit.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
 private fun <N : SyntaxNode> ENSA<N, *>.eClosure(current: Set<State>, visited: Set<State> = current): Set<State> =

@@ -1,8 +1,8 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
-import com.github.andrewkuryan.forge.automata.InputSignal
-import com.github.andrewkuryan.forge.automata.StackSignal
+import com.github.andrewkuryan.forgeKit.InputSignal
+import com.github.andrewkuryan.forgeKit.StackSignal
 
 fun RegExp.asStackSignal() = StackSignal.Marker(this.toString())
 

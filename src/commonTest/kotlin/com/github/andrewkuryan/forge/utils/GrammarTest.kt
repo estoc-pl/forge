@@ -1,11 +1,12 @@
 package com.github.andrewkuryan.forge.utils
 
+import kotlin.test.assertEquals
 import com.github.andrewkuryan.BNF.Grammar
+import com.github.andrewkuryan.forgeKit.Guard
+import com.github.andrewkuryan.forgeKit.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.VizFormatter
 import com.github.andrewkuryan.forge.automata.format.format
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
-import kotlin.test.assertEquals
 
 abstract class GrammarTest(val buildNSA: Grammar.() -> NSA<SyntaxNode>) {
 

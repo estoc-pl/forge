@@ -1,8 +1,8 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
+import com.github.andrewkuryan.forgeKit.*
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.removeSuffix
 
 fun NSA<SyntaxNode>.addRollupTransitions(

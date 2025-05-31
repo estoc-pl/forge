@@ -1,11 +1,11 @@
 package com.github.andrewkuryan.forge.codegen.kt
 
 import kotlin.reflect.KClass
-import com.github.andrewkuryan.forge.automata.Guard
-import com.github.andrewkuryan.forge.automata.MeaningfulTransition
+import com.github.andrewkuryan.forgeKit.Guard
+import com.github.andrewkuryan.forgeKit.MeaningfulTransition
+import com.github.andrewkuryan.forgeKit.SyntaxNode
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.format.format
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 fun NSA<*>.generatePEGTable(nodeType: KClass<*> = SyntaxNode::class) =
     """val initState = ${initState.format(NSACodegen)}

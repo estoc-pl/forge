@@ -1,9 +1,9 @@
 package com.github.andrewkuryan.forge.codegen.kt
 
 import kotlin.reflect.KClass
+import com.github.andrewkuryan.forgeKit.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.Formatter
-import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
 
 object NSACodegen : Formatter {
 

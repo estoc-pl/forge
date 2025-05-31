@@ -1,9 +1,10 @@
 package com.github.andrewkuryan.forge.automata
 
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
+import com.github.andrewkuryan.forgeKit.State
+import com.github.andrewkuryan.forgeKit.Transition
+import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.MeaningfulTransition
 import com.github.andrewkuryan.forge.extensions.hasIntersection
-
-value class State(val index: Int)
 
 typealias TransitionTable<T> = MutableMap<State, MutableSet<T>>
 

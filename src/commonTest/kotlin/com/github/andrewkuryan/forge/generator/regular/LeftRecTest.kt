@@ -3,8 +3,8 @@ package com.github.andrewkuryan.forge.generator.regular
 import com.github.andrewkuryan.BNF.Grammar
 import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
+import com.github.andrewkuryan.forgeKit.SyntaxNode
 import com.github.andrewkuryan.forge.automata.NSA
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.utils.GrammarTest
 
 abstract class LeftRecTest(buildNSA: Grammar.() -> NSA<SyntaxNode>) : GrammarTest(buildNSA) {

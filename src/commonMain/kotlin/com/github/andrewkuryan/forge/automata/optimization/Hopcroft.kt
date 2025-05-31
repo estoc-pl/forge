@@ -1,8 +1,7 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
+import com.github.andrewkuryan.forgeKit.*
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 import com.github.andrewkuryan.forge.extensions.minOfSize
 

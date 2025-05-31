@@ -1,13 +1,12 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
+import com.github.andrewkuryan.forgeKit.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.optimization.applyHopcroft
 import com.github.andrewkuryan.forge.automata.optimization.leftFactorize
 import com.github.andrewkuryan.forge.automata.optimization.removeEmptyTransitions
 import com.github.andrewkuryan.forge.extensions.grammar.ParserGrammar
-import com.github.andrewkuryan.forge.extensions.grammar.SemanticAction
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
     nonterm: Nonterminal,

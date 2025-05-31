@@ -20,6 +20,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":BNF"))
+            implementation(project(":forgeKit"))
         }
 
         commonTest.dependencies {

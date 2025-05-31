@@ -3,8 +3,8 @@ package com.github.andrewkuryan.forge.generator
 import com.github.andrewkuryan.BNF.AtomicRegexp
 import com.github.andrewkuryan.BNF.BaseRegexp
 import com.github.andrewkuryan.BNF.RegExp
+import com.github.andrewkuryan.forgeKit.*
 import com.github.andrewkuryan.forge.automata.*
-import com.github.andrewkuryan.forge.extensions.grammar.SyntaxNode
 
 fun <N : SyntaxNode> ENSA<N, Transition<N>>.processAtomicRegExp(
     regexp: AtomicRegexp,
