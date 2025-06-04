@@ -1,11 +1,9 @@
 package com.github.andrewkuryan.forge.codegen.kt
 
 import kotlin.reflect.KClass
-import com.github.andrewkuryan.forgeKit.Guard
-import com.github.andrewkuryan.forgeKit.MeaningfulTransition
-import com.github.andrewkuryan.forgeKit.SyntaxNode
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.format.format
+import com.github.andrewkuryan.forgeKit.*
 
 fun NSA<*>.generatePEGTable(nodeType: KClass<*> = SyntaxNode::class) =
     """val initState = ${initState.format(NSACodegen)}
@@ -27,10 +25,13 @@ private fun NSA<*>.generateTransitions() = states
 private object TransitionComparator : Comparator<MeaningfulTransition<*>> {
 
     override fun compare(a: MeaningfulTransition<*>, b: MeaningfulTransition<*>) =
-        when (a.guard) {
-            is Guard.Input -> when (b.guard) {
-                is Guard.Input -> b.guard.inputSize - a.guard.inputSize
+        when (val aGuard = a.guard) {
+            is Guard.Input -> when (val bGuard = b.guard) {
                 is Guard.Stack -> -1
+                is Guard.Input -> InputSliceComparator.compare(
+                    aGuard.input + aGuard.inputPreview,
+                    bGuard.input + bGuard.inputPreview
+                )
             }
 
             is Guard.Stack -> when (b.guard) {
@@ -38,4 +39,21 @@ private object TransitionComparator : Comparator<MeaningfulTransition<*>> {
                 is Guard.Stack -> b.guard.stackSize - a.guard.stackSize
             }
         }
+}
+
+private object InputSliceComparator : Comparator<InputSlice> {
+
+    override fun compare(a: InputSlice, b: InputSlice): Int =
+        (0 until maxOf(a.size, b.size)).fold(0) { result, index ->
+            if (result != 0) result
+            else b.getOrNull(index).getSortRank() - a.getOrNull(index).getSortRank()
+        }
+}
+
+private fun InputSignal?.getSortRank() = when (this) {
+    is InputSignal.EOI -> 4
+    is InputSignal.Symbol -> 3
+    is InputSignal.Range -> 2
+    is InputSignal.Not -> 1
+    null -> 0
 }

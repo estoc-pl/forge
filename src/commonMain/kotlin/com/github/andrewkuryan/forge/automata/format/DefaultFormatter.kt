@@ -32,7 +32,7 @@ object DefaultFormatter : Formatter {
             separator = "",
             prefix = if (rest.isEmpty()) "^" else "[^",
             postfix = if (rest.isEmpty()) "" else "]"
-        )
+        ) { it.format() }
     }
 
     private fun InputSignal.Unitary.format() = when (this) {
