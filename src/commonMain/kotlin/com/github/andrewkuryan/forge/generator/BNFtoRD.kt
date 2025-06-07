@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
-import com.github.andrewkuryan.forgeKit.*
+import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.optimization.applyHopcroft
 import com.github.andrewkuryan.forge.automata.optimization.leftFactorize

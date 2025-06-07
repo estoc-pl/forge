@@ -2,10 +2,10 @@ package com.github.andrewkuryan.forge.extensions.grammar
 
 import kotlin.reflect.KProperty0
 import com.github.andrewkuryan.BNF.*
-import com.github.andrewkuryan.forgeKit.SemanticAction
-import com.github.andrewkuryan.forgeKit.SemanticFunction
-import com.github.andrewkuryan.forgeKit.SemanticHandler
-import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.transition.SemanticAction
+import com.github.andrewkuryan.forgeKit.transition.SemanticFunction
+import com.github.andrewkuryan.forgeKit.transition.SemanticHandler
+import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 
 class ParserProduction<N : SyntaxNode>(
     symbols: List<GrammarSymbol>,

@@ -1,9 +1,9 @@
 package com.github.andrewkuryan.forge.utils
 
-import com.github.andrewkuryan.forgeKit.Guard
-import com.github.andrewkuryan.forgeKit.InputSignal
-import com.github.andrewkuryan.forgeKit.SyntaxNode
-import com.github.andrewkuryan.forgeKit.StackSignal
+import com.github.andrewkuryan.forgeKit.transition.Guard
+import com.github.andrewkuryan.forgeKit.transition.InputSignal
+import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
+import com.github.andrewkuryan.forgeKit.transition.StackSignal
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     Guard.Input<SyntaxNode>(

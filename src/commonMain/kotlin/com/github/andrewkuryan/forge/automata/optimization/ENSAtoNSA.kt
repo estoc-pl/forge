@@ -1,9 +1,9 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
-import com.github.andrewkuryan.forgeKit.EmptyTransition
-import com.github.andrewkuryan.forgeKit.MeaningfulTransition
-import com.github.andrewkuryan.forgeKit.State
-import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.transition.EmptyTransition
+import com.github.andrewkuryan.forgeKit.transition.MeaningfulTransition
+import com.github.andrewkuryan.forgeKit.transition.State
+import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 

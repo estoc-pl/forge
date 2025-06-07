@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.automata.format
 
 import kotlin.reflect.KClass
-import com.github.andrewkuryan.forgeKit.*
+import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 
 interface Formatter {

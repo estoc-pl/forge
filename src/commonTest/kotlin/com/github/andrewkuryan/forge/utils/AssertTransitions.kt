@@ -3,9 +3,9 @@ package com.github.andrewkuryan.forge.utils
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
-import com.github.andrewkuryan.forgeKit.Guard
-import com.github.andrewkuryan.forgeKit.State
-import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.transition.Guard
+import com.github.andrewkuryan.forgeKit.transition.State
+import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.format
 

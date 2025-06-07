@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
-import com.github.andrewkuryan.forgeKit.StackSignal
+import com.github.andrewkuryan.forgeKit.transition.StackSignal
 
 data class Prefix(val head: Nonterminal?, val body: List<StackSignal.Preview>)
 

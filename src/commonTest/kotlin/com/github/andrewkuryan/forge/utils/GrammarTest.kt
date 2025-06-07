@@ -2,8 +2,8 @@ package com.github.andrewkuryan.forge.utils
 
 import kotlin.test.assertEquals
 import com.github.andrewkuryan.BNF.Grammar
-import com.github.andrewkuryan.forgeKit.Guard
-import com.github.andrewkuryan.forgeKit.SyntaxNode
+import com.github.andrewkuryan.forgeKit.transition.Guard
+import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.VizFormatter
 import com.github.andrewkuryan.forge.automata.format.format

@@ -1,8 +1,8 @@
 package com.github.andrewkuryan.forge.automata.format
 
 import kotlin.reflect.KClass
-import com.github.andrewkuryan.forgeKit.Guard
-import com.github.andrewkuryan.forgeKit.MeaningfulTransition
+import com.github.andrewkuryan.forgeKit.transition.Guard
+import com.github.andrewkuryan.forgeKit.transition.MeaningfulTransition
 import com.github.andrewkuryan.forge.automata.*
 
 object VizFormatter : Formatter by DefaultFormatter {
