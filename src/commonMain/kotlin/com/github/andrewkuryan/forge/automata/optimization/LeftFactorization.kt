@@ -5,6 +5,7 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.commonPrefix
 import com.github.andrewkuryan.forge.extensions.commonSuffix
 import com.github.andrewkuryan.forge.extensions.hasIntersection
+import kotlin.jvm.JvmName
 
 fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
     val newNSA = NSA<N>()
@@ -67,7 +68,10 @@ private fun <N : SyntaxNode> Guard.Stack<N>.hCombine(other: Guard.Stack<N>) =
         stackPreview = stackPreview.hCombine(other.stackPreview)
     )
 
+@JvmName("hCombineInputSlice")
 private fun InputSlice.hCombine(other: InputSlice) = commonPrefix(this, other)
+
+@JvmName("hCombineStackSlice")
 private fun StackSlice.hCombine(other: StackSlice) = commonSuffix(this, other)
 
 private fun Guard.Meaningful<*>.canHCombine(other: Guard.Meaningful<*>) =
@@ -85,8 +89,10 @@ private fun Guard.Input<*>.canHCombine(other: Guard.Input<*>) = input == other.i
 private fun Guard.Stack<*>.canHCombine(other: Guard.Stack<*>) =
     stack == other.stack && rollupTarget == other.rollupTarget && semanticAction == other.semanticAction
 
+@JvmName("canHCombineInputSlice")
 private fun InputSlice.canHCombine(other: InputSlice) =
     isEmpty() || other.isEmpty() || commonPrefix(this, other).isNotEmpty()
 
+@JvmName("canHCombineStackSlice")
 private fun StackSlice.canHCombine(other: StackSlice) =
     isEmpty() || other.isEmpty() || commonSuffix(this, other).isNotEmpty()

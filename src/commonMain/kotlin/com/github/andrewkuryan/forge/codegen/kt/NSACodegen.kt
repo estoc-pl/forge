@@ -4,6 +4,7 @@ import kotlin.reflect.KClass
 import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.Formatter
+import kotlin.jvm.JvmName
 
 object NSACodegen : Formatter {
 
@@ -41,8 +42,16 @@ object NSACodegen : Formatter {
         ).filter { it.isNotEmpty() }.joinToString(",", "(", ")")
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatInputSlice")
     override fun InputSlice.format() = "listOf(${joinToString(",") { it.format() }})"
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatStackSlice")
     override fun StackSlice.format() = "listOf(${joinToString(",") { it.format() }})"
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatStackPush")
     override fun StackPush.format() = "listOf(${joinToString(",") { it.format() }})"
 
     override fun InputSignal.format() = when (this) {
@@ -65,9 +74,15 @@ object NSACodegen : Formatter {
 
     override fun SemanticAction<*>?.format() = if (this == null) "null" else "SemanticAction(\"${name}\",::${name})"
 
+    @JvmName("formatInputSliceNamedArg")
     private fun InputSlice.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
+
+    @JvmName("formatStackSliceNamedArg")
     private fun StackSlice.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
+
+    @JvmName("formatStackPushNamedArg")
     private fun StackPush.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
+
     private fun StackSignal.Preview.formatNamedArg(name: String) = "$name=${format()}"
     private fun SemanticAction<*>?.formatNamedArg(name: String) = if (this == null) "" else "$name=${format()}"
 }

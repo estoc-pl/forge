@@ -3,6 +3,7 @@ package com.github.andrewkuryan.forge.automata.format
 import kotlin.reflect.KClass
 import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
+import kotlin.jvm.JvmName
 
 object DefaultFormatter : Formatter {
 
@@ -13,7 +14,7 @@ object DefaultFormatter : Formatter {
     |    F = ${finalStates.joinToString(", ", "{", "}") { it.format() }}
     |)""".trimMargin()
 
-    override fun State.format() = "S${index}"
+    override fun State.format() = "Q${index}"
 
     override fun MeaningfulTransition<*>.format() = "${source.format()} -> ${guard.format()} -> ${target.format()}"
 
@@ -22,8 +23,16 @@ object DefaultFormatter : Formatter {
         is Guard.Stack -> "⟨${inputPreview.format()}⟩, ${stack.format()}⟨${stackPreview.format()}⟩ / ${combinedPushFormat()}"
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatInputSlice")
     override fun InputSlice.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatStackSlice")
     override fun StackSlice.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("formatStackPush")
     override fun StackPush.format() = if (isEmpty()) "ε" else joinToString("") { it.format() }
 
     override fun InputSignal.format() = when (this) {

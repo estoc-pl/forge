@@ -26,5 +26,9 @@ kotlin {
         commonTest.dependencies {
             implementation("org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion")
         }
+
+        jvmTest.dependencies {
+            implementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+        }
     }
 }
