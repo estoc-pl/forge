@@ -2,6 +2,7 @@ package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.*
 import com.github.andrewkuryan.forgeKit.transition.InputSignal
+import com.github.andrewkuryan.forgeKit.transition.SemanticAction
 import com.github.andrewkuryan.forgeKit.transition.StackSignal
 
 fun RegExp.asStackSignal() = StackSignal.Marker(this.toString())
@@ -18,3 +19,8 @@ fun NegatableRegexp.asInputSignal(): InputSignal.Unitary =
         is RegExp.Symbol -> InputSignal.Symbol(value)
         is RegExp.Range -> InputSignal.Range(value)
     }
+
+fun <A : Any> EvaluationRule<A>.asSemanticAction() = SemanticAction(
+    name = this.name,
+    handler = this.handler
+)

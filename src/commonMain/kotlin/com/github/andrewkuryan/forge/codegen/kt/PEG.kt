@@ -5,7 +5,7 @@ import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.format.format
 
-fun NSA<*>.generatePEGTable(nodeType: KClass<*> = SyntaxNode::class) =
+fun NSA<*>.generatePEGTable(nodeType: KClass<*> = EmptyNode::class) =
     """val initState = ${initState.format(NSACodegen)}
     |val finalStates = setOf(${finalStates.joinToString(",") { it.format(NSACodegen) }})
     |val transitions = mapOf<State, List<Pair<Guard.Meaningful<${nodeType.simpleName}>, State>>>(

@@ -1,12 +1,12 @@
 package com.github.andrewkuryan.forge.utils
 
+import com.github.andrewkuryan.forgeKit.transition.EmptyNode
 import com.github.andrewkuryan.forgeKit.transition.Guard
 import com.github.andrewkuryan.forgeKit.transition.InputSignal
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forgeKit.transition.StackSignal
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
-    Guard.Input<SyntaxNode>(
+    Guard.Input<EmptyNode>(
         input = listOf(InputSignal.Symbol(input)),
         stackPreview = parseStackSignals(stackPreview),
         stackPushBefore = parseStackPush(stackPushBefore),
@@ -14,7 +14,7 @@ fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackP
     )
 
 fun read(input: String, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
-    Guard.Input<SyntaxNode>(
+    Guard.Input<EmptyNode>(
         input = parseInputSignals(input),
         stackPreview = parseStackSignals(stackPreview),
         stackPushBefore = parseStackPush(stackPushBefore),
@@ -27,7 +27,7 @@ fun rollup(
     target: String,
     stackPushBefore: String = "",
     stackPushAfter: String = "",
-) = Guard.Stack<SyntaxNode>(
+) = Guard.Stack<EmptyNode>(
     stack = parseStackSignals(stack),
     rollupTarget = StackSignal.NodeView(target),
     stackPreview = parseStackSignals(stackPreview),
@@ -36,7 +36,7 @@ fun rollup(
 )
 
 fun exit(stackPreview: String) =
-    Guard.Input<SyntaxNode>(input = listOf(InputSignal.EOI), stackPreview = parseStackSignals(stackPreview))
+    Guard.Input<EmptyNode>(input = listOf(InputSignal.EOI), stackPreview = parseStackSignals(stackPreview))
 
 private typealias Transformer<T> = Pair<Regex, (IntRange, String) -> T>
 

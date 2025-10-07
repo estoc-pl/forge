@@ -7,7 +7,7 @@ import com.github.andrewkuryan.forge.extensions.commonSuffix
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 import kotlin.jvm.JvmName
 
-fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
+fun <N : Any> NSA<N>.leftFactorize(): NSA<N> {
     val newNSA = NSA<N>()
 
     val queue = mutableListOf(setOf(initState) to newNSA.initState)
@@ -49,20 +49,20 @@ fun <N : SyntaxNode> NSA<N>.leftFactorize(): NSA<N> {
     return newNSA
 }
 
-private fun <N : SyntaxNode> Guard.Meaningful<N>.hCombine(other: Guard.Meaningful<N>): Guard.Meaningful<N> =
+private fun <N: Any> Guard.Meaningful<N>.hCombine(other: Guard.Meaningful<N>): Guard.Meaningful<N> =
     when {
         this is Guard.Input && other is Guard.Input -> hCombine(other)
         this is Guard.Stack && other is Guard.Stack -> hCombine(other)
         else -> throw Exception("Cannot combine transitions of different types")
     }
 
-private fun <N : SyntaxNode> Guard.Input<N>.hCombine(other: Guard.Input<N>) =
+private fun <N: Any> Guard.Input<N>.hCombine(other: Guard.Input<N>) =
     copy(
         inputPreview = inputPreview.hCombine(other.inputPreview),
         stackPreview = stackPreview.hCombine(other.stackPreview)
     )
 
-private fun <N : SyntaxNode> Guard.Stack<N>.hCombine(other: Guard.Stack<N>) =
+private fun <N: Any> Guard.Stack<N>.hCombine(other: Guard.Stack<N>) =
     copy(
         inputPreview = inputPreview.hCombine(other.inputPreview),
         stackPreview = stackPreview.hCombine(other.stackPreview)

@@ -2,7 +2,6 @@ package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.Nonterminal
 import com.github.andrewkuryan.forgeKit.transition.State
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.ENSA
 import com.github.andrewkuryan.forge.automata.NSA
 
@@ -14,7 +13,7 @@ open class Ports<A : ENSA<*, *>>(protected val nsa: A, nonterms: Set<Nonterminal
     fun getExit(nonterm: Nonterminal) = ports.getValue(nonterm).exit
 }
 
-class NSAPorts<N : SyntaxNode>(nsa: NSA<N>, nonterms: Set<Nonterminal>) : Ports<NSA<N>>(nsa, nonterms) {
+class NSAPorts<N : Any>(nsa: NSA<N>, nonterms: Set<Nonterminal>) : Ports<NSA<N>>(nsa, nonterms) {
 
     private fun mergeStates(state1: State, state2: State) {
         if (state1 != state2) {

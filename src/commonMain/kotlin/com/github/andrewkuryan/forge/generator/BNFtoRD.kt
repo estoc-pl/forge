@@ -6,13 +6,12 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.optimization.applyHopcroft
 import com.github.andrewkuryan.forge.automata.optimization.leftFactorize
 import com.github.andrewkuryan.forge.automata.optimization.removeEmptyTransitions
-import com.github.andrewkuryan.forge.extensions.grammar.ParserGrammar
 
-fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
+fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<P>>,
-    ports: Ports<ENSA<N, Transition<N>>>,
-    getProductionAction: (P) -> SemanticAction<N>?,
+    ports: Ports<ENSA<A, Transition<A>>>,
+    getProductionAction: (P) -> EvaluationRule<A>?,
 ) {
     productions.getValue(nonterm).forEach { production ->
         val lastStates = production.symbols
@@ -53,7 +52,7 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
                     Guard.Stack(
                         rollupTarget = StackSignal.NodeView(nonterm.name),
                         stack = stackPreview.reversed(),
-                        semanticAction = getProductionAction(production)
+                        semanticAction = getProductionAction(production)?.asSemanticAction()
                     )
                 )
             }
@@ -61,8 +60,8 @@ fun <N : SyntaxNode, P : Production> ENSA<N, Transition<N>>.processNonterm(
     }
 }
 
-fun <N : SyntaxNode> ParserGrammar<N>.buildRDParser(): NSA<N> {
-    val ensa = ENSA<N, Transition<N>>()
+fun <A : Any> AttributeGrammar<A>.buildRDParser(): NSA<A> {
+    val ensa = ENSA<A, Transition<A>>()
 
     val ports = Ports(ensa, productions.keys)
 
@@ -73,8 +72,8 @@ fun <N : SyntaxNode> ParserGrammar<N>.buildRDParser(): NSA<N> {
     return ensa.wrapAndOptimize(ports, startSymbol)
 }
 
-fun Grammar.buildRDParser(): NSA<SyntaxNode> {
-    val ensa = ENSA<SyntaxNode, Transition<SyntaxNode>>()
+fun Grammar.buildRDParser(): NSA<EmptyNode> {
+    val ensa = ENSA<EmptyNode, Transition<EmptyNode>>()
 
     val ports = Ports(ensa, productions.keys)
 
@@ -85,7 +84,7 @@ fun Grammar.buildRDParser(): NSA<SyntaxNode> {
     return ensa.wrapAndOptimize(ports, startSymbol)
 }
 
-private fun <N : SyntaxNode> ENSA<N, Transition<N>>.wrapAndOptimize(
+private fun <N : Any> ENSA<N, Transition<N>>.wrapAndOptimize(
     ports: Ports<ENSA<N, Transition<N>>>,
     startSymbol: Nonterminal,
 ): NSA<N> {

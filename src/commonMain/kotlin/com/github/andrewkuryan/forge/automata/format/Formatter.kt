@@ -7,7 +7,7 @@ import kotlin.jvm.JvmName
 
 interface Formatter {
 
-    fun NSA<*>.format(nodeType: KClass<*> = SyntaxNode::class): String
+    fun NSA<*>.format(nodeType: KClass<*> = EmptyNode::class): String
     fun State.format(): String
 
     fun MeaningfulTransition<*>.format(): String
@@ -31,7 +31,7 @@ interface Formatter {
     fun SemanticAction<*>?.format(): String
 }
 
-fun NSA<*>.format(formatter: Formatter = DefaultFormatter, nodeType: KClass<*> = SyntaxNode::class) =
+fun NSA<*>.format(formatter: Formatter = DefaultFormatter, nodeType: KClass<*> = EmptyNode::class) =
     with(formatter) { format(nodeType) }
 
 fun State.format(formatter: Formatter = DefaultFormatter) = with(formatter) { format() }

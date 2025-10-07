@@ -5,7 +5,7 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 import com.github.andrewkuryan.forge.extensions.minOfSize
 
-fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
+fun <N : Any> NSA<N>.applyHopcroft(): NSA<N> {
     var finalSets = setOf(finalStates, states - finalStates)
     var currentSets = setOf(finalStates, states - finalStates)
 
@@ -57,7 +57,7 @@ fun <N : SyntaxNode> NSA<N>.applyHopcroft(): NSA<N> {
     return newNSA
 }
 
-private data class Behaviour<N : SyntaxNode>(
+private data class Behaviour<N : Any>(
     val input: InputSlice,
     val stack: StackSlice,
     val inputPreview: InputSlice,
@@ -66,7 +66,7 @@ private data class Behaviour<N : SyntaxNode>(
     val semanticAction: SemanticAction<N>?,
 )
 
-private fun <N : SyntaxNode> Guard.Meaningful<N>.getBehavior(): Behaviour<N> =
+private fun <N : Any> Guard.Meaningful<N>.getBehavior(): Behaviour<N> =
     when (this) {
         is Guard.Input -> Behaviour(
             input, emptyList(),

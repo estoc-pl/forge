@@ -3,11 +3,10 @@ package com.github.andrewkuryan.forge.automata.optimization
 import com.github.andrewkuryan.forgeKit.transition.EmptyTransition
 import com.github.andrewkuryan.forgeKit.transition.MeaningfulTransition
 import com.github.andrewkuryan.forgeKit.transition.State
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
-private fun <N : SyntaxNode> ENSA<N, *>.eClosure(current: Set<State>, visited: Set<State> = current): Set<State> =
+private fun <N : Any> ENSA<N, *>.eClosure(current: Set<State>, visited: Set<State> = current): Set<State> =
     current
         .flatMap { state -> getOutTransitions(state).filterIsInstance<EmptyTransition<*>>().map { it.target } }
         .filter { it !in visited }
@@ -15,12 +14,12 @@ private fun <N : SyntaxNode> ENSA<N, *>.eClosure(current: Set<State>, visited: S
         ?.toSet()
         ?.let { eClosure(it, visited + it) } ?: visited
 
-private fun <N : SyntaxNode> ENSA<N, *>.meaningfulClosure(start: State): Set<State> =
+private fun <N : Any> ENSA<N, *>.meaningfulClosure(start: State): Set<State> =
     eClosure(setOf(start))
         .filter { state -> state in finalStates || getOutTransitions(state).any { it !is EmptyTransition } }
         .toSet()
 
-fun <N : SyntaxNode> ENSA<N, *>.removeEmptyTransitions(): NSA<N> {
+fun <N : Any> ENSA<N, *>.removeEmptyTransitions(): NSA<N> {
     val newNSA = NSA<N>()
     val initialClosure = meaningfulClosure(initState)
 

@@ -5,9 +5,9 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import com.github.andrewkuryan.forgeKit.transition.Guard
 import com.github.andrewkuryan.forgeKit.transition.State
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.format
+import com.github.andrewkuryan.forgeKit.transition.EmptyNode
 
 class StateRef(var value: State? = null) {
 
@@ -17,13 +17,13 @@ class StateRef(var value: State? = null) {
 fun NSA<*>.assertTransitions(
     initRef: StateRef,
     finalRef: StateRef,
-    transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
+    transitions: Map<StateRef, List<Pair<Guard.Meaningful<EmptyNode>, StateRef>>>,
 ) = assertTransitions(initRef, listOf(finalRef), transitions)
 
 fun NSA<*>.assertTransitions(
     initRef: StateRef,
     finalRefs: List<StateRef>,
-    transitions: Map<StateRef, List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>>,
+    transitions: Map<StateRef, List<Pair<Guard.Meaningful<EmptyNode>, StateRef>>>,
 ) {
     initRef.value = initState
 
@@ -45,7 +45,7 @@ fun NSA<*>.assertTransitions(
     }
 }
 
-fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<Guard.Meaningful<SyntaxNode>, StateRef>>) {
+fun NSA<*>.assertTransitions(source: State, transitions: List<Pair<Guard.Meaningful<EmptyNode>, StateRef>>) {
     assertEquals(
         transitions.size,
         getOutTransitions(source).size,

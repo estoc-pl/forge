@@ -2,13 +2,12 @@ package com.github.andrewkuryan.forge.automata
 
 import com.github.andrewkuryan.forgeKit.transition.State
 import com.github.andrewkuryan.forgeKit.transition.Transition
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forgeKit.transition.MeaningfulTransition
 import com.github.andrewkuryan.forge.extensions.hasIntersection
 
 typealias TransitionTable<T> = MutableMap<State, MutableSet<T>>
 
-open class ENSA<N : SyntaxNode, T : Transition<N>> {
+open class ENSA<N : Any, T : Transition<N>> {
     private var internalInitState = State(0)
     val initState: State get() = internalInitState
 
@@ -81,7 +80,7 @@ open class ENSA<N : SyntaxNode, T : Transition<N>> {
     }
 }
 
-class NSA<N : SyntaxNode> : ENSA<N, MeaningfulTransition<N>>() {
+class NSA<N: Any> : ENSA<N, MeaningfulTransition<N>>() {
 
     @Throws(MultipleInitStatesException::class)
     fun createMergedState(states: Set<State>): State =

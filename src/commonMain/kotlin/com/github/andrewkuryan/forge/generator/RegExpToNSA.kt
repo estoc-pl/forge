@@ -6,7 +6,7 @@ import com.github.andrewkuryan.BNF.RegExp
 import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 
-fun <N : SyntaxNode> ENSA<N, Transition<N>>.processAtomicRegExp(
+fun <N : Any> ENSA<N, Transition<N>>.processAtomicRegExp(
     regexp: AtomicRegexp,
     marker: StackSignal.Marker?,
 ): Port {
@@ -26,7 +26,7 @@ fun <N : SyntaxNode> ENSA<N, Transition<N>>.processAtomicRegExp(
     return port
 }
 
-fun <N : SyntaxNode> ENSA<N, Transition<N>>.processBaseRegExp(regexp: BaseRegexp, marker: StackSignal.Marker?): Port =
+fun <N : Any> ENSA<N, Transition<N>>.processBaseRegExp(regexp: BaseRegexp, marker: StackSignal.Marker?): Port =
     when (regexp) {
         is AtomicRegexp -> processAtomicRegExp(regexp, marker)
 
@@ -50,12 +50,12 @@ fun <N : SyntaxNode> ENSA<N, Transition<N>>.processBaseRegExp(regexp: BaseRegexp
         }
     }
 
-fun <N : SyntaxNode> ENSA<N, Transition<N>>.createEPort() =
+fun <N : Any> ENSA<N, Transition<N>>.createEPort() =
     Port(nextState(), nextState()).apply {
         addTransition(EmptyTransition(entry, exit))
     }
 
-fun <N : SyntaxNode> ENSA<N, Transition<N>>.processRegExp(regexp: RegExp): List<Pair<Port, StackSignal.Marker?>> =
+fun <N : Any> ENSA<N, Transition<N>>.processRegExp(regexp: RegExp): List<Pair<Port, StackSignal.Marker?>> =
     when (regexp) {
         is BaseRegexp -> regexp.asStackSignal().let { marker -> listOf(processBaseRegExp(regexp, marker) to marker) }
         is RegExp.ε -> listOf(createEPort() to null)

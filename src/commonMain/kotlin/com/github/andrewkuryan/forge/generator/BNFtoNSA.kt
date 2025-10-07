@@ -5,7 +5,7 @@ import com.github.andrewkuryan.forgeKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.removeSuffix
 
-fun NSA<SyntaxNode>.addRollupTransitions(
+fun NSA<EmptyNode>.addRollupTransitions(
     rollupTop: StackSlice,
     rollupTarget: StackSignal.NodeView,
     source: State,
@@ -20,7 +20,7 @@ fun NSA<SyntaxNode>.addRollupTransitions(
     }
 )
 
-fun NSA<SyntaxNode>.addReadTransitions(
+fun NSA<EmptyNode>.addReadTransitions(
     input: InputSlice,
     source: State,
     target: State,
@@ -31,10 +31,10 @@ fun NSA<SyntaxNode>.addReadTransitions(
     }
 )
 
-fun NSA<SyntaxNode>.processNonterm(
+fun NSA<EmptyNode>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<Production>>,
-    ports: NSAPorts<SyntaxNode>,
+    ports: NSAPorts<EmptyNode>,
     prefixes: Map<Nonterminal, Set<Prefix>>,
 ) {
     productions.getValue(nonterm).forEach { production ->
@@ -77,7 +77,7 @@ fun NSA<SyntaxNode>.processNonterm(
     }
 }
 
-fun Grammar.buildNSAParser() = NSA<SyntaxNode>().apply {
+fun Grammar.buildNSAParser() = NSA<EmptyNode>().apply {
     val prefixes = collectPrefixes()
 
     val ports = NSAPorts(this, productions.keys)

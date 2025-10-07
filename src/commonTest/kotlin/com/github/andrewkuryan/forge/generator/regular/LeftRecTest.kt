@@ -3,11 +3,11 @@ package com.github.andrewkuryan.forge.generator.regular
 import com.github.andrewkuryan.BNF.Grammar
 import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
-import com.github.andrewkuryan.forgeKit.transition.SyntaxNode
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.utils.GrammarTest
+import com.github.andrewkuryan.forgeKit.transition.EmptyNode
 
-abstract class LeftRecTest(buildNSA: Grammar.() -> NSA<SyntaxNode>) : GrammarTest(buildNSA) {
+abstract class LeftRecTest(buildNSA: Grammar.() -> NSA<EmptyNode>) : GrammarTest(buildNSA) {
 
     protected val `S → Sa ⏐ b` = grammar {
         S /= S..'a' / 'b'
