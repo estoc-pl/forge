@@ -11,7 +11,7 @@ fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<P>>,
     ports: Ports<ENSA<A, Transition<A>>>,
-    getProductionAction: (P) -> EvaluationRule<A>?,
+    getProductionAction: (P) -> SemanticAction<A>?,
 ) {
     productions.getValue(nonterm).forEach { production ->
         val lastStates = production.symbols
@@ -52,7 +52,7 @@ fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
                     Guard.Stack(
                         rollupTarget = StackSignal.NodeView(nonterm.name),
                         stack = stackPreview.reversed(),
-                        semanticAction = getProductionAction(production)?.asSemanticAction()
+                        semanticAction = getProductionAction(production)
                     )
                 )
             }
@@ -60,13 +60,13 @@ fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
     }
 }
 
-fun <A : Any> AttributeGrammar<A>.buildRDParser(): NSA<A> {
+fun <A : Any> AttributeGrammar<A>.buildRDParser(evaluationToSemanticAction: (Evaluation<A>) -> SemanticAction<A>?): NSA<A> {
     val ensa = ENSA<A, Transition<A>>()
 
     val ports = Ports(ensa, productions.keys)
 
     for (nonterm in productions.keys) {
-        ensa.processNonterm(nonterm, productions, ports) { it.action }
+        ensa.processNonterm(nonterm, productions, ports) { it.evaluation?.let(evaluationToSemanticAction) }
     }
 
     return ensa.wrapAndOptimize(ports, startSymbol)

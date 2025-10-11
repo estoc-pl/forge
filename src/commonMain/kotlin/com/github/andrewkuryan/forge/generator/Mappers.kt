@@ -19,8 +19,3 @@ fun NegatableRegexp.asInputSignal(): InputSignal.Unitary =
         is RegExp.Symbol -> InputSignal.Symbol(value)
         is RegExp.Range -> InputSignal.Range(value)
     }
-
-fun <A : Any> EvaluationRule<A>.asSemanticAction() = SemanticAction(
-    name = this.name,
-    handler = this.handler
-)

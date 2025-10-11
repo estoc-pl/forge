@@ -72,7 +72,11 @@ object NSACodegen : Formatter {
         is StackSignal.Marker -> "StackSignal.Marker(\"${name}\")"
     }
 
-    override fun SemanticAction<*>?.format() = if (this == null) "null" else "SemanticAction(\"${name}\",::${name})"
+    override fun SemanticAction<*>?.format() = when (this) {
+        is SemanticAction.Live -> "null"
+        is SemanticAction.Serialized -> callExpression
+        null -> "null"
+    }
 
     @JvmName("formatInputSliceNamedArg")
     private fun InputSlice.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
