@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.codegen.kt
 
 import kotlin.reflect.KClass
-import com.github.andrewkuryan.forgeKit.transition.*
+import com.github.andrewkuryan.forge.parserKit.transition.*
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.format.format
 

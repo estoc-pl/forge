@@ -1,7 +1,7 @@
 package com.github.andrewkuryan.forge.generator
 
 import com.github.andrewkuryan.BNF.Nonterminal
-import com.github.andrewkuryan.forgeKit.transition.State
+import com.github.andrewkuryan.forge.parserKit.transition.State
 import com.github.andrewkuryan.forge.automata.ENSA
 import com.github.andrewkuryan.forge.automata.NSA
 

@@ -1,9 +1,9 @@
 package com.github.andrewkuryan.forge.utils
 
-import com.github.andrewkuryan.forgeKit.transition.EmptyNode
-import com.github.andrewkuryan.forgeKit.transition.Guard
-import com.github.andrewkuryan.forgeKit.transition.InputSignal
-import com.github.andrewkuryan.forgeKit.transition.StackSignal
+import com.github.andrewkuryan.forge.parserKit.transition.EmptyNode
+import com.github.andrewkuryan.forge.parserKit.transition.Guard
+import com.github.andrewkuryan.forge.parserKit.transition.InputSignal
+import com.github.andrewkuryan.forge.parserKit.transition.StackSignal
 
 fun read(input: Char, stackPreview: String, stackPushBefore: String = "", stackPushAfter: String = "") =
     Guard.Input<EmptyNode>(

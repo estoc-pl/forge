@@ -1,6 +1,6 @@
 package com.github.andrewkuryan.forge.automata.optimization
 
-import com.github.andrewkuryan.forgeKit.transition.*
+import com.github.andrewkuryan.forge.parserKit.transition.*
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.extensions.commonPrefix
 import com.github.andrewkuryan.forge.extensions.commonSuffix

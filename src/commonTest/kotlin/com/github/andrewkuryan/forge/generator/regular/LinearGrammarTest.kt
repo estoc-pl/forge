@@ -5,7 +5,7 @@ import com.github.andrewkuryan.BNF.Grammar.Companion.S
 import com.github.andrewkuryan.BNF.grammar
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.utils.GrammarTest
-import com.github.andrewkuryan.forgeKit.transition.EmptyNode
+import com.github.andrewkuryan.forge.parserKit.transition.EmptyNode
 
 abstract class LinearGrammarTest(buildNSA: Grammar.() -> NSA<EmptyNode>) : GrammarTest(buildNSA) {
 

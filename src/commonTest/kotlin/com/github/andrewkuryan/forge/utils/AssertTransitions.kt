@@ -3,11 +3,11 @@ package com.github.andrewkuryan.forge.utils
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
-import com.github.andrewkuryan.forgeKit.transition.Guard
-import com.github.andrewkuryan.forgeKit.transition.State
+import com.github.andrewkuryan.forge.parserKit.transition.Guard
+import com.github.andrewkuryan.forge.parserKit.transition.State
 import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.format
-import com.github.andrewkuryan.forgeKit.transition.EmptyNode
+import com.github.andrewkuryan.forge.parserKit.transition.EmptyNode
 
 class StateRef(var value: State? = null) {
 
