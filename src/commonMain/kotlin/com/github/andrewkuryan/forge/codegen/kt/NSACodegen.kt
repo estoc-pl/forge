@@ -6,7 +6,7 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.format.Formatter
 import kotlin.jvm.JvmName
 
-object NSACodegen : Formatter {
+class NSACodegen(private val formatSemanticAction: (SemanticAction<*, *>?) -> String) : Formatter {
 
     override fun NSA<*>.format(nodeType: KClass<*>) = """val initState = ${initState.format()}
     |val finalStates = setOf(${finalStates.joinToString(",") { it.format() }})
@@ -72,12 +72,6 @@ object NSACodegen : Formatter {
         is StackSignal.Marker -> "StackSignal.Marker(\"${name}\")"
     }
 
-    override fun SemanticAction<*>?.format() = when (this) {
-        is SemanticAction.Live -> "null"
-        is SemanticAction.Serialized -> callExpression
-        null -> "null"
-    }
-
     @JvmName("formatInputSliceNamedArg")
     private fun InputSlice.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
 
@@ -88,5 +82,5 @@ object NSACodegen : Formatter {
     private fun StackPush.formatNamedArg(name: String) = if (isEmpty()) "" else "$name=${format()}"
 
     private fun StackSignal.Preview.formatNamedArg(name: String) = "$name=${format()}"
-    private fun SemanticAction<*>?.formatNamedArg(name: String) = if (this == null) "" else "$name=${format()}"
+    private fun SemanticAction<*, *>?.formatNamedArg(name: String) = "$name=${formatSemanticAction(this)}"
 }

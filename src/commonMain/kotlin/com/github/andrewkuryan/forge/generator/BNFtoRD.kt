@@ -6,12 +6,13 @@ import com.github.andrewkuryan.forge.automata.*
 import com.github.andrewkuryan.forge.automata.optimization.applyHopcroft
 import com.github.andrewkuryan.forge.automata.optimization.leftFactorize
 import com.github.andrewkuryan.forge.automata.optimization.removeEmptyTransitions
+import com.github.andrewkuryan.forge.grammarKit.RDGrammar
 
 fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
     nonterm: Nonterminal,
     productions: Map<Nonterminal, Set<P>>,
     ports: Ports<ENSA<A, Transition<A>>>,
-    getProductionAction: (P) -> SemanticAction<A>?,
+    getProductionAction: (P) -> SemanticAction<A, *>?,
 ) {
     productions.getValue(nonterm).forEach { production ->
         val lastStates = production.symbols
@@ -60,13 +61,13 @@ fun <A : Any, P : Production> ENSA<A, Transition<A>>.processNonterm(
     }
 }
 
-fun <A : Any> AttributeGrammar<A>.buildRDParser(evaluationToSemanticAction: (Evaluation<A>) -> SemanticAction<A>?): NSA<A> {
+fun <A : Any> RDGrammar<A, *>.buildRDParser(): NSA<A> {
     val ensa = ENSA<A, Transition<A>>()
 
     val ports = Ports(ensa, productions.keys)
 
     for (nonterm in productions.keys) {
-        ensa.processNonterm(nonterm, productions, ports) { it.evaluation?.let(evaluationToSemanticAction) }
+        ensa.processNonterm(nonterm, productions, ports) { it.action }
     }
 
     return ensa.wrapAndOptimize(ports, startSymbol)

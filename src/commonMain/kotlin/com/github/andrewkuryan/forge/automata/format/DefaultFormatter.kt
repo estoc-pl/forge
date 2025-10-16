@@ -57,12 +57,6 @@ object DefaultFormatter : Formatter {
         is StackSignal.Marker -> "⁅$name⁆"
     }
 
-    override fun SemanticAction<*>?.format() = when (this) {
-        is SemanticAction.Live -> "(<source code>)"
-        is SemanticAction.Serialized -> "($callExpression)"
-        null -> ""
-    }
-
     fun Guard.Meaningful<*>.combinedPushFormat() = when (this) {
         is Guard.Input -> "${stackPushBefore.format()}|${stackPushAfter.format()}"
         is Guard.Stack -> "${stackPushBefore.format()}|${rollupTarget.format()}|${stackPushAfter.format()}"

@@ -5,24 +5,35 @@ import com.github.andrewkuryan.forge.parserKit.transition.*
 import com.github.andrewkuryan.forge.automata.NSA
 import com.github.andrewkuryan.forge.automata.format.format
 
-fun NSA<*>.generatePEGTable(nodeType: KClass<*> = EmptyNode::class) =
-    """val initState = ${initState.format(NSACodegen)}
-    |val finalStates = setOf(${finalStates.joinToString(",") { it.format(NSACodegen) }})
-    |val transitions = mapOf<State, List<Pair<Guard.Meaningful<${nodeType.simpleName}>, State>>>(
-    |${generateTransitions()}
-    |)""".trimMargin()
+private const val CONTAINER_ARG_NAME = "container"
 
-private fun NSA<*>.generateTransitions() = states
+fun NSA<*>.generatePEGTable(nodeType: KClass<*> = EmptyNode::class, containerType: KClass<*> = Unit::class) =
+    NSACodegen(::formatSemanticAction).let { nsaCodegen ->
+        """PEGTable<${nodeType.simpleName}, ${containerType.simpleName}>(
+        |   ${initState.format(nsaCodegen)},
+        |   setOf(${finalStates.joinToString(",") { it.format(nsaCodegen) }}),
+        |) { $CONTAINER_ARG_NAME -> mapOf(
+        |   ${generateTransitions(nsaCodegen)}
+        |) }""".trimMargin()
+    }
+
+private fun NSA<*>.generateTransitions(nsaCodegen: NSACodegen) = states
     .map { it to getOutTransitions(it).sortedWith(TransitionComparator) }
     .filter { it.second.isNotEmpty() }
     .joinToString(",\n") { (source, transitions) ->
-        "\t${source.format(NSACodegen)} to listOf" + transitions
+        "\t${source.format(nsaCodegen)} to listOf" + transitions
             .joinToString(",\n\t\t", "(\n\t\t", "\n\t)") {
-                "Pair(${it.guard.format(NSACodegen)},${it.target.format(NSACodegen)})"
+                "Pair(${it.guard.format(nsaCodegen)},${it.target.format(nsaCodegen)})"
             }
     }
 
-private object TransitionComparator : Comparator<MeaningfulTransition<*>> {
+private fun formatSemanticAction(action: SemanticAction<*, *>?) = when (action) {
+    is SemanticAction.Value -> "null"
+    is SemanticAction.Ref -> "$CONTAINER_ARG_NAME.${action.path}"
+    null -> "null"
+}
+
+object TransitionComparator : Comparator<MeaningfulTransition<*>> {
 
     override fun compare(a: MeaningfulTransition<*>, b: MeaningfulTransition<*>) =
         when (val aGuard = a.guard) {

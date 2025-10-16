@@ -63,7 +63,7 @@ private data class Behaviour<N : Any>(
     val inputPreview: InputSlice,
     val stackSlice: StackSlice,
     val combinedStackPush: List<StackSignal.Preview>,
-    val semanticAction: SemanticAction<N>?,
+    val semanticAction: SemanticAction<N, *>?,
 )
 
 private fun <N : Any> Guard.Meaningful<N>.getBehavior(): Behaviour<N> =

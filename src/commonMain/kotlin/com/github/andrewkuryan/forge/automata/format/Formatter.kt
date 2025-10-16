@@ -27,8 +27,6 @@ interface Formatter {
 
     fun InputSignal.format(): String
     fun StackSignal.Preview.format(): String
-
-    fun SemanticAction<*>?.format(): String
 }
 
 fun NSA<*>.format(formatter: Formatter = DefaultFormatter, nodeType: KClass<*> = EmptyNode::class) =
@@ -50,5 +48,3 @@ fun StackPush.format(formatter: Formatter = DefaultFormatter) = with(formatter) 
 
 fun InputSignal.format(formatter: Formatter = DefaultFormatter) = with(formatter) { format() }
 fun StackSignal.Preview.format(formatter: Formatter = DefaultFormatter) = with(formatter) { format() }
-
-fun SemanticAction<*>?.format(formatter: Formatter = DefaultFormatter) = with(formatter) { format() }
