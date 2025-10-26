@@ -9,7 +9,7 @@ private const val CONTAINER_ARG_NAME = "container"
 
 fun NSA<*>.generatePEGTable(nodeType: KClass<*> = EmptyNode::class, containerType: KClass<*> = Unit::class) =
     NSACodegen(::formatSemanticAction).let { nsaCodegen ->
-        """PEGTable<${nodeType.simpleName}, ${containerType.simpleName}>(
+        """PEGConfig<${nodeType.simpleName}, ${containerType.simpleName}>(
         |   ${initState.format(nsaCodegen)},
         |   setOf(${finalStates.joinToString(",") { it.format(nsaCodegen) }}),
         |) { $CONTAINER_ARG_NAME -> mapOf(
